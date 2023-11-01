@@ -1,0 +1,7 @@
+{
+  "env": {
+    "MONGO_USER": "devsolution902",
+    "MONGO_PASSWORD": "DDR123456789!",
+    "MONGO_DB": "db_receipt"
+  }
+}
