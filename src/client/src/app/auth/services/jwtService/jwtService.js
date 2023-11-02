@@ -114,10 +114,10 @@ class JwtService extends FuseUtils.EventEmitter {
 
   setSession = (access_token) => {
     if (access_token) {
-      localStorage.setItem('jwt_access_token', access_token);
+      localStorage.setItem('remember_user_token', access_token);
       axios.defaults.headers.common.Authorization = `Bearer ${access_token}`;
     } else {
-      localStorage.removeItem('jwt_access_token');
+      localStorage.removeItem('remember_user_token');
       delete axios.defaults.headers.common.Authorization;
     }
   };
@@ -142,7 +142,7 @@ class JwtService extends FuseUtils.EventEmitter {
   };
 
   getAccessToken = () => {
-    return window.localStorage.getItem('jwt_access_token');
+    return window.localStorage.getItem('remember_user_token');
   };
 }
 
