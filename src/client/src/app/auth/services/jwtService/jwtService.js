@@ -122,8 +122,8 @@ class JwtService extends FuseUtils.EventEmitter {
   };
 
   updateUserData = (user) => {
-    return axios.post(jwtServiceConfig.updateUser, {
-      user,
+    return new Promise((resolve, reject) => {
+      resolve(user);
     });
   };
 
