@@ -1,14 +1,15 @@
 import axios from "axios";
-import useLocalStorage from "@fuse/hooks/useLocalStorage";
 import FuseUtils from "@fuse/utils";
 import { LocalStorageKey } from "@constants";
 
-const API = axios.create({ baseURL: process.env.REACT_APP_API });
+axios.defaults.baseURL = "http://localhost:8080";
+axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
+axios.defaults.headers.common["Content-Type"] =
+  "application/x-www-form-urlencoded";
 
-API.interceptors.request.use((req) => {
-  const [remember_token] = useLocalStorage(
-    LocalStorageKey.REMEMBER_USER_TOKEN,
-    null
+axios.interceptors.request.use((req) => {
+  const remember_token = window.localStorage.getItem(
+    LocalStorageKey.REMEMBER_USER_TOKEN
   );
   if (FuseUtils.isEmpty(remember_token)) {
     req.headers.authorization = `Bearer ${remember_token}`;

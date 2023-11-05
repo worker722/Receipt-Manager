@@ -1,69 +1,80 @@
-import { yupResolver } from '@hookform/resolvers/yup';
-import { Controller, useForm } from 'react-hook-form';
-import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import { Link } from 'react-router-dom';
-import * as yup from 'yup';
-import _ from '@lodash';
-import AvatarGroup from '@mui/material/AvatarGroup';
-import Avatar from '@mui/material/Avatar';
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
-import FormHelperText from '@mui/material/FormHelperText';
-import JwtService from 'src/app/auth/services/jwtService';
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Controller, useForm } from "react-hook-form";
+import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import { Link } from "react-router-dom";
+import * as yup from "yup";
+import _ from "@lodash";
+import AvatarGroup from "@mui/material/AvatarGroup";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import FormHelperText from "@mui/material/FormHelperText";
+import JwtService from "src/app/auth/services/jwtService";
+import { useDispatch } from "react-redux";
+import { showMessage } from "app/store/fuse/messageSlice";
 
 /**
  * Form Validation Schema
  */
 const schema = yup.object().shape({
-  displayName: yup.string().required('You must enter display name'),
-  email: yup.string().email('You must enter a valid email').required('You must enter a email'),
+  fullName: yup.string().required("You must enter display name"),
+  email: yup
+    .string()
+    .email("You must enter a valid email")
+    .required("You must enter a email"),
   password: yup
     .string()
-    .required('Please enter your password.')
-    .min(8, 'Password is too short - should be 8 chars minimum.'),
-  passwordConfirm: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match'),
-  acceptTermsConditions: yup.boolean().oneOf([true], 'The terms and conditions must be accepted.'),
+    .required("Please enter your password.")
+    .min(8, "Password is too short - should be 8 chars minimum."),
+  passwordConfirm: yup
+    .string()
+    .oneOf([yup.ref("password"), null], "Passwords must match"),
+  acceptTermsConditions: yup
+    .boolean()
+    .oneOf([true], "The terms and conditions must be accepted."),
 });
 
 const defaultValues = {
-  displayName: '',
-  email: '',
-  password: '',
-  passwordConfirm: '',
+  fullName: "",
+  email: "",
+  password: "",
+  passwordConfirm: "",
   acceptTermsConditions: false,
 };
 
 function SignUpPage() {
   const { control, formState, handleSubmit, reset } = useForm({
-    mode: 'onChange',
+    mode: "onChange",
     defaultValues,
     resolver: yupResolver(schema),
   });
 
+  const dispatch = useDispatch();
+
   const { isValid, dirtyFields, errors, setError } = formState;
 
-  function onSubmit({ displayName, password, email }) {
-    JwtService
-      .createUser({
-        displayName,
-        password,
-        email,
-      })
+  function onSubmit({ fullName, password, passwordConfirm, email }) {
+    JwtService.createUser({
+      fullName,
+      password,
+      passwordConfirm,
+      email,
+    })
       .then((user) => {
         // No need to do anything, registered user data will be set at app/auth/AuthContext
       })
       .catch((_errors) => {
-        _errors.forEach((error) => {
-          setError(error.type, {
-            type: 'manual',
-            message: error.message,
-          });
-        });
+        dispatch(
+          showMessage({
+            message: _errors.message,
+            variant: "error",
+          })
+        );
       });
   }
 
@@ -90,17 +101,18 @@ function SignUpPage() {
             onSubmit={handleSubmit(onSubmit)}
           >
             <Controller
-              name="displayName"
+              name="fullName"
               control={control}
               render={({ field }) => (
                 <TextField
                   {...field}
                   className="mb-24"
-                  label="Display name"
+                  label="Full name"
                   autoFocus
                   type="name"
-                  error={!!errors.displayName}
-                  helperText={errors?.displayName?.message}
+                  placeholder="John Doe"
+                  error={!!errors.fullName}
+                  helperText={errors?.fullName?.message}
                   variant="outlined"
                   required
                   fullWidth
@@ -166,12 +178,17 @@ function SignUpPage() {
               name="acceptTermsConditions"
               control={control}
               render={({ field }) => (
-                <FormControl className="items-center" error={!!errors.acceptTermsConditions}>
+                <FormControl
+                  className="items-center"
+                  error={!!errors.acceptTermsConditions}
+                >
                   <FormControlLabel
                     label="I agree to the Terms of Service and Privacy Policy"
                     control={<Checkbox size="small" {...field} />}
                   />
-                  <FormHelperText>{errors?.acceptTermsConditions?.message}</FormHelperText>
+                  <FormHelperText>
+                    {errors?.acceptTermsConditions?.message}
+                  </FormHelperText>
                 </FormControl>
               )}
             />
@@ -193,7 +210,7 @@ function SignUpPage() {
 
       <Box
         className="relative hidden md:flex flex-auto items-center justify-center h-full p-64 lg:px-112 overflow-hidden"
-        sx={{ backgroundColor: 'primary.main' }}
+        sx={{ backgroundColor: "primary.main" }}
       >
         <svg
           className="absolute inset-0 pointer-events-none"
@@ -205,7 +222,7 @@ function SignUpPage() {
         >
           <Box
             component="g"
-            sx={{ color: 'primary.light' }}
+            sx={{ color: "primary.light" }}
             className="opacity-20"
             fill="none"
             stroke="currentColor"
@@ -218,7 +235,7 @@ function SignUpPage() {
         <Box
           component="svg"
           className="absolute -top-64 -right-64 opacity-20"
-          sx={{ color: 'primary.light' }}
+          sx={{ color: "primary.light" }}
           viewBox="0 0 220 192"
           width="220px"
           height="192px"
@@ -236,23 +253,27 @@ function SignUpPage() {
               <rect x="0" y="0" width="4" height="4" fill="currentColor" />
             </pattern>
           </defs>
-          <rect width="220" height="192" fill="url(#837c3e70-6c3a-44e6-8854-cc48c737b659)" />
+          <rect
+            width="220"
+            height="192"
+            fill="url(#837c3e70-6c3a-44e6-8854-cc48c737b659)"
+          />
         </Box>
 
         <div className="z-10 relative w-full max-w-2xl">
           <div className="text-7xl font-bold leading-none text-gray-100">
             <div>Welcome to</div>
-            <div>our community</div>
+            <div>our application</div>
           </div>
           <div className="mt-24 text-lg tracking-tight leading-6 text-gray-400">
-            Fuse helps developers to build organized and well coded dashboards full of beautiful and
-            rich modules. Join us and start building your application today.
+            To manage receipts securely and easily with our application. Join us
+            and start making your today happy.
           </div>
           <div className="flex items-center mt-32">
             <AvatarGroup
               sx={{
-                '& .MuiAvatar-root': {
-                  borderColor: 'primary.main',
+                "& .MuiAvatar-root": {
+                  borderColor: "primary.main",
                 },
               }}
             >
