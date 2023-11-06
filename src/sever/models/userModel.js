@@ -90,6 +90,16 @@ userSchema.pre("findOneAndUpdate", async function (next) {
   this.set({ updated_at: new Date() });
 });
 
+//Cannot be selected if deleted
+userSchema.pre("find", async function (next) {
+  this.where({ deleted_at: null });
+});
+
+//Cannot be selected if deleted
+userSchema.pre("findOne", async function (next) {
+  // this.where({ deleted_at: null });
+});
+
 //Compare user password
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);

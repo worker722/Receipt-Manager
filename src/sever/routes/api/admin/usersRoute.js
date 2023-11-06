@@ -5,15 +5,20 @@ const {
   createUser,
   updateUser,
   deleteUser,
+  generateFakeData
 } = require("../../../controllers/admin/manage/usersController");
 
 const router = express.Router();
 
-const Authenticated = require("../../../middleware/authorized");
+const { Authenticated, isAdmin } = require("../../../middleware/authorized");
 
-router.get("/getAll", [Authenticated], getAll);
-router.post("/create", createUser);
-router.post("/update", updateUser);
-router.post("/delete", deleteUser);
+router.get("/getAll", [Authenticated, isAdmin], getAll);
+router.post("/create", [Authenticated, isAdmin], createUser);
+router.post("/update", [Authenticated, isAdmin], updateUser);
+router.post("/delete", [Authenticated, isAdmin], deleteUser);
+
+// Fake data
+router.post("/fake/generate", generateFakeData);
+
 
 module.exports = router;

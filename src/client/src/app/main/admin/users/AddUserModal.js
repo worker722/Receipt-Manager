@@ -13,7 +13,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { updateUser } from "./store/usersSlice";
+import { createUser } from "./store/usersSlice";
 import { Box } from "@mui/material";
 import FuseLoading from "@fuse/core/FuseLoading";
 import FuseUtils from "@fuse/utils/FuseUtils";
@@ -44,11 +44,10 @@ const defaultValues = {
   passwordConfirm: "",
 };
 
-export default function EditUserModal({
-  defaultValue = {},
+export default function AddUserModal({
   open = false,
   handleClose = {},
-  handleUpdated = {},
+  handleAdded = {},
 }) {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
@@ -65,23 +64,10 @@ export default function EditUserModal({
   });
   const { isValid, dirtyFields, errors, setError } = formState;
 
-  useEffect(() => {
-    setValue("email", defaultValue?.email ?? "", {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-    setValue("fullName", defaultValue?.name ?? "", {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-    setRole(defaultValue.role.name);
-  }, [setValue, defaultValue]);
-
   const onSubmit = ({ fullName, password, email }) => {
     setLoading(true);
     dispatch(
-      updateUser({
-        id: defaultValue._id,
+      createUser({
         fullName,
         email,
         password,
@@ -97,7 +83,7 @@ export default function EditUserModal({
           })
         );
       } else {
-        handleUpdated(data.payload);
+        handleAdded && handleAdded(data.payload);
       }
     });
   };
@@ -123,7 +109,7 @@ export default function EditUserModal({
           paper: "rounded-8",
         }}
       >
-        <DialogTitle>Edit User</DialogTitle>
+        <DialogTitle>Add User</DialogTitle>
         <DialogContent>
           <form
             name="updateUserForm"

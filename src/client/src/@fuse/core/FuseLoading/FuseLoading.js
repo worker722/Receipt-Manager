@@ -15,7 +15,7 @@ function FuseLoading(props) {
   return (
     <div
       className={clsx(
-        "flex flex-1 flex-col items-center justify-center p-24",
+        "flex flex-1 flex-col items-center justify-center",
         !showLoading && "hidden"
       )}
     >

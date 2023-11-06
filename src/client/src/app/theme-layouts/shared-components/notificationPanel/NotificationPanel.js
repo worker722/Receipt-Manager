@@ -84,7 +84,7 @@ function NotificationPanel(props) {
       ),
     });
 
-    dispatch(addNotification(item));
+    //dispatch(addNotification(item));
   }
 
   return (

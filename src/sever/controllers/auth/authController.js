@@ -70,6 +70,15 @@ const SignInWithEmailAndPassword = async (req, res) => {
     if (!existingUser)
       return response(res, {}, {}, 404, "Email doesn't exist.");
 
+    if (existingUser.active == 0)
+      return response(
+        res,
+        {},
+        {},
+        404,
+        "Your account has been blocked. Contact to support."
+      );
+
     const isPasswordCorrect = await existingUser.comparePassword(password);
 
     if (!isPasswordCorrect)
@@ -116,13 +125,26 @@ const SignInWithToken = async (req, res) => {
           .populate(REF_NAME.ROLE)
           .exec();
 
-        // Generate JWT token
-        const token = verifiedUser.getJwtToken();
+        if (verifiedUser) {
+          if (verifiedUser.active == 0)
+            return response(
+              res,
+              {},
+              {},
+              404,
+              "Your account has been blocked. Contact to support."
+            );
 
-        return response(res, {
-          access_token: token,
-          user: processedUser(verifiedUser),
-        });
+          // Generate JWT token
+          const token = verifiedUser.getJwtToken();
+
+          return response(res, {
+            access_token: token,
+            user: processedUser(verifiedUser),
+          });
+        } else {
+          response(res, {}, {}, 403);
+        }
       }
     );
   } catch (error) {

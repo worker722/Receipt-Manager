@@ -4,13 +4,19 @@ import FusePageSimple from "@fuse/core/FusePageSimple";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
-import { getUsers, selectUsers } from "./store/usersSlice";
+import { deleteUser, getUsers, selectUsers } from "./store/usersSlice";
 import { useDispatch, useSelector } from "react-redux";
 import withReducer from "app/store/withReducer";
 import reducer from "./store";
 import { useEffect, useState } from "react";
 import EditUserModal from "./EditUserModal";
+import AddUserModal from "./AddUserModal";
 import { showMessage } from "app/store/fuse/messageSlice";
+import FuseUtils from "@fuse/utils/FuseUtils";
+import moment from "moment";
+import Button from "@mui/material/Button";
+import FuseLoading from "@fuse/core/FuseLoading";
+import ConfirmDialog from "@fuse/core/ConfirmDialog";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {
@@ -28,8 +34,12 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
 const ManageUsersPage = (props) => {
   const { t } = useTranslation("ManageUsersPage");
 
-  const [openModal, setOpenModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [openAddModal, setOpenAddModal] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [editUser, setEditUser] = useState({});
+  const [deleteUser_id, setDeleteUserID] = useState();
   const [rows, setRows] = useState([]);
 
   const dispatch = useDispatch();
@@ -40,33 +50,77 @@ const ManageUsersPage = (props) => {
   }, [users]);
 
   useEffect(() => {
-    dispatch(getUsers());
+    setLoading(true);
+    dispatch(getUsers()).then((data) => {
+      const { message = "" } = data.payload;
+      if (!FuseUtils.isEmpty(message)) {
+        _showMessage(message, "error");
+      }
+      setLoading(false);
+    });
   }, [dispatch]);
+
+  const handleAddUser = () => {
+    setOpenAddModal(true);
+  };
 
   const handleEditUser = (id) => () => {
     setEditUser(users.find((user) => user._id == id));
-    setOpenModal(true);
+    setOpenEditModal(true);
   };
 
   const handleDeleteUser = (id) => () => {
-    setRows(rows.filter((row) => row.id !== id));
+    setOpenDeleteDialog(true);
+    setDeleteUserID(id);
   };
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
+  const handleConfirmDelete = () => {
+    setOpenDeleteDialog(false);
+    dispatch(deleteUser(deleteUser_id)).then((data) => {
+      const { message = "" } = data.payload;
+      if (!FuseUtils.isEmpty(message)) {
+        _showMessage(message, "error");
+      } else {
+        _showMessage("Deleted successfully", "info");
+        setRows(rows.filter((row) => row._id !== deleteUser_id));
+      }
+    });
+  };
+
+  const handleCloseAddModal = () => {
+    setOpenAddModal(false);
+  };
+
+  const handleCloseEditModal = () => {
+    setOpenEditModal(false);
+  };
+
+  const handleCreatedUser = (createdUser) => {
+    handleCloseAddModal();
+
+    _showMessage("Successfully added!", "info");
+    setRows([...rows, createdUser]);
   };
 
   const handleUpdatedUser = (updatedUser) => {
-    handleCloseModal();
-    dispatch(
-      showMessage({
-        message: "Successfully updated!",
-        variant: "info",
-      })
-    );
+    handleCloseEditModal();
+    _showMessage("Successfully updated!", "info");
     setRows(
       rows.map((row) => (row._id === updatedUser._id ? updatedUser : row))
     );
+  };
+
+  const _showMessage = (message = "", variant = "info") => {
+    dispatch(
+      showMessage({
+        message,
+        variant,
+      })
+    );
+  };
+
+  const toLocalTime = (time) => {
+    return moment.utc(time).local().format("YYYY-MM-DD hh:mm:ss");
   };
 
   const columns = [
@@ -86,21 +140,21 @@ const ManageUsersPage = (props) => {
       field: "created_at",
       headerName: "Created at",
       width: 200,
+      valueGetter: (params) => toLocalTime(params.row.created_at),
     },
     {
       field: "updated_at",
       headerName: "Updated at",
       width: 200,
+      valueGetter: (params) => toLocalTime(params.row.updated_at),
     },
     {
       field: "active",
       headerName: "Active",
-    },
-    {
-      field: "redirect_url",
-      headerName: "Redirect URL",
-      width: 200,
-      valueGetter: (params) => `${params.row.role.redirect_url}`,
+      valueGetter: (params) => {
+        if (params.row.active == 1) return "Actived";
+        else if (params.row.active == 0) return "Blocked";
+      },
     },
     {
       field: "actions",
@@ -131,31 +185,65 @@ const ManageUsersPage = (props) => {
   return (
     <Root
       header={
-        <div className="p-24">
-          <h4>{t("PAGE_TITLE")}</h4>
+        <div className="p-24 flex">
+          <div className="w-full self-center">
+            <h4>{t("PAGE_TITLE")}</h4>
+          </div>
+          <div className="float-right">
+            <Button
+              onClick={handleAddUser}
+              variant="contained"
+              color="primary"
+              aria-label="Add"
+            >
+              Add
+            </Button>
+          </div>
         </div>
       }
       content={
-        <div style={{ height: 800, width: "100%" }}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            getRowId={(row) => row._id}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[5, 10]}
-            checkboxSelection
-          />
-          {openModal && (
-            <EditUserModal
-              defaultValue={editUser}
-              open={openModal}
-              handleClose={handleCloseModal}
-              handleUpdated={handleUpdatedUser}
-            />
+        <div style={{ width: "100%" }}>
+          {loading ? (
+            <FuseLoading />
+          ) : (
+            <>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                getRowId={(row) => row._id}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                  },
+                }}
+                pageSizeOptions={[5, 10]}
+                checkboxSelection
+              />
+              {openEditModal && (
+                <EditUserModal
+                  defaultValue={editUser}
+                  open={openEditModal}
+                  handleClose={handleCloseEditModal}
+                  handleUpdated={handleUpdatedUser}
+                />
+              )}
+              {openAddModal && (
+                <AddUserModal
+                  open={openAddModal}
+                  handleClose={handleCloseAddModal}
+                  handleAdded={handleCreatedUser}
+                />
+              )}
+              {openDeleteDialog && (
+                <ConfirmDialog
+                  open={openDeleteDialog}
+                  onCancel={() => setOpenDeleteDialog(false)}
+                  onAccept={handleConfirmDelete}
+                  question="Do you want to delete this user?"
+                  message="If you delete this user, all related receipts and bank expenses will be deleted."
+                />
+              )}
+            </>
           )}
         </div>
       }

@@ -15,7 +15,7 @@ function AnalyticsDashboardAppHeader(props) {
           </Typography>
         </div>
         <div className="flex items-center mt-24 sm:mt-0 sm:mx-8 space-x-12">
-          <Button
+          {/* <Button
             className="whitespace-nowrap"
             startIcon={<FuseSvgIcon size={20}>heroicons-solid:cog</FuseSvgIcon>}
           >
@@ -28,7 +28,7 @@ function AnalyticsDashboardAppHeader(props) {
             startIcon={<FuseSvgIcon size={20}>heroicons-solid:save</FuseSvgIcon>}
           >
             Export
-          </Button>
+          </Button> */}
         </div>
       </div>
     </div>
