@@ -1,14 +1,14 @@
-import FuseUtils from '@fuse/utils';
-import AppContext from 'app/AppContext';
-import { Component } from 'react';
-import { matchRoutes } from 'react-router-dom';
-import withRouter from '@fuse/core/withRouter';
-import history from '@history';
+import FuseUtils from "@fuse/utils";
+import AppContext from "app/AppContext";
+import { Component } from "react";
+import { matchRoutes } from "react-router-dom";
+import withRouter from "@fuse/core/withRouter";
+import history from "@history";
 import {
   getSessionRedirectUrl,
   setSessionRedirectUrl,
   resetSessionRedirectUrl,
-} from '@fuse/core/FuseAuthorization/sessionRedirectUrl';
+} from "@fuse/core/FuseAuthorization/sessionRedirectUrl";
 
 class FuseAuthorization extends Component {
   constructor(props, context) {
@@ -44,9 +44,20 @@ class FuseAuthorization extends Component {
 
     const matched = matchedRoutes ? matchedRoutes[0] : false;
 
-    const userHasPermission = FuseUtils.hasPermission(matched.route.auth, userRole);
+    const userHasPermission = FuseUtils.hasPermission(
+      matched.route.auth,
+      userRole
+    );
 
-    const ignoredPaths = ['/', '/callback', '/sign-in', '/sign-out', '/logout', '/404'];
+    const ignoredPaths = [
+      "/",
+      "/callback",
+      "/sign-in",
+      "/sign-up",
+      "/sign-out", // Added route for User redirect to specific route by Server after sign up : Check store/userSlice.js
+      "/logout",
+      "/404",
+    ];
 
     if (matched && !userHasPermission && !ignoredPaths.includes(pathname)) {
       setSessionRedirectUrl(pathname);
@@ -66,7 +77,7 @@ class FuseAuthorization extends Component {
         Redirect to Login Page
         */
     if (!userRole || userRole.length === 0) {
-      setTimeout(() => history.push('/sign-in'), 0);
+      setTimeout(() => history.push("/sign-in"), 0);
     } else {
       /*
         User is member

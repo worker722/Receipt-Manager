@@ -46,7 +46,8 @@ function NotificationPanel(props) {
     /*
 		Get Notifications from db
 		 */
-    dispatch(getNotifications());
+    // Modified By @Panther
+    // dispatch(getNotifications());
   }, [dispatch]);
 
   useEffect(() => {
@@ -83,7 +84,7 @@ function NotificationPanel(props) {
       ),
     });
 
-    dispatch(addNotification(item));
+    //dispatch(addNotification(item));
   }
 
   return (

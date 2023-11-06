@@ -1,26 +1,31 @@
 {
-  "name": "receipt_manager",
+  "name": "online-receipt-manager-server",
   "version": "1.0.0",
-  "description": "Easy receipt scan and management tool for online users",
-  "main": "index.js",
-  "author": "Orest",
-  "license": "MIT",
+  "description": "",
+  "main": "server.js",
   "scripts": {
-    "build": "tsc",
-    "start": "concurrently \"tsc -w\" \"nodemon dist/js/app.js\""
+    "start": "node server",
+    "server": "nodemon server",
+    "client": "npm run start --prefix client",
+    "dev": "concurrently \"npm run server\" \"cd client && npm start\""
   },
+  "author": "Panther",
+  "license": "MIT",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "mongodb": "^6.2.0",
-    "typescript": "^5.2.2"
+    "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
+    "mongoose": "^8.0.0",
+    "node-mailjet": "^6.0.4"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.15",
-    "@types/express": "^4.17.20",
-    "@types/node": "^20.8.10",
-    "concurrently": "^8.2.2",
-    "nodemon": "^3.0.1"
+    "@faker-js/faker": "^8.2.0",
+    "concurrently": "^6.0.0",
+    "nodemon": "^2.0.7"
   }
 }
