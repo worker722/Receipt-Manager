@@ -3,9 +3,6 @@ const { Schema } = mongoose;
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// Models
-const UserRole = require("./userRoleModel");
-
 const userSchema = new Schema({
   role: {
     type: Schema.Types.ObjectId,
@@ -30,6 +27,12 @@ const userSchema = new Schema({
   },
   phone_number: {
     type: String,
+    validate: {
+      validator: function (v) {
+        return /\d{3}-\d{3}-\d{4}/.test(v);
+      },
+      message: (props) => `${props.value} is not a valid phone number!`,
+    },
   },
   password: {
     type: String,
@@ -82,6 +85,11 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
+//Encrypting password before updating user
+userSchema.pre("findOneAndUpdate", async function (next) {
+  this.set({ updated_at: new Date() });
+});
+
 //Compare user password
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
@@ -123,4 +131,8 @@ userSchema.methods.getRedirectURL = function () {
 
 const User = mongoose.model("users", userSchema);
 
-module.exports = User;
+const REF_NAME = {
+  ROLE: "role",
+};
+
+module.exports = { User, REF_NAME };

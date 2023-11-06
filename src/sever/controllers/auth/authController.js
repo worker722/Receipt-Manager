@@ -1,4 +1,4 @@
-const User = require("../../models/userModel.js");
+const { User, REF_NAME } = require("../../models/userModel.js");
 const UserRole = require("../../models/userRoleModel.js");
 const response = require("../../utils/response.js");
 const jwt = require("jsonwebtoken");
@@ -39,15 +39,17 @@ const SignUp = async (req, res) => {
     newUser.name = fullName;
     newUser.email = email;
     newUser.password = password;
-    (await newUser.save()).populate("role").then(async (savedUser, err) => {
-      // Generate JWT token
-      const token = savedUser.getJwtToken();
+    (await newUser.save())
+      .populate(REF_NAME.ROLE)
+      .then(async (savedUser, err) => {
+        // Generate JWT token
+        const token = savedUser.getJwtToken();
 
-      return response(res, {
-        access_token: token,
-        user: processedUser(savedUser),
+        return response(res, {
+          access_token: token,
+          user: processedUser(savedUser),
+        });
       });
-    });
   } catch (error) {
     console.log("error", error);
     return response(res, {}, error, 500, "Something went worng.");
@@ -63,7 +65,7 @@ const SignInWithEmailAndPassword = async (req, res) => {
     if (!email || !password)
       return response(res, {}, {}, 400, "Please fill all the required fields.");
 
-    const existingUser = await User.findOne({ email }).populate("role");
+    const existingUser = await User.findOne({ email }).populate(REF_NAME.ROLE);
 
     if (!existingUser)
       return response(res, {}, {}, 404, "Email doesn't exist.");
@@ -111,7 +113,7 @@ const SignInWithToken = async (req, res) => {
         }
 
         const verifiedUser = await User.findById(decodedData.id)
-          .populate("role")
+          .populate(REF_NAME.ROLE)
           .exec();
 
         // Generate JWT token

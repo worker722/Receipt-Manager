@@ -1,7 +1,16 @@
 import { styled } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import FusePageSimple from "@fuse/core/FusePageSimple";
-import { DataGrid } from "@mui/x-data-grid";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
+import { getUsers, selectUsers } from "./store/usersSlice";
+import { useDispatch, useSelector } from "react-redux";
+import withReducer from "app/store/withReducer";
+import reducer from "./store";
+import { useEffect, useState } from "react";
+import EditUserModal from "./EditUserModal";
+import { showMessage } from "app/store/fuse/messageSlice";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {
@@ -16,41 +25,108 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-sidebarContent": {},
 }));
 
-const columns = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "firstName", headerName: "First name", width: 130 },
-  { field: "lastName", headerName: "Last name", width: 130 },
-  {
-    field: "age",
-    headerName: "Age",
-    type: "number",
-    width: 90,
-  },
-  {
-    field: "fullName",
-    headerName: "Full name",
-    description: "This column has a value getter and is not sortable.",
-    sortable: false,
-    width: 160,
-    valueGetter: (params) =>
-      `${params.row.firstName || ""} ${params.row.lastName || ""}`,
-  },
-];
-
-const rows = [
-  { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
-  { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-  { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-  { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-  { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
-  { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
-  { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-  { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-  { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
-];
-
 const ManageUsersPage = (props) => {
   const { t } = useTranslation("ManageUsersPage");
+
+  const [openModal, setOpenModal] = useState(false);
+  const [editUser, setEditUser] = useState({});
+  const [rows, setRows] = useState([]);
+
+  const dispatch = useDispatch();
+  const { users } = useSelector(selectUsers);
+
+  useEffect(() => {
+    setRows(users);
+  }, [users]);
+
+  useEffect(() => {
+    dispatch(getUsers());
+  }, [dispatch]);
+
+  const handleEditUser = (id) => () => {
+    setEditUser(users.find((user) => user._id == id));
+    setOpenModal(true);
+  };
+
+  const handleDeleteUser = (id) => () => {
+    setRows(rows.filter((row) => row.id !== id));
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  const handleUpdatedUser = (updatedUser) => {
+    handleCloseModal();
+    dispatch(
+      showMessage({
+        message: "Successfully updated!",
+        variant: "info",
+      })
+    );
+    setRows(
+      rows.map((row) => (row._id === updatedUser._id ? updatedUser : row))
+    );
+  };
+
+  const columns = [
+    { field: "name", headerName: "Full name", width: 200, editable: true },
+    { field: "email", headerName: "Email", width: 250 },
+    {
+      field: "role",
+      headerName: "Role",
+      width: 160,
+      valueGetter: (params) => {
+        if (`${params.row.role.name}` == "admin") return "Administrator";
+        else if (`${params.row.role.name}` == "staff") return "Staff";
+        else if (`${params.row.role.name}` == "user") return "User";
+      },
+    },
+    {
+      field: "created_at",
+      headerName: "Created at",
+      width: 200,
+    },
+    {
+      field: "updated_at",
+      headerName: "Updated at",
+      width: 200,
+    },
+    {
+      field: "active",
+      headerName: "Active",
+    },
+    {
+      field: "redirect_url",
+      headerName: "Redirect URL",
+      width: 200,
+      valueGetter: (params) => `${params.row.role.redirect_url}`,
+    },
+    {
+      field: "actions",
+      type: "actions",
+      headerName: "Actions",
+      width: 100,
+      cellClassName: "actions",
+      getActions: ({ id }) => {
+        return [
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="Edit"
+            className="textPrimary"
+            onClick={handleEditUser(id)}
+            color="inherit"
+          />,
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Delete"
+            onClick={handleDeleteUser(id)}
+            color="inherit"
+          />,
+        ];
+      },
+    },
+  ];
 
   return (
     <Root
@@ -60,18 +136,27 @@ const ManageUsersPage = (props) => {
         </div>
       }
       content={
-        <div style={{ height: 400, width: "100%" }}>
+        <div style={{ height: 800, width: "100%" }}>
           <DataGrid
             rows={rows}
             columns={columns}
+            getRowId={(row) => row._id}
             initialState={{
               pagination: {
-                paginationModel: { page: 0, pageSize: 5 },
+                paginationModel: { page: 0, pageSize: 10 },
               },
             }}
             pageSizeOptions={[5, 10]}
             checkboxSelection
           />
+          {openModal && (
+            <EditUserModal
+              defaultValue={editUser}
+              open={openModal}
+              handleClose={handleCloseModal}
+              handleUpdated={handleUpdatedUser}
+            />
+          )}
         </div>
       }
       scroll="content"
@@ -79,4 +164,4 @@ const ManageUsersPage = (props) => {
   );
 };
 
-export default ManageUsersPage;
+export default withReducer("manageUsersPage", reducer)(ManageUsersPage);

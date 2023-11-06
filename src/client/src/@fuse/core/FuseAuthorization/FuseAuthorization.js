@@ -37,20 +37,17 @@ class FuseAuthorization extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    console.log(props);
     const { location, userRole } = props;
     const { pathname } = location;
 
     const matchedRoutes = matchRoutes(state.routes, pathname);
 
     const matched = matchedRoutes ? matchedRoutes[0] : false;
-    console.log(`matchRoutes`, matched.route.auth);
 
     const userHasPermission = FuseUtils.hasPermission(
       matched.route.auth,
       userRole
     );
-    console.log("hasPermiss", userHasPermission);
 
     const ignoredPaths = [
       "/",
@@ -63,10 +60,8 @@ class FuseAuthorization extends Component {
     ];
 
     if (matched && !userHasPermission && !ignoredPaths.includes(pathname)) {
-      console.log("setSessionRedirectUrl");
       setSessionRedirectUrl(pathname);
     }
-    console.log("access", matched ? userHasPermission : true);
 
     return {
       accessGranted: matched ? userHasPermission : true,
