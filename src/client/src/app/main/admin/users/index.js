@@ -65,7 +65,7 @@ const ManageUsersPage = (props) => {
   };
 
   const handleEditUser = (id) => () => {
-    setEditUser(users.find((user) => user._id == id));
+    setEditUser(rows.find((user) => user._id == id));
     setOpenEditModal(true);
   };
 
@@ -97,6 +97,8 @@ const ManageUsersPage = (props) => {
 
   const handleCreatedUser = (createdUser) => {
     handleCloseAddModal();
+
+    console.log({ createdUser });
 
     _showMessage("Successfully added!", "info");
     setRows([...rows, createdUser]);
