@@ -34,26 +34,9 @@ roleSchema.static("getRoleID", async function getRoleID(name = "user") {
   return role.get("_id");
 });
 
-roleSchema.static("seed", async function seed() {
-  await Role.deleteMany({});
-
-  Role.create([
-    {
-      name: "admin",
-      value: 0,
-      redirect_url: "dashboards/analytics",
-    },
-    {
-      name: "staff",
-      value: 1,
-      redirect_url: "/",
-    },
-    {
-      name: "user",
-      value: 2,
-      redirect_url: "/",
-    },
-  ]);
+//Set updated date before updating role
+roleSchema.pre("findOneAndUpdate", async function (next) {
+  this.set({ updated_at: new Date() });
 });
 
 const Role = model("roles", roleSchema);

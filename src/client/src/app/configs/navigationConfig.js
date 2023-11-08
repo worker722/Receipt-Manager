@@ -15,7 +15,7 @@ const navigationConfig = [
     subtitle: "",
     type: "group",
     icon: "heroicons-outline:home",
-    translate: "LANG_DASHBOARDS",
+    translate: "ADMIN_LANG_DASHBOARDS",
     children: [
       {
         id: "dashboards.analytics",
@@ -37,10 +37,18 @@ const navigationConfig = [
       {
         id: "page-users",
         title: "User Manage",
-        translate: "LANG_USER_MANAGE",
+        translate: "ADMIN_LANG_USER_MANAGE",
         type: "item",
         icon: "heroicons-outline:star",
         url: "users",
+      },
+      {
+        id: "page-roles",
+        title: "Role Manage",
+        translate: "ADMIN_LANG_ROLE_MANAGE",
+        type: "item",
+        icon: "heroicons-outline:star",
+        url: "roles",
       },
     ],
   },
