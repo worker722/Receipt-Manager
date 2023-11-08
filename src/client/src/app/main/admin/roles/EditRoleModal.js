@@ -66,7 +66,7 @@ export default function EditRoleModal({
           })
         );
       } else {
-        handleUpdated(data.payload);
+        if (!FuseUtils.isEmpty(data?.payload)) handleUpdated(data.payload);
       }
     });
   };

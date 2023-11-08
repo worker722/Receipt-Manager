@@ -125,7 +125,7 @@ export default function EditUserModal({
           })
         );
       } else {
-        handleUpdated(data.payload);
+        if (!FuseUtils.isEmpty(data?.payload)) handleUpdated(data.payload);
       }
     });
   };

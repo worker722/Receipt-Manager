@@ -19,7 +19,10 @@ class JwtService extends FuseUtils.EventEmitter {
       },
       (err) => {
         return new Promise((resolve, reject) => {
-          if (
+          if (err?.code == "ERR_NETWORK") {
+            this.emit("onError", "Network failed. Please check your network!");
+            resolve();
+          } else if (
             err?.response?.status === 401 &&
             err?.config &&
             !err?.config?.__isRetryRequest
@@ -27,8 +30,10 @@ class JwtService extends FuseUtils.EventEmitter {
             // if you ever get an unauthorized response, logout the user
             this.emit("onAutoLogout", "Invalid access_token");
             this.setSession(null);
+            reject();
+          } else {
+            reject();
           }
-          reject();
         });
       }
     );
@@ -48,7 +53,10 @@ class JwtService extends FuseUtils.EventEmitter {
       this.emit("onAutoLogin", true);
     } else {
       this.setSession(null);
-      this.emit("onAutoLogout", "access_token expired");
+      this.emit(
+        "onAutoLogout",
+        "Your credential was expired. Please login again."
+      );
     }
   };
 
@@ -57,14 +65,18 @@ class JwtService extends FuseUtils.EventEmitter {
       axios
         .post(jwtServiceConfig.signUp, data)
         .then((response) => {
-          const { data = {}, status = 200 } = response?.data;
-          if (status == 200) {
-            const { user, access_token } = data;
-            this.setSession(access_token);
-            resolve(user);
-            this.emit("onLogin", user);
+          if (response?.status == 200) {
+            const { data = {}, status = 200 } = response?.data;
+            if (status == 200) {
+              const { user, access_token } = data;
+              this.setSession(access_token);
+              resolve(user);
+              this.emit("onLogin", user);
+            } else {
+              reject(response?.data);
+            }
           } else {
-            reject(response?.data);
+            reject();
           }
         })
         .catch((_error) =>
@@ -83,14 +95,18 @@ class JwtService extends FuseUtils.EventEmitter {
           },
         })
         .then((response) => {
-          const { data = {}, status = 200 } = response.data;
-          if (status == 200) {
-            const { user, access_token } = data;
-            if (remember) this.setSession(access_token);
-            resolve(user);
-            this.emit("onLogin", user);
+          if (response?.status == 200) {
+            const { data = {}, status = 200 } = response.data;
+            if (status == 200) {
+              const { user, access_token } = data;
+              if (remember) this.setSession(access_token);
+              resolve(user);
+              this.emit("onLogin", user);
+            } else {
+              reject(response.data);
+            }
           } else {
-            reject(response.data);
+            reject();
           }
         });
     });
@@ -105,18 +121,18 @@ class JwtService extends FuseUtils.EventEmitter {
           },
         })
         .then((response) => {
-          if (response.data?.data?.user) {
+          if (response?.data?.data?.user) {
             const { access_token = {}, user = {} } = response.data.data;
             this.setSession(access_token);
             resolve(user);
           } else {
             this.logout();
-            reject(new Error("Failed to login with token."));
+            reject(new Error("Failed to login."));
           }
         })
         .catch((error) => {
           this.logout();
-          reject(new Error("Failed to login with token."));
+          reject(new Error("Failed to login."));
         });
     });
   };

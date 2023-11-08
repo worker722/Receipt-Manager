@@ -75,7 +75,7 @@ export default function AddUserModal({
       })
     ).then((data) => {
       setLoading(false);
-      if (!FuseUtils.isEmpty(data.payload?.message)) {
+      if (!FuseUtils.isEmpty(data?.payload?.message)) {
         dispatch(
           showMessage({
             message: data.payload?.message,
@@ -83,7 +83,8 @@ export default function AddUserModal({
           })
         );
       } else {
-        handleAdded && handleAdded(data.payload);
+        if (!FuseUtils.isEmpty(data?.payload))
+          handleAdded && handleAdded(data?.payload);
       }
     });
   };

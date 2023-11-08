@@ -69,12 +69,14 @@ function SignUpPage() {
         // No need to do anything, registered user data will be set at app/auth/AuthContext
       })
       .catch((_errors) => {
-        dispatch(
-          showMessage({
-            message: _errors.message,
-            variant: "error",
-          })
-        );
+        if (_errors && _errors?.message) {
+          dispatch(
+            showMessage({
+              message: _errors.message,
+              variant: "error",
+            })
+          );
+        }
       });
   }
 

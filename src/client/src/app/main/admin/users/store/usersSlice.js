@@ -6,16 +6,22 @@ import FuseUtils from "@fuse/utils/FuseUtils";
 
 export const getUsers = createAsyncThunk("admin/users/getUsers", async () => {
   const response = await axios.get("/api/admin/users/getAll");
-  const { data = {}, error = {}, message = "", status = -1 } = response.data;
-  if (status == 200) {
-    return data ?? { users: [] };
-  } else {
-    if (!FuseUtils.isEmpty(error))
-      console.error("admin/users/store/usersSlice/getUsers", error);
+  if (response?.status == 200) {
+    const { data = {}, error = {}, message = "", status = -1 } = response.data;
+    if (status == 200) {
+      return data ?? { users: [] };
+    } else {
+      if (!FuseUtils.isEmpty(error))
+        console.error("admin/users/store/usersSlice/getUsers", error);
 
+      return {
+        users: [],
+        ...response.data,
+      };
+    }
+  } else {
     return {
       users: [],
-      ...response.data,
     };
   }
 });
@@ -24,15 +30,24 @@ export const createUser = createAsyncThunk(
   "admin/users/createUser",
   async (user) => {
     const response = await axios.post("/api/admin/users/create", { user });
-    const { data = {}, error = {}, message = "", status = -1 } = response.data;
-    if (status == 200) {
-      return data?.user ?? {};
-    } else {
-      console.error("admin/users/store/usersSlice/createUser", error);
+    if (response?.status == 200) {
+      const {
+        data = {},
+        error = {},
+        message = "",
+        status = -1,
+      } = response.data;
+      if (status == 200) {
+        return data?.user ?? {};
+      } else {
+        console.error("admin/users/store/usersSlice/createUser", error);
 
-      return {
-        ...response.data,
-      };
+        return {
+          ...response.data,
+        };
+      }
+    } else {
+      return {};
     }
   }
 );
@@ -41,15 +56,24 @@ export const updateUser = createAsyncThunk(
   "admin/users/updateUser",
   async (user) => {
     const response = await axios.post("/api/admin/users/update", { user });
-    const { data = {}, error = {}, message = "", status = -1 } = response.data;
-    if (status == 200) {
-      return data?.user ?? {};
-    } else {
-      console.error("admin/users/store/usersSlice/updateUser", error);
+    if (response?.status == 200) {
+      const {
+        data = {},
+        error = {},
+        message = "",
+        status = -1,
+      } = response.data;
+      if (status == 200) {
+        return data?.user ?? {};
+      } else {
+        console.error("admin/users/store/usersSlice/updateUser", error);
 
-      return {
-        ...response.data,
-      };
+        return {
+          ...response.data,
+        };
+      }
+    } else {
+      return {};
     }
   }
 );
@@ -58,15 +82,24 @@ export const deleteUser = createAsyncThunk(
   "admin/users/deleteUser",
   async (id) => {
     const response = await axios.post("/api/admin/users/delete", { id });
-    const { data = {}, error = {}, message = "", status = -1 } = response.data;
-    if (status == 200) {
-      return data?.user ?? {};
-    } else {
-      console.error("admin/users/store/usersSlice/deleteUser", error);
+    if (response?.status == 200) {
+      const {
+        data = {},
+        error = {},
+        message = "",
+        status = -1,
+      } = response.data;
+      if (status == 200) {
+        return data?.user ?? {};
+      } else {
+        console.error("admin/users/store/usersSlice/deleteUser", error);
 
-      return {
-        ...response.data,
-      };
+        return {
+          ...response.data,
+        };
+      }
+    } else {
+      return {};
     }
   }
 );
