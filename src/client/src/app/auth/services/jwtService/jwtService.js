@@ -49,7 +49,7 @@ class JwtService extends FuseUtils.EventEmitter {
     }
 
     if (this.isAuthTokenValid(access_token)) {
-      this.setSession(access_token);
+      this.setSession(access_token, false);
       this.emit("onAutoLogin", true);
     } else {
       this.setSession(null);
@@ -99,7 +99,7 @@ class JwtService extends FuseUtils.EventEmitter {
             const { data = {}, status = 200 } = response.data;
             if (status == 200) {
               const { user, access_token } = data;
-              if (remember) this.setSession(access_token);
+              this.setSession(access_token, remember);
               resolve(user);
               this.emit("onLogin", user);
             } else {
@@ -143,9 +143,10 @@ class JwtService extends FuseUtils.EventEmitter {
     });
   };
 
-  setSession = (access_token) => {
+  setSession = (access_token, remember = true) => {
     if (access_token) {
-      localStorage.setItem(LocalStorageKey.REMEMBER_USER_TOKEN, access_token);
+      if (remember)
+        localStorage.setItem(LocalStorageKey.REMEMBER_USER_TOKEN, access_token);
       axios.defaults.headers.common.Authorization = `Bearer ${access_token}`;
     } else {
       localStorage.removeItem(LocalStorageKey.REMEMBER_USER_TOKEN);
