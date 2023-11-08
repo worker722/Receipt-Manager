@@ -21,7 +21,7 @@ function AuthProvider({ children }) {
       jwtService
         .signInWithToken()
         .then((user) => {
-          success(user, "Signed in with JWT");
+          success(user);
         })
         .catch((error) => {
           pass(error.message);
@@ -29,7 +29,7 @@ function AuthProvider({ children }) {
     });
 
     jwtService.on("onLogin", (user) => {
-      success(user, "Signed in");
+      success(user);
     });
 
     jwtService.on("onLogout", () => {
