@@ -5,9 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server",
-    "server": "nodemon server",
-    "client": "npm run start --prefix client",
-    "dev": "concurrently \"npm run server\" \"cd client && npm start\""
+    "dev": "nodemon server",
+    "live": "pm2 start server.js"
   },
   "author": "Panther",
   "license": "MIT",
