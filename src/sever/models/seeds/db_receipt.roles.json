@@ -19,12 +19,12 @@
   },
   "name": "staff",
   "value": 1,
-  "redirect_url": "/",
+  "redirect_url": "/staff",
   "created_at": {
     "$date": "2023-11-04T21:26:30.841Z"
   },
   "updated_at": {
-    "$date": "2023-11-04T21:26:30.841Z"
+    "$date": "2023-11-09T15:06:12.946Z"
   },
   "__v": 0
 },
@@ -37,7 +37,10 @@
   "created_at": {
     "$date": "2023-11-04T21:26:30.841Z"
   },
-  "redirect_url": "/",
+  "redirect_url": "/me",
   "value": 2,
-  "__v": 0
+  "__v": 0,
+  "updated_at": {
+    "$date": "2023-11-09T15:06:19.482Z"
+  }
 }]
