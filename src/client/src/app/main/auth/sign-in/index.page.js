@@ -54,7 +54,10 @@ function SignInPage() {
       shouldDirty: true,
       shouldValidate: true,
     });
-    setValue("password", "123456789", { shouldDirty: true, shouldValidate: true });
+    setValue("password", "123456789", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
   }, [setValue]);
 
   function onSubmit({ email, password, remember }) {
@@ -63,12 +66,14 @@ function SignInPage() {
         // No need to do anything, user data will be set at app/auth/AuthContext
       })
       .catch((_errors) => {
-        dispatch(
-          showMessage({
-            message: _errors.message,
-            variant: "error",
-          })
-        );
+        if (_errors?.message) {
+          dispatch(
+            showMessage({
+              message: _errors.message,
+              variant: "error",
+            })
+          );
+        }
       });
   }
 

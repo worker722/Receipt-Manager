@@ -5,7 +5,6 @@
       "@fuse/*": ["./src/@fuse/*"],
       "@history*": ["./src/@history"],
       "@lodash": ["./src/@lodash"],
-      "@api": ["./src/@api"],
       "@constants": ["./src/@constants"],
       "app/store/*": ["./src/app/store/*"],
       "app/shared-components/*": ["./src/app/shared-components/*"],

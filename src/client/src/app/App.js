@@ -1,4 +1,4 @@
-import "@api";
+import axios from "axios";
 import BrowserRouter from "@fuse/core/BrowserRouter";
 import FuseLayout from "@fuse/core/FuseLayout";
 import FuseTheme from "@fuse/core/FuseTheme";
@@ -15,6 +15,12 @@ import FuseAuthorization from "@fuse/core/FuseAuthorization";
 import settingsConfig from "app/configs/settingsConfig";
 import withAppProviders from "./withAppProviders";
 import { AuthProvider } from "./auth/AuthContext";
+
+// Set Axios http default
+axios.defaults.baseURL = "http://localhost:8080";
+axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
+axios.defaults.headers.common["Content-Type"] =
+  "application/x-www-form-urlencoded";
 
 const emotionCacheOptions = {
   rtl: {

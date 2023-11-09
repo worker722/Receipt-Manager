@@ -85,7 +85,7 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-//Encrypting password before updating user
+//Set updated date before updating user
 userSchema.pre("findOneAndUpdate", async function (next) {
   this.set({ updated_at: new Date() });
 });
