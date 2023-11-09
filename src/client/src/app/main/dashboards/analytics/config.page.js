@@ -9,10 +9,9 @@ const AnalyticsDashboardPageConfig = {
       config: {},
     },
   },
-  auth: authRoles.admin,
   routes: [
     {
-      path: 'dashboards/analytics',
+      path: '/dashboards',
       element: <AnalyticsDashboardPage />,
     },
   ],
