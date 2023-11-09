@@ -1,5 +1,5 @@
 const { User, REF_NAME } = require("../../models/userModel.js");
-const UserRole = require("../../models/userRoleModel.js");
+const Role = require("../../models/roleModel.js");
 const response = require("../../utils/response.js");
 const jwt = require("jsonwebtoken");
 
@@ -35,7 +35,7 @@ const SignUp = async (req, res) => {
       );
 
     const newUser = new User();
-    newUser.role = await UserRole.getRoleID("admin");
+    newUser.role = await Role.getRoleID("admin");
     newUser.name = fullName;
     newUser.email = email;
     newUser.password = password;
@@ -58,7 +58,7 @@ const SignUp = async (req, res) => {
 
 // Sign In / Log In
 const SignInWithEmailAndPassword = async (req, res) => {
-  const { email = null, password = null } = req.body?.data;
+  const { email = null, password = null } = req.body?.data ?? {};
 
   try {
     // Validation fields
@@ -98,6 +98,7 @@ const SignInWithEmailAndPassword = async (req, res) => {
       user: processedUser(existingUser),
     });
   } catch (error) {
+    console.log(error);
     response(res, {}, error, 500, "Something went wrong.");
   }
 };

@@ -1,8 +1,10 @@
 const { User, REF_NAME } = require("../../../models/userModel");
-const UserRole = require("../../../models/userRoleModel");
+const Role = require("../../../models/roleModel");
 const response = require("../../../utils/response");
 const bcrypt = require("bcryptjs");
 const { faker } = require("@faker-js/faker");
+
+const LOG_PATH = "admin/manage/usersController"
 
 const getAll = async (req, res) => {
   try {
@@ -31,7 +33,7 @@ const createUser = async (req, res) => {
       );
 
     const newUser = new User();
-    newUser.role = await UserRole.getRoleID(role);
+    newUser.role = await Role.getRoleID(role);
     newUser.name = fullName;
     newUser.email = email;
     newUser.password = password;
@@ -43,11 +45,11 @@ const createUser = async (req, res) => {
         });
       })
       .catch((_error) => {
-        console.log("admin/manage/usersController/createUser", error);
+        console.log(`${LOG_PATH}@createUser`, _error);
         response(res, {}, _error, 500, "Something went wrong!");
       });
   } catch (error) {
-    console.log("admin/manage/usersController/createUser", error);
+    console.log(`${LOG_PATH}@createUser`, error);
     response(res, {}, error, 500, "Something went wrong!");
   }
 };
@@ -58,7 +60,7 @@ const updateUser = async (req, res) => {
     return response(res, {}, {}, 400, "Please fill all the required fields.");
 
   const _password = await bcrypt.hash(user.password, 10);
-  const _role = await UserRole.getRoleID(user.role);
+  const _role = await Role.getRoleID(user.role);
 
   try {
     const updatedUser = await User.findByIdAndUpdate(
@@ -87,7 +89,7 @@ const updateUser = async (req, res) => {
       200
     );
   } catch (error) {
-    console.log(error);
+    console.log(`${LOG_PATH}@updateUser`, error);
     response(res, {}, error, 500, "Something went wrong");
   }
 };
@@ -117,6 +119,8 @@ const deleteUser = async (req, res) => {
     ).exec();
     response(res, { user: deletedUser }, {}, 200, "Deleted successfully!");
   } catch (error) {
+    console.log(`${LOG_PATH}@deleteUser`, error);
+
     response(res, {}, error, 500, "Something went wrong!");
   }
 };
@@ -124,8 +128,8 @@ const deleteUser = async (req, res) => {
 const generateFakeData = async (req, res) => {
   try {
     await User.deleteMany({});
-    const adminRole = await UserRole.getRoleID("admin");
-    const role = await UserRole.getRoleID("user");
+    const adminRole = await Role.getRoleID("admin");
+    const role = await Role.getRoleID("user");
     const _password = await bcrypt.hash("11111111", 10);
     const fakeData = [];
     fakeData.push({
@@ -146,7 +150,7 @@ const generateFakeData = async (req, res) => {
 
     response(res, {}, {}, 200, "Successfully generated 100 users!");
   } catch (error) {
-    response(res, {}, {}, 500, "Something went wrong");
+    response(res, {}, error, 500, "Something went wrong");
   }
 };
 

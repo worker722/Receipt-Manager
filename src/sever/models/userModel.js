@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const userSchema = new Schema({
   role: {
     type: Schema.Types.ObjectId,
-    ref: "userRoles",
+    ref: "roles",
     required: true,
   },
   avatar: {

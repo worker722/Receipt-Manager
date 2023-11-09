@@ -18,7 +18,7 @@ router.post("/update", [Authenticated, isAdmin], updateUser);
 router.post("/delete", [Authenticated, isAdmin], deleteUser);
 
 // Fake data
-router.post("/fake/generate", generateFakeData);
+// router.post("/fake/generate", generateFakeData);
 
 
 module.exports = router;

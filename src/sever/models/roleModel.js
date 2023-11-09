@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-const userRoleSchema = new Schema({
+const roleSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -29,15 +29,15 @@ const userRoleSchema = new Schema({
   },
 });
 
-userRoleSchema.static("getRoleID", async function getRoleID(name = "user") {
-  const role = await UserRole.findOne({ name });
+roleSchema.static("getRoleID", async function getRoleID(name = "user") {
+  const role = await Role.findOne({ name });
   return role.get("_id");
 });
 
-userRoleSchema.static("seed", async function seed() {
-  await UserRole.deleteMany({});
+roleSchema.static("seed", async function seed() {
+  await Role.deleteMany({});
 
-  UserRole.create([
+  Role.create([
     {
       name: "admin",
       value: 0,
@@ -56,6 +56,6 @@ userRoleSchema.static("seed", async function seed() {
   ]);
 });
 
-const UserRole = model("userRoles", userRoleSchema);
+const Role = model("roles", roleSchema);
 
-module.exports = UserRole;
+module.exports = Role;
