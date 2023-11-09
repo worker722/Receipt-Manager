@@ -3,6 +3,7 @@ const Role = require("../../../models/roleModel");
 const response = require("../../../utils/response");
 const bcrypt = require("bcryptjs");
 const { faker } = require("@faker-js/faker");
+const { avatarUploader } = require("../../../utils/fileUploader");
 
 const LOG_PATH = "admin/manage/usersController"
 
@@ -94,6 +95,23 @@ const updateUser = async (req, res) => {
   }
 };
 
+const updateAvatar = async (req, res) => {
+  avatarUploader(req, res, function (_err) {
+    if (_err) {
+      return response(
+        res,
+        {},
+        _err,
+        400,
+        "Photo upload failed. Please try again."
+      );
+    } else {
+      const file = req.file;
+      response(res, { file: file }, {}, 200, "success");
+    }
+  });
+};
+
 const deleteUser = async (req, res) => {
   const { id = null } = req.body;
   try {
@@ -159,5 +177,7 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  updateAvatar,
+
   generateFakeData,
 };
