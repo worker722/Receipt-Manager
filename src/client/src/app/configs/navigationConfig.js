@@ -22,13 +22,13 @@ const navigationConfig = [
 
   // Admin routes
   {
-    id: "managements",
+    id: "admin_managements",
     title: "Management",
     subtitle: "",
     type: "group",
     auth: authRoles.admin,
     icon: "heroicons-outline:home",
-    translate: "MANAGEMENTS",
+    translate: "LANG_MANAGEMENTS",
     children: [
       {
         id: "page-roles",
@@ -50,6 +50,25 @@ const navigationConfig = [
   },
 
   // Staff routes
+  {
+    id: "staff_managements",
+    title: "Management",
+    subtitle: "",
+    type: "group",
+    auth: authRoles.staff,
+    icon: "heroicons-outline:home",
+    translate: "LANG_MANAGEMENTS",
+    children: [
+      {
+        id: "page-expensed",
+        title: "Bank Expense Manage",
+        translate: "STAFF_LANG_EXPENSE_MANAGE",
+        type: "item",
+        icon: "heroicons-outline:star",
+        url: "expenses",
+      },
+    ],
+  },
 ];
 
 export default navigationConfig;
