@@ -98,8 +98,6 @@ const ManageUsersPage = (props) => {
   const handleCreatedUser = (createdUser) => {
     handleCloseAddModal();
 
-    console.log({ createdUser });
-
     _showMessage("Successfully added!", "info");
     setRows([...rows, createdUser]);
   };
