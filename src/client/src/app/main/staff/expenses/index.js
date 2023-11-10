@@ -13,6 +13,7 @@ import { showMessage } from "app/store/fuse/messageSlice";
 import FuseUtils from "@fuse/utils/FuseUtils";
 import moment from "moment";
 import FuseLoading from "@fuse/core/FuseLoading";
+import Button from "@mui/material/Button";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {
@@ -92,24 +93,24 @@ const ManageExpensesPage = (props) => {
     {
       field: "started_at",
       headerName: "Start Date",
-      width: 200,
+      width: 150,
       valueGetter: (params) => toLocalTime(params.row.started_at, "MM/DD/YYYY"),
     },
     {
       field: "ended_at",
       headerName: "End Date",
-      width: 200,
+      width: 150,
       valueGetter: (params) => toLocalTime(params.row.ended_at, "MM/DD/YYYY"),
     },
     {
       field: "amount",
       headerName: "Amount",
-      width: 200,
+      width: 100,
     },
     {
       field: "currency",
       headerName: "Currency",
-      width: 200,
+      width: 100,
     },
     {
       field: "location",
@@ -159,6 +160,15 @@ const ManageExpensesPage = (props) => {
         <div className="p-24 flex">
           <div className="w-full self-center">
             <h4>{t("PAGE_TITLE")}</h4>
+          </div>
+          <div className="float-right">
+            <Button
+              variant="contained"
+              color="primary"
+              aria-label="Add"
+            >
+              Upload
+            </Button>
           </div>
         </div>
       }
