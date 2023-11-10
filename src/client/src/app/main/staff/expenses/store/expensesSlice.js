@@ -36,11 +36,11 @@ export const getExpenses = createAsyncThunk(
   }
 );
 
-export const updateExpense = createAsyncThunk(
-  "staff/expenses/updateExpense",
-  async (expense) => {
-    const response = await axios.post(`${API}/update`, {
-      expense,
+export const createExpense = createAsyncThunk(
+  "staff/expenses/createExpense",
+  async (file) => {
+    const response = await axios.post(`${API}/create`, {
+      file,
     });
     if (response?.status == 200) {
       const {
@@ -53,14 +53,15 @@ export const updateExpense = createAsyncThunk(
         return data?.expense ?? {};
       } else {
         if (!FuseUtils.isEmpty(error))
-          console.error(`${LOG_PATH}@updateExpense`, error);
+          console.error(`${LOG_PATH}@createExpense`, error);
 
         return {
+          createdExpenses: [],
           ...response.data,
         };
       }
     } else {
-      return {};
+      return [];
     }
   }
 );
@@ -69,13 +70,13 @@ const expensesSlice = createSlice({
   name: "staff/expenses",
   initialState: {
     expenses: [],
-    updatedExpense: {},
+    createdExpenses: [],
   },
   reducers: {},
   extraReducers: {
     [getExpenses.fulfilled]: (state, action) => action.payload,
-    [updateExpense.fulfilled]: (state, action) => {
-      state.updatedExpense = action.payload;
+    [createExpense.fulfilled]: (state, action) => {
+      state.createdExpenses = action.payload;
     },
   },
 });

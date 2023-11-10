@@ -1,14 +1,16 @@
 import { styled } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import FusePageSimple from "@fuse/core/FusePageSimple";
-import EditIcon from "@mui/icons-material/Edit";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
-import { getExpenses, selectExpenses } from "./store/expensesSlice";
+import {
+  getExpenses,
+  selectExpenses,
+  createExpense,
+} from "./store/expensesSlice";
 import { useDispatch, useSelector } from "react-redux";
 import withReducer from "app/store/withReducer";
 import reducer from "./store";
 import { useEffect, useState } from "react";
-import EditExpenseModal from "./EditExpenseModal";
 import { showMessage } from "app/store/fuse/messageSlice";
 import FuseUtils from "@fuse/utils/FuseUtils";
 import moment from "moment";
@@ -45,8 +47,6 @@ const ManageExpensesPage = (props) => {
   const { t } = useTranslation("ManageExpensesPage");
 
   const [loading, setLoading] = useState(false);
-  const [openEditModal, setOpenEditModal] = useState(false);
-  const [editExpense, setEditExpense] = useState({});
   const [rows, setRows] = useState([]);
 
   const dispatch = useDispatch();
@@ -67,21 +67,15 @@ const ManageExpensesPage = (props) => {
     });
   }, [dispatch]);
 
-  const handleEditExpense = (id) => () => {
-    setEditExpense(rows.find((expense) => expense._id == id));
-    setOpenEditModal(true);
-  };
-
-  const handleCloseEditModal = () => {
-    setOpenEditModal(false);
-  };
-
-  const handleUpdatedExpense = (updatedExpense) => {
-    handleCloseEditModal();
-    _showMessage("Successfully updated!", "info");
-    setRows(
-      rows.map((row) => (row._id === updatedExpense._id ? updatedExpense : row))
-    );
+  const handleUploadExpenseFile = (event) => {
+    if (!event.target.value) return;
+    // dispatch(createExpense(event.target.value))
+    //   .then((data) => {
+    //     console.log({ data });
+    //   })
+    //   .catch((error) => {
+    //     console.log({ error });
+    //   });
   };
 
   const _showMessage = (message = "", variant = "info") => {
@@ -147,24 +141,6 @@ const ManageExpensesPage = (props) => {
       width: 200,
       valueGetter: (params) => toLocalTime(params.row.updated_at),
     },
-    // {
-    //   field: "actions",
-    //   type: "actions",
-    //   headerName: "Actions",
-    //   width: 100,
-    //   cellClassName: "actions",
-    //   getActions: ({ id }) => {
-    //     return [
-    //       <GridActionsCellItem
-    //         icon={<EditIcon />}
-    //         label="Edit"
-    //         className="textPrimary"
-    //         onClick={handleEditExpense(id)}
-    //         color="inherit"
-    //       />,
-    //     ];
-    //   },
-    // },
   ];
 
   return (
@@ -182,7 +158,11 @@ const ManageExpensesPage = (props) => {
               startIcon={<CloudUploadIcon />}
             >
               Upload
-              <VisuallyHiddenInput type="file" />
+              <VisuallyHiddenInput
+                onChange={handleUploadExpenseFile}
+                accept=".xlsx, .xls, .csv"
+                type="file"
+              />
             </Button>
           </div>
         </div>
@@ -205,14 +185,6 @@ const ManageExpensesPage = (props) => {
                 pageSizeOptions={[5, 10]}
                 checkboxSelection
               />
-              {openEditModal && (
-                <EditExpenseModal
-                  defaultValue={editExpense}
-                  open={openEditModal}
-                  handleClose={handleCloseEditModal}
-                  handleUpdated={handleUpdatedExpense}
-                />
-              )}
             </>
           )}
         </div>
