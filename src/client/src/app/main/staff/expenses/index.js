@@ -14,6 +14,7 @@ import FuseUtils from "@fuse/utils/FuseUtils";
 import moment from "moment";
 import FuseLoading from "@fuse/core/FuseLoading";
 import Button from "@mui/material/Button";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {
@@ -27,6 +28,18 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-sidebarHeader": {},
   "& .FusePageSimple-sidebarContent": {},
 }));
+
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
 
 const ManageExpensesPage = (props) => {
   const { t } = useTranslation("ManageExpensesPage");
@@ -163,11 +176,13 @@ const ManageExpensesPage = (props) => {
           </div>
           <div className="float-right">
             <Button
+              component="label"
               variant="contained"
               color="primary"
-              aria-label="Add"
+              startIcon={<CloudUploadIcon />}
             >
               Upload
+              <VisuallyHiddenInput type="file" />
             </Button>
           </div>
         </div>

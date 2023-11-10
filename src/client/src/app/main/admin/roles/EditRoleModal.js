@@ -14,6 +14,7 @@ import { Box } from "@mui/material";
 import FuseLoading from "@fuse/core/FuseLoading";
 import FuseUtils from "@fuse/utils/FuseUtils";
 import { showMessage } from "app/store/fuse/messageSlice";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 /**
  * Form Validation Schema
@@ -131,20 +132,16 @@ export default function EditRoleModal({
               >
                 Cancel
               </Button>
-              {!loading ? (
-                <Button
-                  variant="contained"
-                  color="success"
-                  className=" w-full mt-10 "
-                  aria-label="Save"
-                  type="submit"
-                  disabled={_.isEmpty(dirtyFields) || !isValid}
-                >
-                  Save
-                </Button>
-              ) : (
-                <FuseLoading showLabel={false} delay={0} />
-              )}
+              <LoadingButton
+                variant="contained"
+                color="success"
+                className=" w-full mt-10 "
+                aria-label="Save"
+                type="submit"
+                disabled={_.isEmpty(dirtyFields) || !isValid}
+              >
+                Save
+              </LoadingButton>
             </Box>
           </form>
         </DialogContent>
