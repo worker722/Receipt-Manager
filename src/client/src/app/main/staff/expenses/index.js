@@ -3,12 +3,12 @@ import { useTranslation } from "react-i18next";
 import FusePageSimple from "@fuse/core/FusePageSimple";
 import EditIcon from "@mui/icons-material/Edit";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
-import { getRoles, selectRoles } from "./store/rolesSlice";
+import { getExpenses, selectExpenses } from "./store/expensesSlice";
 import { useDispatch, useSelector } from "react-redux";
 import withReducer from "app/store/withReducer";
 import reducer from "./store";
 import { useEffect, useState } from "react";
-import EditRoleModal from "./EditRoleModal";
+import EditExpenseModal from "./EditExpenseModal";
 import { showMessage } from "app/store/fuse/messageSlice";
 import FuseUtils from "@fuse/utils/FuseUtils";
 import moment from "moment";
@@ -27,24 +27,24 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-sidebarContent": {},
 }));
 
-const ManageRolesPage = (props) => {
-  const { t } = useTranslation("ManageRolesPage");
+const ManageExpensesPage = (props) => {
+  const { t } = useTranslation("ManageExpensesPage");
 
   const [loading, setLoading] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
-  const [editRole, setEditRole] = useState({});
+  const [editExpense, setEditExpense] = useState({});
   const [rows, setRows] = useState([]);
 
   const dispatch = useDispatch();
-  const { roles } = useSelector(selectRoles);
+  const { expenses } = useSelector(selectExpenses);
 
   useEffect(() => {
-    setRows(roles);
-  }, [roles]);
+    setRows(expenses);
+  }, [expenses]);
 
   useEffect(() => {
     setLoading(true);
-    dispatch(getRoles()).then((data) => {
+    dispatch(getExpenses()).then((data) => {
       const { message = "" } = data.payload;
       if (!FuseUtils.isEmpty(message)) {
         _showMessage(message, "error");
@@ -53,8 +53,8 @@ const ManageRolesPage = (props) => {
     });
   }, [dispatch]);
 
-  const handleEditRole = (id) => () => {
-    setEditRole(rows.find((role) => role._id == id));
+  const handleEditExpense = (id) => () => {
+    setEditExpense(rows.find((expense) => expense._id == id));
     setOpenEditModal(true);
   };
 
@@ -62,11 +62,11 @@ const ManageRolesPage = (props) => {
     setOpenEditModal(false);
   };
 
-  const handleUpdatedRole = (updatedRole) => {
+  const handleUpdatedExpense = (updatedExpense) => {
     handleCloseEditModal();
     _showMessage("Successfully updated!", "info");
     setRows(
-      rows.map((row) => (row._id === updatedRole._id ? updatedRole : row))
+      rows.map((row) => (row._id === updatedExpense._id ? updatedExpense : row))
     );
   };
 
@@ -79,27 +79,47 @@ const ManageRolesPage = (props) => {
     );
   };
 
-  const toLocalTime = (time) => {
-    return moment.utc(time).local().format("YYYY-MM-DD hh:mm:ss");
+  const toLocalTime = (time, format = "YYYY-MM-DD hh:mm:ss") => {
+    return moment.utc(time).local().format(format);
   };
 
   const columns = [
     {
-      field: "name",
-      headerName: "Name",
+      field: "merchant",
+      headerName: "Merchant",
       width: 200,
-      editable: true,
-      valueGetter: (params) => {
-        if (`${params.row.name}` == "admin") return "Administrator";
-        else if (`${params.row.name}` == "staff") return "Staff";
-        else if (`${params.row.name}` == "user") return "User";
-      },
     },
     {
-      field: "redirect_url",
-      headerName: "Redirect URL",
+      field: "started_at",
+      headerName: "Start Date",
       width: 200,
-      editable: true,
+      valueGetter: (params) => toLocalTime(params.row.started_at, "MM/DD/YYYY"),
+    },
+    {
+      field: "ended_at",
+      headerName: "End Date",
+      width: 200,
+      valueGetter: (params) => toLocalTime(params.row.ended_at, "MM/DD/YYYY"),
+    },
+    {
+      field: "amount",
+      headerName: "Amount",
+      width: 200,
+    },
+    {
+      field: "currency",
+      headerName: "Currency",
+      width: 200,
+    },
+    {
+      field: "location",
+      headerName: "Location",
+      width: 200,
+    },
+    {
+      field: "company",
+      headerName: "Company",
+      width: 200,
     },
     {
       field: "created_at",
@@ -113,24 +133,24 @@ const ManageRolesPage = (props) => {
       width: 200,
       valueGetter: (params) => toLocalTime(params.row.updated_at),
     },
-    {
-      field: "actions",
-      type: "actions",
-      headerName: "Actions",
-      width: 100,
-      cellClassName: "actions",
-      getActions: ({ id }) => {
-        return [
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Edit"
-            className="textPrimary"
-            onClick={handleEditRole(id)}
-            color="inherit"
-          />,
-        ];
-      },
-    },
+    // {
+    //   field: "actions",
+    //   type: "actions",
+    //   headerName: "Actions",
+    //   width: 100,
+    //   cellClassName: "actions",
+    //   getActions: ({ id }) => {
+    //     return [
+    //       <GridActionsCellItem
+    //         icon={<EditIcon />}
+    //         label="Edit"
+    //         className="textPrimary"
+    //         onClick={handleEditExpense(id)}
+    //         color="inherit"
+    //       />,
+    //     ];
+    //   },
+    // },
   ];
 
   return (
@@ -161,11 +181,11 @@ const ManageRolesPage = (props) => {
                 checkboxSelection
               />
               {openEditModal && (
-                <EditRoleModal
-                  defaultValue={editRole}
+                <EditExpenseModal
+                  defaultValue={editExpense}
                   open={openEditModal}
                   handleClose={handleCloseEditModal}
-                  handleUpdated={handleUpdatedRole}
+                  handleUpdated={handleUpdatedExpense}
                 />
               )}
             </>
@@ -177,4 +197,4 @@ const ManageRolesPage = (props) => {
   );
 };
 
-export default withReducer("manageRolesPage", reducer)(ManageRolesPage);
+export default withReducer("manageExpensesPage", reducer)(ManageExpensesPage);

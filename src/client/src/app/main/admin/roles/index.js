@@ -88,7 +88,6 @@ const ManageRolesPage = (props) => {
       field: "name",
       headerName: "Name",
       width: 200,
-      editable: true,
       valueGetter: (params) => {
         if (`${params.row.name}` == "admin") return "Administrator";
         else if (`${params.row.name}` == "staff") return "Staff";
@@ -99,7 +98,6 @@ const ManageRolesPage = (props) => {
       field: "redirect_url",
       headerName: "Redirect URL",
       width: 200,
-      editable: true,
     },
     {
       field: "created_at",

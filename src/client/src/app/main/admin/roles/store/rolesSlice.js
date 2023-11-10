@@ -1,8 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { showMessage } from "app/store/fuse/messageSlice";
 import _ from "@lodash";
 import FuseUtils from "@fuse/utils/FuseUtils";
+
+const LOG_PATH = "admin/roles/store/rolesSlice";
 
 export const getRoles = createAsyncThunk("admin/roles/getRoles", async () => {
   const response = await axios.get("/api/admin/roles/getAll");
@@ -12,7 +13,7 @@ export const getRoles = createAsyncThunk("admin/roles/getRoles", async () => {
       return data ?? { roles: [] };
     } else {
       if (!FuseUtils.isEmpty(error))
-        console.error("admin/roles/store/rolesSlice/getRoles", error);
+        console.error(`${LOG_PATH}@getRoles`, error);
 
       return {
         roles: [],
@@ -40,7 +41,8 @@ export const updateRole = createAsyncThunk(
       if (status == 200) {
         return data?.role ?? {};
       } else {
-        console.error("admin/roles/store/rolesSlice/updateRole", error);
+        if (!FuseUtils.isEmpty(error))
+          console.error(`${LOG_PATH}@updateRole`, error);
 
         return {
           ...response.data,

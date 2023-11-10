@@ -9,7 +9,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { updateRole } from "./store/rolesSlice";
+import { updateExpense } from "./store/expensesSlice";
 import { Box } from "@mui/material";
 import FuseLoading from "@fuse/core/FuseLoading";
 import FuseUtils from "@fuse/utils/FuseUtils";
@@ -26,7 +26,7 @@ const defaultValues = {
   redirect_url: "/",
 };
 
-export default function EditRoleModal({
+export default function EditExpenseModal({
   defaultValue = {},
   open = false,
   handleClose = {},
@@ -52,7 +52,7 @@ export default function EditRoleModal({
   const onSubmit = ({ redirect_url }) => {
     setLoading(true);
     dispatch(
-      updateRole({
+      updateExpense({
         _id: defaultValue._id,
         redirect_url,
       })
@@ -73,7 +73,7 @@ export default function EditRoleModal({
 
   const _onClose = (event, reason) => {
     if (reason == "escapeKeyDown" || reason == "backdropClick") {
-      // Unknown event, cannot be closed without role interactions
+      // Unknown event, cannot be closed without expense interactions
     } else {
       // Can be added saving change confirmation like: 'There are some unsaved changes. Do you want to leave?'
       handleClose && handleClose();
@@ -92,10 +92,10 @@ export default function EditRoleModal({
           paper: "rounded-8",
         }}
       >
-        <DialogTitle>Edit Role</DialogTitle>
+        <DialogTitle>Edit Expense</DialogTitle>
         <DialogContent>
           <form
-            name="updateRoleForm"
+            name="updateExpenseForm"
             noValidate
             className="flex flex-col justify-center w-full mt-32"
             onSubmit={handleSubmit(onSubmit)}

@@ -1,8 +1,8 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import roles from "./rolesSlice";
+import expenses from "./expensesSlice";
 
 const reducer = combineReducers({
-  roles,
+  expenses,
 });
 
 export default reducer;

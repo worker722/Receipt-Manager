@@ -1,5 +1,5 @@
 const locale = {
-  PAGE_TITLE: 'Gérer Les Utilisateurs',
+  PAGE_TITLE: 'Gérer les dépenses',
 };
 
 export default locale;

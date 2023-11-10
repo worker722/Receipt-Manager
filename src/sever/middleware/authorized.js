@@ -82,6 +82,24 @@ function isStaff(req, res, next) {
   }
 }
 
+function isUser(req, res, next) {
+  if (
+    req.currentUser.role.name == "admin" ||
+    req.currentUser.role.name == "user"
+  ) {
+    next();
+  } else {
+    console.log("You're not permitted to perform this action.");
+    return response(
+      res,
+      {},
+      {},
+      403,
+      "You are not permitted to perform this actions."
+    );
+  }
+}
+
 function isOnlyUser(req, res, next) {
   if (req.currentUser.role.name == "user") {
     next();
@@ -97,4 +115,4 @@ function isOnlyUser(req, res, next) {
   }
 }
 
-module.exports = { Authenticated, isAdmin, isStaff, isOnlyUser };
+module.exports = { Authenticated, isAdmin, isStaff, isUser, isOnlyUser };

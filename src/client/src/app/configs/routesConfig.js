@@ -7,9 +7,15 @@ import settingsConfig from "app/configs/settingsConfig";
 import Error404Page from "../main/404/Error404Page";
 import DashboardConfigs from "../main/dashboards/config.dashboards";
 import AdminConfigs from "../main/admin/config.admin";
+import StaffConfigs from "../main/staff/config.staff";
 import AuthConfigs from "../main/auth/config.auth";
 
-const routeConfigs = [...DashboardConfigs, ...AdminConfigs, ...AuthConfigs];
+const routeConfigs = [
+  ...DashboardConfigs,
+  ...AdminConfigs,
+  ...StaffConfigs,
+  ...AuthConfigs,
+];
 
 const routes = [
   ...FuseUtils.generateRoutesFromConfigs(
