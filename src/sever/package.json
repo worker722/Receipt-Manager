@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server",
     "dev": "nodemon server",
-    "live": "pm2 start server.js"
+    "live": "pm2 start server.js",
+    "build": "ncc build server.js -o dist"
   },
   "author": "Panther",
   "license": "MIT",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^8.2.0",
+    "@vercel/ncc": "^0.38.1",
     "concurrently": "^6.0.0",
     "nodemon": "^2.0.7"
   }
