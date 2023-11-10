@@ -1,8 +1,8 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const User = require("../../models/userModel.js");
-const response = require("../../utils/response.js");
+const User = require("@models/userModel.js");
+const response = require("@utils/response.js");
 
 // const mailjet = require ('node-mailjet')
 // .connect('6d599b08fcc04ddcdaede7a9f0c880d9', '9da3014d83bce0f52a4f363a37e52f38', {

@@ -5,7 +5,9 @@ const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 
-const routes = require("./routes");
+require('module-alias/register')
+
+const routes = require("./src/routes");
 
 const app = express();
 

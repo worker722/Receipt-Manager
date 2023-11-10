@@ -1,5 +1,5 @@
-const Expense = require("../../models/expenseModel");
-const { response } = require("../../utils");
+const Expense = require("@models/expenseModel");
+const { response } = require("@utils");
 const { faker } = require("@faker-js/faker");
 
 const LOG_PATH = "staff/expensesController";

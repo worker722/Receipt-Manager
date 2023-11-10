@@ -1,6 +1,6 @@
-const { User, REF_NAME } = require("../../../models/userModel");
-const Role = require("../../../models/roleModel");
-const { response, isEmpty } = require("../../../utils");
+const { User, REF_NAME } = require("@models/userModel");
+const Role = require("@models/roleModel");
+const { response, isEmpty } = require("@utils");
 const bcrypt = require("bcryptjs");
 const { faker } = require("@faker-js/faker");
 

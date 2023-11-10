@@ -3,11 +3,11 @@ const express = require("express");
 const {
   getAll,
   createExpense,
-} = require("../../../controllers/staff/expensesController");
+} = require("@controllers/staff/expensesController");
 
 const router = express.Router();
 
-const { Authenticated, isStaff } = require("../../../middleware/authorized");
+const { Authenticated, isStaff } = require("@middleware/authorized");
 
 router.get("/getAll", [Authenticated, isStaff], getAll);
 router.post("/create", [Authenticated, isStaff], createExpense);

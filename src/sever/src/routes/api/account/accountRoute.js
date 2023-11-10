@@ -2,7 +2,7 @@ const express = require("express");
 
 const {
   verifyEmail
-} = require("../../../controllers/account/accountController");
+} = require("@controllers/account/accountController");
 
 const router = express.Router();
 
