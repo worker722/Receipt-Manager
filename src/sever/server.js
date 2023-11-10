@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const path = require("path");
 
 require('module-alias/register')
 
@@ -12,6 +13,8 @@ const routes = require("./src/routes");
 const app = express();
 
 dotenv.config();
+
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));

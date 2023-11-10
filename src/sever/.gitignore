@@ -8,6 +8,9 @@ client/node_modules
 keys.js
 .env
 
+# Uploads
+/uploads
+
 # testing
 /coverage
 
