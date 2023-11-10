@@ -1,15 +1,18 @@
 const { User, REF_NAME } = require("../../../models/userModel");
 const Role = require("../../../models/roleModel");
-const response = require("../../../utils/response");
+const { response, isEmpty } = require("../../../utils");
 const bcrypt = require("bcryptjs");
 const { faker } = require("@faker-js/faker");
 const { avatarUploader } = require("../../../utils/fileUploader");
 
-const LOG_PATH = "admin/manage/usersController"
+const LOG_PATH = "admin/manage/usersController";
 
 const getAll = async (req, res) => {
   try {
-    const users = (await User.find({}).populate(REF_NAME.ROLE).exec()) ?? [];
+    const users =
+      (await User.find({ _id: { $ne: req.currentUser._id } })
+        .populate(REF_NAME.ROLE)
+        .exec()) ?? [];
     return response(res, { users }, {}, 200);
   } catch (error) {
     response(res, {}, error, 500, "Something went wrong!");
@@ -57,27 +60,35 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { user } = req.body;
-  if (!user?.fullName || !user?.email || !user?.password || !user?.role)
+  if (!user?.fullName || !user?.email || !user?.role)
     return response(res, {}, {}, 400, "Please fill all the required fields.");
 
-  const _password = await bcrypt.hash(user.password, 10);
   const _role = await Role.getRoleID(user.role);
+  var _fields = {};
+  if (!isEmpty(user.password)) {
+    const _password = await bcrypt.hash(user.password, 10);
+    _fields = {
+      $set: {
+        role: _role,
+        name: user.fullName,
+        email: user.email,
+        password: _password,
+      },
+    };
+  } else {
+    _fields = {
+      $set: {
+        role: _role,
+        name: user.fullName,
+        email: user.email,
+      },
+    };
+  }
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      user.id,
-      {
-        $set: {
-          name: user.fullName,
-          email: user.email,
-          password: _password,
-          role: _role,
-        },
-      },
-      {
-        new: true,
-      }
-    )
+    const updatedUser = await User.findByIdAndUpdate(user.id, _fields, {
+      new: true,
+    })
       .populate(REF_NAME.ROLE)
       .exec();
 

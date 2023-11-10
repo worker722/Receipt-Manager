@@ -1,6 +1,8 @@
 import * as React from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -30,18 +32,20 @@ const schema = yup.object().shape({
     .required("You must enter a email"),
   password: yup
     .string()
-    .required("Please enter your password.")
+    .required("Please enter new password.")
     .min(8, "Password is too short - should be 8 chars minimum."),
   passwordConfirm: yup
     .string()
     .oneOf([yup.ref("password"), null], "Passwords must match"),
 });
 
+const defaultPassword = "123456789";
+
 const defaultValues = {
   fullName: "",
   email: "",
-  password: "",
-  passwordConfirm: "",
+  password: defaultPassword,
+  passwordConfirm: defaultPassword,
 };
 
 export default function EditUserModal({
@@ -53,9 +57,33 @@ export default function EditUserModal({
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("user");
+  const [visiblePassword, setVisiblePassword] = useState(false);
 
   const handleChangeRole = (event) => {
     setRole(event.target.value);
+  };
+
+  const handleChangePasswordReset = () => {
+    if (visiblePassword) {
+      setValue("password", defaultPassword, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue("passwordConfirm", defaultPassword, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    } else {
+      setValue("password", "", {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue("passwordConfirm", "", {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+    setVisiblePassword(!visiblePassword);
   };
 
   const { control, formState, handleSubmit, setValue } = useForm({
@@ -84,7 +112,7 @@ export default function EditUserModal({
         id: defaultValue._id,
         fullName,
         email,
-        password,
+        password: visiblePassword ? password : "",
         role,
       })
     ).then((data) => {
@@ -97,7 +125,7 @@ export default function EditUserModal({
           })
         );
       } else {
-        handleUpdated(data.payload);
+        if (!FuseUtils.isEmpty(data?.payload)) handleUpdated(data.payload);
       }
     });
   };
@@ -191,40 +219,60 @@ export default function EditUserModal({
             />
 
             <Controller
-              name="password"
+              name="password_reset"
               control={control}
               render={({ field }) => (
-                <TextField
-                  {...field}
-                  className="mb-24"
-                  label="Password"
-                  type="password"
-                  error={!!errors.password}
-                  helperText={errors?.password?.message}
-                  variant="outlined"
-                  required
-                  fullWidth
-                />
+                <div>
+                  <FormControlLabel
+                    {...field}
+                    className="mb-12"
+                    control={<Checkbox onChange={handleChangePasswordReset} />}
+                    label="Reset Password"
+                  />
+                </div>
               )}
             />
 
-            <Controller
-              name="passwordConfirm"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  className="mb-24"
-                  label="Password (Confirm)"
-                  type="password"
-                  error={!!errors.passwordConfirm}
-                  helperText={errors?.passwordConfirm?.message}
-                  variant="outlined"
-                  required
-                  fullWidth
+            {visiblePassword && (
+              <>
+                <Controller
+                  name="password"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      className="mb-24"
+                      label="New Password"
+                      type="password"
+                      error={!!errors.password}
+                      helperText={errors?.password?.message}
+                      variant="outlined"
+                      required
+                      fullWidth
+                    />
+                  )}
                 />
-              )}
-            />
+
+                <Controller
+                  name="passwordConfirm"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      className="mb-24"
+                      label="Password (Confirm)"
+                      type="password"
+                      error={!!errors.passwordConfirm}
+                      helperText={errors?.passwordConfirm?.message}
+                      variant="outlined"
+                      required
+                      fullWidth
+                    />
+                  )}
+                />
+              </>
+            )}
+
             <Box>
               <Button
                 variant="outlined"

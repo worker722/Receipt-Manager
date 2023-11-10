@@ -1,6 +1,6 @@
 const { User, REF_NAME } = require("../../models/userModel.js");
 const Role = require("../../models/roleModel.js");
-const response = require("../../utils/response.js");
+const { response } = require("../../utils");
 const jwt = require("jsonwebtoken");
 
 // Sign Up / Register User
