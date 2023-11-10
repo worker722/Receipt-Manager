@@ -1,6 +1,8 @@
 const Expense = require("@models/expenseModel");
 const { response, fileUploader } = require("@utils");
 const { faker } = require("@faker-js/faker");
+var XLSX = require("xlsx");
+const mongoose = require("mongoose");
 
 const LOG_PATH = "staff/expensesController";
 
@@ -15,7 +17,7 @@ const getAll = async (req, res) => {
 };
 
 const createExpense = async (req, res) => {
-  fileUploader.expenseUploader(req, res, function (_err) {
+  fileUploader.expenseUploader(req, res, async function (_err) {
     if (_err) {
       return response(
         res,
@@ -25,8 +27,12 @@ const createExpense = async (req, res) => {
         "File upload failed. Please try again."
       );
     } else {
-      const file = req.file;
-      response(res, { expense: file }, {}, 200, "success");
+      const workbook = XLSX.readFile(req.file.path);
+      const sheet_name_list = workbook.SheetNames;
+      const json_data = XLSX.utils.sheet_to_json(
+        workbook.Sheets[sheet_name_list[0]]
+      );
+      response(res, {file: req.file, expenses: json_data}, {}, 200);
     }
   });
 };

@@ -56,7 +56,7 @@ export const createExpense = createAsyncThunk(
         status = -1,
       } = response.data;
       if (status == 200) {
-        return data?.expense ?? {};
+        return data?.expenses ?? {};
       } else {
         if (!FuseUtils.isEmpty(error))
           console.error(`${LOG_PATH}@createExpense`, error);

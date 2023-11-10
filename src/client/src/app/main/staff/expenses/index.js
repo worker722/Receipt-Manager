@@ -49,6 +49,8 @@ const ManageExpensesPage = (props) => {
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
 
+  const [columns, setColumns] = useState([]);
+
   const dispatch = useDispatch();
   const { expenses } = useSelector(selectExpenses);
 
@@ -68,10 +70,20 @@ const ManageExpensesPage = (props) => {
   }, [dispatch]);
 
   const handleUploadExpenseFile = (event) => {
-    if (!event.target.files.length == 0) return;
+    if (event.target.files.length == 0) return;
     dispatch(createExpense(event.target.files[0]))
       .then((data) => {
-        console.log({ data });
+        const keys = Object.keys(data.payload[0]);
+        var temp_columns = [];
+        keys.forEach((key) => {
+          temp_columns.push({
+            field: key,
+            headerName: key,
+            width: 200,
+          });
+        });
+        setColumns(temp_columns);
+        setRows(data?.payload);
       })
       .catch((error) => {
         console.log({ error });
@@ -91,57 +103,68 @@ const ManageExpensesPage = (props) => {
     return moment.utc(time).local().format(format);
   };
 
-  const columns = [
-    {
-      field: "merchant",
-      headerName: "Merchant",
-      width: 200,
-    },
-    {
-      field: "started_at",
-      headerName: "Start Date",
-      width: 150,
-      valueGetter: (params) => toLocalTime(params.row.started_at, "MM/DD/YYYY"),
-    },
-    {
-      field: "ended_at",
-      headerName: "End Date",
-      width: 150,
-      valueGetter: (params) => toLocalTime(params.row.ended_at, "MM/DD/YYYY"),
-    },
-    {
-      field: "amount",
-      headerName: "Amount",
-      width: 100,
-    },
-    {
-      field: "currency",
-      headerName: "Currency",
-      width: 100,
-    },
-    {
-      field: "location",
-      headerName: "Location",
-      width: 200,
-    },
-    {
-      field: "company",
-      headerName: "Company",
-      width: 200,
-    },
-    {
-      field: "created_at",
-      headerName: "Created at",
-      width: 200,
-      valueGetter: (params) => toLocalTime(params.row.created_at),
-    },
-    {
-      field: "updated_at",
-      headerName: "Updated at",
-      width: 200,
-      valueGetter: (params) => toLocalTime(params.row.updated_at),
-    },
-  ];
+  // const columns = [
+  //   {
+  //     field: "merchant",
+  //     headerName: "Merchant",
+  //     width: 200,
+  //   },
+  //   {
+  //     field: "started_at",
+  //     headerName: "Start Date",
+  //     width: 150,
+  //     valueGetter: (params) => toLocalTime(params.row.started_at, "MM/DD/YYYY"),
+  //   },
+  //   {
+  //     field: "ended_at",
+  //     headerName: "End Date",
+  //     width: 150,
+  //     valueGetter: (params) => toLocalTime(params.row.ended_at, "MM/DD/YYYY"),
+  //   },
+  //   {
+  //     field: "amount",
+  //     headerName: "Amount",
+  //     width: 100,
+  //   },
+  //   {
+  //     field: "currency",
+  //     headerName: "Currency",
+  //     width: 100,
+  //   },
+  //   {
+  //     field: "location",
+  //     headerName: "Location",
+  //     width: 200,
+  //   },
+  //   {
+  //     field: "company",
+  //     headerName: "Company",
+  //     width: 200,
+  //   },
+  //   {
+  //     field: "created_at",
+  //     headerName: "Created at",
+  //     width: 200,
+  //     valueGetter: (params) => toLocalTime(params.row.created_at),
+  //   },
+  //   {
+  //     field: "updated_at",
+  //     headerName: "Updated at",
+  //     width: 200,
+  //     valueGetter: (params) => toLocalTime(params.row.updated_at),
+  //   },
+  // ];
+
+  const generateRandomString = (length) => {
+    let result = "";
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  };
 
   return (
     <Root
@@ -176,7 +199,7 @@ const ManageExpensesPage = (props) => {
               <DataGrid
                 rows={rows}
                 columns={columns}
-                getRowId={(row) => row._id}
+                getRowId={(row) => generateRandomString(9)}
                 initialState={{
                   pagination: {
                     paginationModel: { page: 0, pageSize: 10 },
