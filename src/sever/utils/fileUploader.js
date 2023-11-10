@@ -1,16 +1,23 @@
 const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
-// Set up storage for uploaded files
+const _DIR = {
+  avatar: "uploads/profile/avatar",
+  expense: "uploads/expense/",
+};
+
+// Set up storage for uploaded profile images
 const avatarStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/profile/avatar/");
+    cb(null, _DIR.avatar);
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
+    cb(null, `profile_image_${Date.now()}_${file.originalname}`);
   },
 });
 
-// Create the multer instance
+// Create the multer instance for profile image file upload
 const avatarUploader = multer({
   storage: avatarStorage,
   fileFilter: function (req, file, cb) {
@@ -20,16 +27,75 @@ const avatarUploader = multer({
 
     var extname = filetypes.test(path.extname(file.originalname).toLowerCase());
 
+    const BASE_DIR_PATH = path.join(path.resolve("./"), _DIR.avatar);
+
     if (mimetype && extname) {
-      return cb(null, true);
+      if (!fs.existsSync(BASE_DIR_PATH)) {
+        fs.mkdir(BASE_DIR_PATH, { recursive: true }, (err) => {
+          if (err) {
+            return cb("Directory cannot be created now!");
+          }
+          return cb(null, true);
+        });
+      } else {
+        return cb(null, true);
+      }
+    } else {
+      cb(
+        "Error: File upload only supports the " +
+          "following filetypes - " +
+          filetypes
+      );
     }
-
-    cb(
-      "Error: File upload only supports the " +
-        "following filetypes - " +
-        filetypes
-    );
   },
-}).single('avatar');
+}).single("avatar");
 
-module.exports = { avatarUploader };
+// Set up storage for uploaded bank expense files
+const expenseStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, `${_DIR.expense}/${req.currentUser._id}`);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `expense_${Date.now()}_${file.originalname}`);
+  },
+});
+
+// Create the multer instance for Bank Expense file upload
+const expenseUploader = multer({
+  storage: expenseStorage,
+  fileFilter: function (req, file, cb) {
+    // Set the filetypes, it is optional
+    var filetypes = /xlsx|xls|csv|vnd.ms-excel/;
+    var mimetype = filetypes.test(file.mimetype);
+
+    var extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
+    // App path/uploads/expense/user_id
+    const BASE_DIR_PATH = path.join(
+      path.resolve("./"),
+      `${_DIR.expense}/${req.currentUser._id}`
+    );
+
+    if (mimetype && extname) {
+      if (!fs.existsSync(BASE_DIR_PATH)) {
+        fs.mkdir(BASE_DIR_PATH, { recursive: true }, (err) => {
+          if (err) {
+            return cb("Directory cannot be created now!");
+          }
+          return cb(null, true);
+        });
+      } else {
+        return cb(null, true);
+      }
+    } else {
+      cb(
+        file.mimetype +
+          "Error: File upload only supports the " +
+          "following filetypes - " +
+          filetypes
+      );
+    }
+  },
+}).single("expense");
+
+module.exports = { avatarUploader, expenseUploader };
