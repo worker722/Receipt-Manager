@@ -70,7 +70,7 @@ const expenseUploader = multer({
   storage: expenseStorage,
   fileFilter: function (req, file, cb) {
     // Set the filetypes, it is optional
-    var filetypes = /xlsx|xls|csv|vnd.ms-excel/;
+    var filetypes = /xlsx|xls|csv|excel|sheet/;
     var mimetype = filetypes.test(file.mimetype);
 
     var extname = filetypes.test(path.extname(file.originalname).toLowerCase());

@@ -68,14 +68,14 @@ const ManageExpensesPage = (props) => {
   }, [dispatch]);
 
   const handleUploadExpenseFile = (event) => {
-    if (!event.target.value) return;
-    // dispatch(createExpense(event.target.value))
-    //   .then((data) => {
-    //     console.log({ data });
-    //   })
-    //   .catch((error) => {
-    //     console.log({ error });
-    //   });
+    if (!event.target.files.length == 0) return;
+    dispatch(createExpense(event.target.files[0]))
+      .then((data) => {
+        console.log({ data });
+      })
+      .catch((error) => {
+        console.log({ error });
+      });
   };
 
   const _showMessage = (message = "", variant = "info") => {

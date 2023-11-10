@@ -26,7 +26,7 @@ const createExpense = async (req, res) => {
       );
     } else {
       const file = req.file;
-      response(res, { file: file }, {}, 200, "success");
+      response(res, { expense: file }, {}, 200, "success");
     }
   });
 };

@@ -38,10 +38,16 @@ export const getExpenses = createAsyncThunk(
 
 export const createExpense = createAsyncThunk(
   "staff/expenses/createExpense",
-  async (file) => {
-    const response = await axios.post(`${API}/create`, {
-      file,
-    });
+  async (expense) => {
+    const response = await axios.post(
+      `${API}/create`,
+      { expense },
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     if (response?.status == 200) {
       const {
         data = {},
