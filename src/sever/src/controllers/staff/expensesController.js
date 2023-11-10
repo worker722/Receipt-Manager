@@ -1,5 +1,5 @@
 const Expense = require("@models/expenseModel");
-const { response } = require("@utils");
+const { response, fileUploader } = require("@utils");
 const { faker } = require("@faker-js/faker");
 
 const LOG_PATH = "staff/expensesController";
@@ -14,7 +14,22 @@ const getAll = async (req, res) => {
   }
 };
 
-const createExpense = async (req, res) => {};
+const createExpense = async (req, res) => {
+  fileUploader.expenseUploader(req, res, function (_err) {
+    if (_err) {
+      return response(
+        res,
+        {},
+        _err,
+        400,
+        "File upload failed. Please try again."
+      );
+    } else {
+      const file = req.file;
+      response(res, { file: file }, {}, 200, "success");
+    }
+  });
+};
 
 const generateFakeData = async () => {
   try {

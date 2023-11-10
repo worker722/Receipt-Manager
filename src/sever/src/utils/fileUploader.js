@@ -13,7 +13,12 @@ const avatarStorage = multer.diskStorage({
     cb(null, _DIR.avatar);
   },
   filename: (req, file, cb) => {
-    cb(null, `profile_image_${Date.now()}_${file.originalname}`);
+    cb(
+      null,
+      `profile_image_${Date.now()}_${Math.round(Math.random() * 1e9)}_${
+        file.originalname
+      }`
+    );
   },
 });
 
