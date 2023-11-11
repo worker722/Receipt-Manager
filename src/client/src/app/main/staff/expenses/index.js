@@ -71,8 +71,11 @@ const ManageExpensesPage = (props) => {
 
   const handleUploadExpenseFile = (event) => {
     if (event.target.files.length == 0) return;
+
+    setLoading(true);
     dispatch(createExpense(event.target.files[0]))
       .then((data) => {
+        setLoading(false);
         const keys = Object.keys(data.payload[0]);
         var temp_columns = [];
         keys.forEach((key) => {
@@ -86,6 +89,7 @@ const ManageExpensesPage = (props) => {
         setRows(data?.payload);
       })
       .catch((error) => {
+        setLoading(false);
         console.log({ error });
       });
   };
@@ -102,58 +106,6 @@ const ManageExpensesPage = (props) => {
   const toLocalTime = (time, format = "YYYY-MM-DD hh:mm:ss") => {
     return moment.utc(time).local().format(format);
   };
-
-  // const columns = [
-  //   {
-  //     field: "merchant",
-  //     headerName: "Merchant",
-  //     width: 200,
-  //   },
-  //   {
-  //     field: "started_at",
-  //     headerName: "Start Date",
-  //     width: 150,
-  //     valueGetter: (params) => toLocalTime(params.row.started_at, "MM/DD/YYYY"),
-  //   },
-  //   {
-  //     field: "ended_at",
-  //     headerName: "End Date",
-  //     width: 150,
-  //     valueGetter: (params) => toLocalTime(params.row.ended_at, "MM/DD/YYYY"),
-  //   },
-  //   {
-  //     field: "amount",
-  //     headerName: "Amount",
-  //     width: 100,
-  //   },
-  //   {
-  //     field: "currency",
-  //     headerName: "Currency",
-  //     width: 100,
-  //   },
-  //   {
-  //     field: "location",
-  //     headerName: "Location",
-  //     width: 200,
-  //   },
-  //   {
-  //     field: "company",
-  //     headerName: "Company",
-  //     width: 200,
-  //   },
-  //   {
-  //     field: "created_at",
-  //     headerName: "Created at",
-  //     width: 200,
-  //     valueGetter: (params) => toLocalTime(params.row.created_at),
-  //   },
-  //   {
-  //     field: "updated_at",
-  //     headerName: "Updated at",
-  //     width: 200,
-  //     valueGetter: (params) => toLocalTime(params.row.updated_at),
-  //   },
-  // ];
 
   const generateRandomString = (length) => {
     let result = "";
@@ -196,18 +148,20 @@ const ManageExpensesPage = (props) => {
             <FuseLoading />
           ) : (
             <>
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                getRowId={(row) => generateRandomString(9)}
-                initialState={{
-                  pagination: {
-                    paginationModel: { page: 0, pageSize: 10 },
-                  },
-                }}
-                pageSizeOptions={[5, 10]}
-                checkboxSelection
-              />
+              {rows.length > 0 && columns.length > 0 && (
+                <DataGrid
+                  rows={rows}
+                  columns={columns}
+                  getRowId={(row) => generateRandomString(9)}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { page: 0, pageSize: 10 },
+                    },
+                  }}
+                  pageSizeOptions={[5, 10]}
+                  checkboxSelection
+                />
+              )}
             </>
           )}
         </div>
