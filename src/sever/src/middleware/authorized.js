@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const { response } = require("@utils");
-const { User, REF_NAME } = require("@models/userModel");
+const { response } = require("../utils");
+const { User, REF_NAME } = require("../models/userModel");
 
 function Authenticated(req, res, next) {
   try {

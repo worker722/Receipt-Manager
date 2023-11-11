@@ -1,15 +1,8 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const User = require("@models/userModel.js");
-const response = require("@utils/response.js");
-
-// const mailjet = require ('node-mailjet')
-// .connect('6d599b08fcc04ddcdaede7a9f0c880d9', '9da3014d83bce0f52a4f363a37e52f38', {
-//     url: 'api.mailjet.com', // default is the API url
-//     version: 'v3.1', // default is '/v3'
-//     perform_api_call: true // used for tests. default is true
-//   })
+const User = require("../../models/userModel");
+const { response } = require("../../utils");
 
 // Forget Password Route
 

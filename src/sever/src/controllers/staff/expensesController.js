@@ -1,8 +1,7 @@
-const Expense = require("@models/expenseModel");
-const { response, fileUploader } = require("@utils");
+const Expense = require("../../models/expenseModel");
+const { response, fileUploader } = require("../../utils");
 const { faker } = require("@faker-js/faker");
 var XLSX = require("xlsx");
-const mongoose = require("mongoose");
 
 const LOG_PATH = "staff/expensesController";
 

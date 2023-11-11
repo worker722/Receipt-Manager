@@ -5,7 +5,7 @@ const {
   SignInWithEmailAndPassword,
   SignInWithToken,
   SignOut,
-} = require("@controllers/auth/authController");
+} = require("../../../controllers/auth/authController");
 
 const router = express.Router();
 

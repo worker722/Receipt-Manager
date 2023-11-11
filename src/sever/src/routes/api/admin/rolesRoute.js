@@ -5,11 +5,11 @@ const {
   createRole,
   updateRole,
   deleteRole,
-} = require("@controllers/admin/manage/rolesController");
+} = require("../../../controllers/admin/manage/rolesController");
 
 const router = express.Router();
 
-const { Authenticated, isAdmin } = require("@middleware/authorized");
+const { Authenticated, isAdmin } = require("../../../middleware/authorized");
 
 router.get("/getAll", [Authenticated, isAdmin], getAll);
 router.post("/create", [Authenticated, isAdmin], createRole);

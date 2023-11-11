@@ -6,8 +6,6 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const path = require("path");
 
-require('module-alias/register')
-
 const routes = require("./src/routes");
 
 const app = express();

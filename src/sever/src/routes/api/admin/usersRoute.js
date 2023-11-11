@@ -7,11 +7,11 @@ const {
   updateAvatar,
   deleteUser,
   generateFakeData
-} = require("@controllers/admin/manage/usersController");
+} = require("../../../controllers/admin/manage/usersController");
 
 const router = express.Router();
 
-const { Authenticated, isAdmin } = require("@middleware/authorized");
+const { Authenticated, isAdmin } = require("../../../middleware/authorized");
 
 router.get("/getAll", [Authenticated, isAdmin], getAll);
 router.post("/create", [Authenticated, isAdmin], createUser);

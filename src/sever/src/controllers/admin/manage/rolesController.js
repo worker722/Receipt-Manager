@@ -1,5 +1,5 @@
-const Role = require("@models/roleModel");
-const { response } = require("@utils");
+const Role = require("../../../models/roleModel");
+const { response } = require("../../../utils");
 
 const LOG_PATH = "admin/manage/rolesController";
 
