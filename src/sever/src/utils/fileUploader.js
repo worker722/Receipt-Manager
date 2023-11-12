@@ -1,6 +1,6 @@
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const path = require("node:path");
+const fs = require("node:fs");
 
 const _DIR = {
   avatar: "uploads/profile/avatar",
