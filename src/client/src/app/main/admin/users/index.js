@@ -98,8 +98,6 @@ const ManageUsersPage = (props) => {
   const handleCreatedUser = (createdUser) => {
     handleCloseAddModal();
 
-    console.log({ createdUser });
-
     _showMessage("Successfully added!", "info");
     setRows([...rows, createdUser]);
   };
@@ -126,7 +124,7 @@ const ManageUsersPage = (props) => {
   };
 
   const columns = [
-    { field: "name", headerName: "Full name", width: 200, editable: true },
+    { field: "name", headerName: "Full name", width: 200 },
     { field: "email", headerName: "Email", width: 250 },
     {
       field: "role",

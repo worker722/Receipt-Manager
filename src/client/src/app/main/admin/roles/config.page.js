@@ -4,6 +4,8 @@ import i18next from "i18next";
 import en from "./i18n/en";
 import fr from "./i18n/fr";
 
+import { authRoles } from "src/app/auth";
+
 import ManageRolesPage from "./index";
 
 // i18next.addResourceBundle('ar', 'ManageRolesPage', ar);
@@ -16,6 +18,7 @@ const PageConfig = {
       config: {},
     },
   },
+  auth: authRoles.admin,
   routes: [
     {
       path: "roles",

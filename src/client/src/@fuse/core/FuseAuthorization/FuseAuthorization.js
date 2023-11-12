@@ -69,8 +69,30 @@ class FuseAuthorization extends Component {
   }
 
   redirectRoute() {
-    const { userRole } = this.props;
-    const redirectUrl = getSessionRedirectUrl() || this.props.loginRedirectUrl;
+    const { userRole, loginRedirectUrl } = this.props;
+
+    var redirectUrl = loginRedirectUrl;
+
+    const sessionRedirectUrl = getSessionRedirectUrl();
+
+    /*If sessionRedirectUrl is not empty, but User doesn't have permission to access that page.
+      Ex. Admin was on /manage page, after logout he logged in as User account, cannot access /manage screen.
+      So in this case, User must be redirected by default url
+      */
+    if (!FuseUtils.isEmpty(sessionRedirectUrl)) {
+      const matchedRoutes = matchRoutes(this.state.routes, sessionRedirectUrl);
+
+      const matched = matchedRoutes ? matchedRoutes[0] : false;
+
+      const userHasPermission = FuseUtils.hasPermission(
+        matched?.route?.auth,
+        userRole
+      );
+
+      if (matched && userHasPermission) {
+        redirectUrl = sessionRedirectUrl;
+      }
+    }
 
     /*
         User is guest

@@ -20,7 +20,7 @@ import { AuthProvider } from "./auth/AuthContext";
 axios.defaults.baseURL = "http://localhost:8080";
 axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
 axios.defaults.headers.common["Content-Type"] =
-  "application/x-www-form-urlencoded";
+  "multipart/form-data";
 
 const emotionCacheOptions = {
   rtl: {

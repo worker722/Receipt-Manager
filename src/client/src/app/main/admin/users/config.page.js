@@ -1,4 +1,5 @@
 import i18next from "i18next";
+import { authRoles } from "src/app/auth";
 
 // import ar from './i18n/ar';
 import en from "./i18n/en";
@@ -16,6 +17,7 @@ const PageConfig = {
       config: {},
     },
   },
+  auth: authRoles.admin,
   routes: [
     {
       path: "users",
