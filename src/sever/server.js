@@ -13,6 +13,8 @@ const app = express();
 dotenv.config();
 
 app.use(express.static(path.join(__dirname, "public")));
+// Make uploads folder to public accessable
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));

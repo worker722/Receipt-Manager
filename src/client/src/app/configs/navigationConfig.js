@@ -46,6 +46,14 @@ const navigationConfig = [
         icon: "heroicons-outline:user-group",
         url: "users",
       },
+      {
+        id: "page-categories",
+        title: "Category Manage",
+        translate: "ADMIN_LANG_EXPENSE_CATEGORY_MANAGE",
+        type: "item",
+        icon: "feather:layers",
+        url: "category",
+      },
     ],
   },
 

@@ -5,6 +5,7 @@ const fs = require("node:fs");
 const _DIR = {
   avatar: "uploads/profile/avatar",
   expense: "uploads/expense/",
+  category: "uploads/category/",
 };
 
 // Set up storage for uploaded profile images
@@ -103,4 +104,52 @@ const expenseUploader = multer({
   },
 }).single("expense");
 
-module.exports = { avatarUploader, expenseUploader };
+// Set up storage for uploaded profile images
+const categoryStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, _DIR.category);
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      `category_brand_${Date.now()}_${Math.round(Math.random() * 1e9)}_${
+        file.originalname
+      }`
+    );
+  },
+});
+
+// Create the multer instance for expense category image file upload
+const categoryUploader = multer({
+  storage: categoryStorage,
+  fileFilter: function (req, file, cb) {
+    // Set the filetypes, it is optional
+    var filetypes = /jpeg|jpg|png/;
+    var mimetype = filetypes.test(file.mimetype);
+
+    var extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
+    const BASE_DIR_PATH = path.join(path.resolve("./"), _DIR.category);
+
+    if (mimetype && extname) {
+      if (!fs.existsSync(BASE_DIR_PATH)) {
+        fs.mkdir(BASE_DIR_PATH, { recursive: true }, (err) => {
+          if (err) {
+            return cb("Directory cannot be created now!");
+          }
+          return cb(null, true);
+        });
+      } else {
+        return cb(null, true);
+      }
+    } else {
+      cb(
+        "Error: File upload only supports the " +
+          "following filetypes - " +
+          filetypes
+      );
+    }
+  },
+}).single("category_photo");
+
+module.exports = { avatarUploader, expenseUploader, categoryUploader };

@@ -16,6 +16,8 @@ import settingsConfig from "app/configs/settingsConfig";
 import withAppProviders from "./withAppProviders";
 import { AuthProvider } from "./auth/AuthContext";
 
+console.log(process.env.SERVER_API_URL)
+
 // Set Axios http default
 axios.defaults.baseURL = "http://localhost:8080";
 axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";

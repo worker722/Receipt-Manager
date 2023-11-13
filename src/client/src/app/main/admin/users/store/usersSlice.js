@@ -3,6 +3,8 @@ import axios from "axios";
 import _ from "@lodash";
 import FuseUtils from "@fuse/utils/FuseUtils";
 
+const LOG_PATH = "admin/users/store/usersSlice";
+
 export const getUsers = createAsyncThunk("admin/users/getUsers", async () => {
   const response = await axios.get("/api/admin/users/getAll");
   if (response?.status == 200) {
@@ -11,7 +13,7 @@ export const getUsers = createAsyncThunk("admin/users/getUsers", async () => {
       return data ?? { users: [] };
     } else {
       if (!FuseUtils.isEmpty(error))
-        console.error("admin/users/store/usersSlice/getUsers", error);
+        console.error(`${LOG_PATH}@getUsers`, error);
 
       return {
         users: [],
@@ -39,7 +41,8 @@ export const createUser = createAsyncThunk(
       if (status == 200) {
         return data?.user ?? {};
       } else {
-        console.error("admin/users/store/usersSlice/createUser", error);
+        if (!FuseUtils.isEmpty(error))
+          console.error(`${LOG_PATH}@createUser`, error);
 
         return {
           ...response.data,
@@ -65,7 +68,8 @@ export const updateUser = createAsyncThunk(
       if (status == 200) {
         return data?.user ?? {};
       } else {
-        console.error("admin/users/store/usersSlice/updateUser", error);
+        if (!FuseUtils.isEmpty(error))
+          console.error(`${LOG_PATH}@updateUser`, error);
 
         return {
           ...response.data,
@@ -91,7 +95,8 @@ export const deleteUser = createAsyncThunk(
       if (status == 200) {
         return data?.user ?? {};
       } else {
-        console.error("admin/users/store/usersSlice/deleteUser", error);
+        if (!FuseUtils.isEmpty(error))
+          console.error(`${LOG_PATH}@deleteUser`, error);
 
         return {
           ...response.data,
