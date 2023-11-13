@@ -21,6 +21,7 @@ import moment from "moment";
 import Button from "@mui/material/Button";
 import FuseLoading from "@fuse/core/FuseLoading";
 import ConfirmDialog from "@fuse/core/ConfirmDialog";
+import { Server } from "@constants";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {
@@ -136,7 +137,12 @@ const ManageCategoryPage = (props) => {
       headerName: "Photo",
       width: 250,
       renderCell: (params) => {
-        return <img height={200} src={`http://localhost:8080/${params.row.photo}`}></img>;
+        return (
+          <img
+            height={200}
+            src={`${Server.SERVER_URL}/${params.row.photo}`}
+          ></img>
+        );
       },
     },
     {

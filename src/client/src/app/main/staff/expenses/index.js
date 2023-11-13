@@ -88,10 +88,6 @@ const ManageExpensesPage = (props) => {
         setColumns(temp_columns);
         setRows(data?.payload);
       })
-      .catch((error) => {
-        setLoading(false);
-        console.log({ error });
-      });
   };
 
   const _showMessage = (message = "", variant = "info") => {
