@@ -3,7 +3,7 @@ const Role = require("../../../models/roleModel");
 const { response, isEmpty } = require("../../../utils");
 const bcrypt = require("bcryptjs");
 const { faker } = require("@faker-js/faker");
-const { avatarUploader } = require("../../../utils/fileUploader");
+const { avatarUploader } = require("../../../utils/fileManager");
 
 const LOG_PATH = "admin/manage/usersController";
 

@@ -1,7 +1,7 @@
 const { Category, REF_NAME } = require("../../../models/categoryModel");
 const { response, isEmpty } = require("../../../utils");
 const { faker } = require("@faker-js/faker");
-const { categoryUploader, removeFile } = require("../../../utils/fileUploader");
+const { categoryUploader, removeFile } = require("../../../utils/fileManager");
 
 const LOG_PATH = "admin/manage/categoryController";
 
