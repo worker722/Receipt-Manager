@@ -75,7 +75,7 @@ const ManageExpensesPage = (props) => {
     setLoading(true);
     dispatch(createExpense(event.target.files[0])).then((data) => {
       setLoading(false);
-      setRows(data?.payload);
+      setRows([...rows, ...data?.payload]);
     });
   };
 
