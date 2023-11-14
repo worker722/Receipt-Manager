@@ -108,6 +108,7 @@ const ManageCategoryPage = (props) => {
   };
 
   const handleUpdatedCategory = (updatedCategory) => {
+    console.log({ updatedCategory });
     handleCloseEditModal();
     _showMessage("Successfully updated!", "info");
     setRows(
@@ -140,7 +141,14 @@ const ManageCategoryPage = (props) => {
         return (
           <img
             height={200}
-            src={`${Server.SERVER_URL}/${params.row.photo}`}
+            srcSet={`${Server.SERVER_URL}/${
+              params.row.photo
+            }?${Date.now()}?h=200w=248&fit=crop&auto=format`}
+            src={`${Server.SERVER_URL}/${
+              params.row.photo
+            }?${Date.now()}?h=200w=248&fit=crop&auto=format`}
+            loading="lazy"
+            onLoad={() => console.log(`${params.row._id} loaded`)}
           ></img>
         );
       },

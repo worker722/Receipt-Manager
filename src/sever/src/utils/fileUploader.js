@@ -152,4 +152,21 @@ const categoryUploader = multer({
   },
 }).single("category_photo");
 
-module.exports = { avatarUploader, expenseUploader, categoryUploader };
+const removeFile = (_file) => {
+  return new Promise((resolve, reject) => {
+    if (_file.includes("public/assets")) return resolve(true);
+
+    fs.unlink(_file, (err) => {
+      if (err) return reject(err);
+      console.log(`Deleted ${_file}`);
+      resolve(`Deleted ${_file}`);
+    });
+  });
+};
+
+module.exports = {
+  avatarUploader,
+  expenseUploader,
+  categoryUploader,
+  removeFile,
+};

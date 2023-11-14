@@ -63,6 +63,19 @@ const updateUser = async (req, res) => {
   if (!user?.fullName || !user?.email || !user?.role)
     return response(res, {}, {}, 400, "Please fill all the required fields.");
 
+  const existingUser = await User.findOne({
+    email: user.email,
+    _id: { $ne: user.id },
+  });
+  if (existingUser)
+    return response(
+      res,
+      {},
+      {},
+      400,
+      "An account with this email already exists."
+    );
+
   const _role = await Role.getRoleID(user.role);
   var _fields = {};
   if (!isEmpty(user.password)) {

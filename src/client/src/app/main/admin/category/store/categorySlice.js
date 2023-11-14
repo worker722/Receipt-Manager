@@ -75,9 +75,17 @@ export const createCategory = createAsyncThunk(
 export const updateCategory = createAsyncThunk(
   "admin/category/updateCategory",
   async (category) => {
-    const response = await axios.post("/api/admin/category/update", {
-      category,
-    });
+    const response = await axios.post(
+      "/api/admin/category/update",
+      {
+        ...category,
+      },
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     if (response?.status == 200) {
       const {
         data = {},

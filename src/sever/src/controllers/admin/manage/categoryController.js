@@ -1,7 +1,7 @@
 const { Category, REF_NAME } = require("../../../models/categoryModel");
 const { response, isEmpty } = require("../../../utils");
 const { faker } = require("@faker-js/faker");
-const { categoryUploader } = require("../../../utils/fileUploader");
+const { categoryUploader, removeFile } = require("../../../utils/fileUploader");
 
 const LOG_PATH = "admin/manage/categoryController";
 
@@ -61,7 +61,75 @@ const createCategory = async (req, res) => {
   }
 };
 
-const updateCategory = async (req, res) => {};
+const updateCategory = async (req, res) => {
+  try {
+    categoryUploader(req, res, async function (_err) {
+      if (_err) {
+        return response(
+          res,
+          {},
+          _err,
+          400,
+          "Photo upload failed. Please try again."
+        );
+      } else {
+        const { name, removePhoto, _id } = req.body;
+        const subname = processString(name);
+        const existingCategory = await Category.findOne({
+          subname,
+          _id: { $ne: _id },
+        });
+        if (existingCategory)
+          return response(
+            res,
+            {},
+            {},
+            400,
+            "A category with this name already exists."
+          );
+
+        const oldCategory = await Category.findOne({ _id });
+
+        var fields = {};
+        fields.name = name;
+        fields.subname = subname;
+        if (req?.file?.path) {
+          fields.photo = req.file.path;
+          await removeFile(oldCategory.get("photo"));
+        }
+
+        var updatedCategory = await Category.findByIdAndUpdate(
+          _id,
+          {
+            $set: fields,
+          },
+          {
+            new: true,
+          }
+        ).exec();
+
+        if (removePhoto) {
+          await removeFile(oldCategory.get("photo"));
+          updatedCategory = await Category.findByIdAndUpdate(
+            _id,
+            {
+              $unset: { photo: "" },
+            },
+            {
+              new: true,
+            }
+          ).exec();
+        }
+        return response(res, {
+          category: updatedCategory,
+        });
+      }
+    });
+  } catch (error) {
+    console.log(`${LOG_PATH}@createCategory`, error);
+    response(res, {}, error, 500, "Something went wrong!");
+  }
+};
 
 const deleteCategory = async (req, res) => {};
 

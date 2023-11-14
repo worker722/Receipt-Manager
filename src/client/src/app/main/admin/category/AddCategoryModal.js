@@ -143,7 +143,7 @@ export default function AddCategoryModal({
         <DialogTitle>Add Category</DialogTitle>
         <DialogContent>
           <form
-            name="updateCategoryForm"
+            name="addCategoryForm"
             noValidate
             className="flex flex-col justify-center w-full mt-32"
             onSubmit={handleSubmit(onSubmit)}

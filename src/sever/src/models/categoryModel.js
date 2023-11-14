@@ -8,6 +8,7 @@ const categorySchema = new Schema({
   },
   photo: {
     type: String,
+    default: 'public/assets/category_brand_default.png'
   },
   subname: {
     type: String,

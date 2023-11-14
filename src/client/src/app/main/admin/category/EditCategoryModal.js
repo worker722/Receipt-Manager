@@ -1,8 +1,6 @@
 import * as React from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -10,43 +8,46 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import IconButton from "@mui/material/IconButton";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { updateCategory } from "./store/categorySlice";
-import { Box } from "@mui/material";
+import { Box, Container } from "@mui/material";
 import FuseUtils from "@fuse/utils/FuseUtils";
 import { showMessage } from "app/store/fuse/messageSlice";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { styled } from "@mui/material/styles";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import Avatar from "@mui/material/Avatar";
+import { useRef } from "react";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import { Server } from "@constants";
 
 /**
  * Form Validation Schema
  */
 const schema = yup.object().shape({
-  fullName: yup.string().required("You must enter display name"),
-  email: yup
-    .string()
-    .email("You must enter a valid email")
-    .required("You must enter a email"),
-  password: yup
-    .string()
-    .required("Please enter new password.")
-    .min(8, "Password is too short - should be 8 chars minimum."),
-  passwordConfirm: yup
-    .string()
-    .oneOf([yup.ref("password"), null], "Passwords must match"),
+  name: yup.string().required("You must enter display name"),
 });
 
-const defaultPassword = "123456789";
-
 const defaultValues = {
-  fullName: "",
-  email: "",
-  password: defaultPassword,
-  passwordConfirm: defaultPassword,
+  name: "",
 };
+
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: "100%",
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: "100%",
+});
 
 export default function EditCategoryModal({
   defaultValue = {},
@@ -56,35 +57,11 @@ export default function EditCategoryModal({
 }) {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState("category");
-  const [visiblePassword, setVisiblePassword] = useState(false);
+  const uploadInputRef = useRef(false);
+  const [photoUri, setPhotoUri] = useState(false);
+  const [file, setFile] = useState(false);
 
-  const handleChangeRole = (event) => {
-    setRole(event.target.value);
-  };
-
-  const handleChangePasswordReset = () => {
-    if (visiblePassword) {
-      setValue("password", defaultPassword, {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-      setValue("passwordConfirm", defaultPassword, {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-    } else {
-      setValue("password", "", {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-      setValue("passwordConfirm", "", {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-    }
-    setVisiblePassword(!visiblePassword);
-  };
+  const fileReader = new FileReader();
 
   const { control, formState, handleSubmit, setValue } = useForm({
     mode: "onChange",
@@ -94,30 +71,30 @@ export default function EditCategoryModal({
   const { isValid, dirtyFields, errors, setError } = formState;
 
   useEffect(() => {
-    setValue("email", defaultValue?.email ?? "", {
+    setValue("name", defaultValue?.name ?? "", {
       shouldDirty: true,
       shouldValidate: true,
     });
-    setValue("fullName", defaultValue?.name ?? "", {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-    setRole(defaultValue.role.name);
   }, [setValue, defaultValue]);
 
-  const onSubmit = ({ fullName, password, email }) => {
+  useEffect(() => {
+    if (!FuseUtils.isEmpty(defaultValue?.photo))
+      setPhotoUri(`${Server.SERVER_URL}/${defaultValue.photo}`);
+  }, [defaultValue]);
+
+  const onSubmit = ({ name }) => {
     setLoading(true);
     dispatch(
       updateCategory({
-        id: defaultValue._id,
-        fullName,
-        email,
-        password: visiblePassword ? password : "",
-        role,
+        _id: defaultValue._id,
+        name,
+        removePhoto: photoUri ? null : true,
+        category_photo: file,
       })
     ).then((data) => {
+      fileReader.abort();
       setLoading(false);
-      if (!FuseUtils.isEmpty(data.payload?.message)) {
+      if (!FuseUtils.isEmpty(data?.payload?.message)) {
         dispatch(
           showMessage({
             message: data.payload?.message,
@@ -125,9 +102,36 @@ export default function EditCategoryModal({
           })
         );
       } else {
-        if (!FuseUtils.isEmpty(data?.payload)) handleUpdated(data.payload);
+        if (!FuseUtils.isEmpty(data?.payload))
+          handleUpdated && handleUpdated(data?.payload);
       }
     });
+  };
+
+  const handleUpload = (event) => {
+    if (uploadInputRef?.current) {
+      uploadInputRef.current.click();
+    }
+  };
+
+  const handleChange = (event) => {
+    if (event.target.files.length > 0) {
+      const selectedFile = event.target.files[0];
+      setFile(selectedFile);
+
+      fileReader.onload = (e) => {
+        const { result } = e.target;
+        if (result) {
+          setPhotoUri(result);
+        }
+      };
+      fileReader.readAsDataURL(selectedFile);
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setPhotoUri(false);
+    setFile(false);
   };
 
   const _onClose = (event, reason) => {
@@ -135,6 +139,7 @@ export default function EditCategoryModal({
       // Unknown event, cannot be closed without category interactions
     } else {
       // Can be added saving change confirmation like: 'There are some unsaved changes. Do you want to leave?'
+      fileReader.abort();
       handleClose && handleClose();
     }
   };
@@ -159,119 +164,66 @@ export default function EditCategoryModal({
             className="flex flex-col justify-center w-full mt-32"
             onSubmit={handleSubmit(onSubmit)}
           >
+            <div className=" justify-center self-center">
+              <div
+                className=" w-200 h-200 border-dotted border-2 self-center"
+                style={{ borderRadius: "2.2vmax" }}
+                onClick={handleUpload}
+              >
+                {photoUri ? (
+                  <img
+                    src={photoUri}
+                    alt={"Preview"}
+                    loading="lazy"
+                    style={{ borderRadius: "2.2vmax" }}
+                    className=" w-full h-full object-cover"
+                  />
+                ) : (
+                  <p
+                    className=" text-center select-none"
+                    style={{ lineHeight: "20rem" }}
+                  >
+                    Choose a photo
+                  </p>
+                )}
+                <VisuallyHiddenInput
+                  ref={uploadInputRef}
+                  onChange={handleChange}
+                  accept="image/*"
+                  type="file"
+                />
+              </div>
+            </div>
+
+            <div className=" h-40 mb-12 justify-center self-center">
+              {photoUri && (
+                <IconButton
+                  onClick={handleRemovePhoto}
+                  size="large"
+                  children={<HighlightOffIcon color="error" />}
+                />
+              )}
+            </div>
+
             <Controller
-              name="fullName"
+              name="name"
               control={control}
               render={({ field }) => (
                 <TextField
                   {...field}
                   className="mb-24"
-                  label="Full name"
+                  label="Name"
                   autoFocus
                   type="name"
-                  placeholder="John Doe"
-                  error={!!errors.fullName}
-                  helperText={errors?.fullName?.message}
+                  placeholder="Taxi"
+                  error={!!errors.name}
+                  helperText={errors?.name?.message}
                   variant="outlined"
                   required
                   fullWidth
                 />
               )}
             />
-
-            <Controller
-              name="email"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  className="mb-24"
-                  label="Email"
-                  type="email"
-                  error={!!errors.email}
-                  helperText={errors?.email?.message}
-                  variant="outlined"
-                  required
-                  fullWidth
-                />
-              )}
-            />
-
-            <Controller
-              name="role"
-              control={control}
-              render={({ field }) => (
-                <FormControl fullWidth className="mb-24">
-                  <InputLabel id="demo-simple-select-label">Role</InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={role}
-                    label="Role"
-                    onChange={handleChangeRole}
-                  >
-                    <MenuItem value={"admin"}>Administrator</MenuItem>
-                    <MenuItem value={"staff"}>Staff</MenuItem>
-                    <MenuItem value={"category"}>Category</MenuItem>
-                  </Select>
-                </FormControl>
-              )}
-            />
-
-            <Controller
-              name="password_reset"
-              control={control}
-              render={({ field }) => (
-                <div>
-                  <FormControlLabel
-                    {...field}
-                    className="mb-12"
-                    control={<Checkbox onChange={handleChangePasswordReset} />}
-                    label="Reset Password"
-                  />
-                </div>
-              )}
-            />
-
-            {visiblePassword && (
-              <>
-                <Controller
-                  name="password"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      className="mb-24"
-                      label="New Password"
-                      type="password"
-                      error={!!errors.password}
-                      helperText={errors?.password?.message}
-                      variant="outlined"
-                      required
-                      fullWidth
-                    />
-                  )}
-                />
-
-                <Controller
-                  name="passwordConfirm"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      className="mb-24"
-                      label="Password (Confirm)"
-                      type="password"
-                      error={!!errors.passwordConfirm}
-                      helperText={errors?.passwordConfirm?.message}
-                      variant="outlined"
-                      required
-                      fullWidth
-                    />
-                  )}
-                />
-              </>
-            )}
 
             <Box>
               <Button
