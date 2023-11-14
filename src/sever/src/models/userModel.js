@@ -139,10 +139,12 @@ userSchema.methods.getRedirectURL = function () {
   return this.role.redirect_url;
 };
 
-const User = mongoose.model("users", userSchema);
-
 const REF_NAME = {
   ROLE: "role",
 };
 
-module.exports = { User, REF_NAME };
+const DB_COLLECTION_NAME = "users";
+
+const User = mongoose.model(DB_COLLECTION_NAME, userSchema);
+
+module.exports = { User, REF_NAME, DB_COLLECTION_NAME };

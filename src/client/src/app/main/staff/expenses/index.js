@@ -49,8 +49,6 @@ const ManageExpensesPage = (props) => {
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
 
-  const [columns, setColumns] = useState([]);
-
   const dispatch = useDispatch();
   const { expenses } = useSelector(selectExpenses);
 
@@ -65,6 +63,8 @@ const ManageExpensesPage = (props) => {
       if (!FuseUtils.isEmpty(message)) {
         _showMessage(message, "error");
       }
+
+      setRows(data?.payload.expenses);
       setLoading(false);
     });
   }, [dispatch]);
@@ -73,21 +73,10 @@ const ManageExpensesPage = (props) => {
     if (event.target.files.length == 0) return;
 
     setLoading(true);
-    dispatch(createExpense(event.target.files[0]))
-      .then((data) => {
-        setLoading(false);
-        const keys = Object.keys(data.payload[0]);
-        var temp_columns = [];
-        keys.forEach((key) => {
-          temp_columns.push({
-            field: key,
-            headerName: key,
-            width: 200,
-          });
-        });
-        setColumns(temp_columns);
-        setRows(data?.payload);
-      })
+    dispatch(createExpense(event.target.files[0])).then((data) => {
+      setLoading(false);
+      setRows(data?.payload);
+    });
   };
 
   const _showMessage = (message = "", variant = "info") => {
@@ -113,6 +102,61 @@ const ManageExpensesPage = (props) => {
     }
     return result;
   };
+
+  const columns = [
+    { field: "treatmented_at", headerName: "Treatment Date", width: 150 },
+    {
+      field: "contracting_by_number",
+      headerName: "Treatment Date",
+      width: 150,
+    },
+    { field: "contract_number", headerName: "Treatment Date", width: 150 },
+    {
+      field: "operation_location_code",
+      headerName: "Treatment Date",
+      width: 150,
+    },
+    { field: "titular_name", headerName: "Treatment Date", width: 150 },
+    { field: "employee_identifier", headerName: "Treatment Date", width: 150 },
+    { field: "card_number", headerName: "Treatment Date", width: 150 },
+    { field: "card_created_at", headerName: "Treatment Date", width: 150 },
+    { field: "sold_at", headerName: "Treatment Date", width: 150 },
+    { field: "closed_at", headerName: "Treatment Date", width: 150 },
+    {
+      field: "taken_into_account_at",
+      headerName: "Treatment Date",
+      width: 150,
+    },
+    { field: "operation_code", headerName: "Treatment Date", width: 150 },
+    { field: "under_code_operation", headerName: "Treatment Date", width: 150 },
+    {
+      field: "direction_of_operation",
+      headerName: "Treatment Date",
+      width: 150,
+    },
+    { field: "amount_charged", headerName: "Treatment Date", width: 150 },
+    { field: "origin_currency_code", headerName: "Treatment Date", width: 150 },
+    {
+      field: "total_amount_original_currency",
+      headerName: "Treatment Date",
+      width: 150,
+    },
+    { field: "trader_company_name", headerName: "Treatment Date", width: 150 },
+    { field: "code_department", headerName: "Treatment Date", width: 150 },
+    { field: "country_code", headerName: "Treatment Date", width: 150 },
+    { field: "locality", headerName: "Treatment Date", width: 150 },
+    { field: "code_mcc", headerName: "Treatment Date", width: 150 },
+    { field: "operation_time", headerName: "Treatment Date", width: 150 },
+    { field: "execution_area", headerName: "Treatment Date", width: 150 },
+    {
+      field: "merchant_siret_number",
+      headerName: "Treatment Date",
+      width: 150,
+    },
+    { field: "commission_amount_1", headerName: "Treatment Date", width: 150 },
+    { field: "commission_amount_2", headerName: "Treatment Date", width: 150 },
+    { field: "commission_amount_3", headerName: "Treatment Date", width: 150 },
+  ];
 
   return (
     <Root
@@ -148,7 +192,7 @@ const ManageExpensesPage = (props) => {
                 <DataGrid
                   rows={rows}
                   columns={columns}
-                  getRowId={(row) => generateRandomString(9)}
+                  getRowId={(row) => row._id}
                   initialState={{
                     pagination: {
                       paginationModel: { page: 0, pageSize: 10 },

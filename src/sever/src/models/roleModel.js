@@ -39,6 +39,8 @@ roleSchema.pre("findOneAndUpdate", async function (next) {
   this.set({ updated_at: new Date() });
 });
 
-const Role = model("roles", roleSchema);
+const DB_COLLECTION_NAME = "roles";
+
+const Role = model(DB_COLLECTION_NAME, roleSchema);
 
 module.exports = Role;
