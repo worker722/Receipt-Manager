@@ -15,9 +15,10 @@ import FuseAuthorization from "@fuse/core/FuseAuthorization";
 import settingsConfig from "app/configs/settingsConfig";
 import withAppProviders from "./withAppProviders";
 import { AuthProvider } from "./auth/AuthContext";
+import { Server } from "@constants";
 
 // Set Axios http default
-axios.defaults.baseURL = "http://localhost:8080";
+axios.defaults.baseURL = Server.SERVER_URL;
 axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
 axios.defaults.headers.common["Content-Type"] =
   "multipart/form-data";

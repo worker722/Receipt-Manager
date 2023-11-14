@@ -1,5 +1,5 @@
 const response = require("./response");
 const isEmpty = require("./isEmpty");
-const fileUploader = require("./fileUploader");
+const fileManager = require("./fileManager");
 
-module.exports = { response, isEmpty, fileUploader };
+module.exports = { response, isEmpty, fileManager };

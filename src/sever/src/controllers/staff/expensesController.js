@@ -1,5 +1,5 @@
 const Expense = require("../../models/expenseModel");
-const { response, fileUploader } = require("../../utils");
+const { response, fileManager } = require("../../utils");
 const { faker } = require("@faker-js/faker");
 var XLSX = require("xlsx");
 
@@ -16,7 +16,7 @@ const getAll = async (req, res) => {
 };
 
 const createExpense = async (req, res) => {
-  fileUploader.expenseUploader(req, res, async function (_err) {
+  fileManager.expenseUploader(req, res, async function (_err) {
     if (_err) {
       return response(
         res,

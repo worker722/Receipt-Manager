@@ -6,6 +6,7 @@ const locale = {
   // Admin
   ADMIN_LANG_USER_MANAGE: 'Manage Users',
   ADMIN_LANG_ROLE_MANAGE: 'Manage Roles',
+  ADMIN_LANG_EXPENSE_CATEGORY_MANAGE: 'Expense Categories',
 
   // Staff
   STAFF_LANG_EXPENSE_MANAGE: 'Bank Expenses',

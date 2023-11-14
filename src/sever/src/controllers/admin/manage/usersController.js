@@ -3,7 +3,7 @@ const Role = require("../../../models/roleModel");
 const { response, isEmpty } = require("../../../utils");
 const bcrypt = require("bcryptjs");
 const { faker } = require("@faker-js/faker");
-const { avatarUploader } = require("../../../utils/fileUploader");
+const { avatarUploader } = require("../../../utils/fileManager");
 
 const LOG_PATH = "admin/manage/usersController";
 
@@ -62,6 +62,19 @@ const updateUser = async (req, res) => {
   const { user } = req.body;
   if (!user?.fullName || !user?.email || !user?.role)
     return response(res, {}, {}, 400, "Please fill all the required fields.");
+
+  const existingUser = await User.findOne({
+    email: user.email,
+    _id: { $ne: user.id },
+  });
+  if (existingUser)
+    return response(
+      res,
+      {},
+      {},
+      400,
+      "An account with this email already exists."
+    );
 
   const _role = await Role.getRoleID(user.role);
   var _fields = {};
