@@ -27,6 +27,18 @@ const createCategory = async (req, res) => {
         );
       } else {
         const { name } = req.body;
+        if (!name) {
+          if (req?.file?.path) {
+            await removeFile(req.file.path);
+          }
+          return response(
+            res,
+            {},
+            {},
+            400,
+            "Please fill all the required fields."
+          );
+        }
         const subname = processString(name);
         const existingCategory = await Category.findOne({ subname });
         if (existingCategory)
@@ -74,6 +86,18 @@ const updateCategory = async (req, res) => {
         );
       } else {
         const { name, removePhoto, _id } = req.body;
+        if (!name) {
+          if (req?.file?.path) {
+            await removeFile(req.file.path);
+          }
+          return response(
+            res,
+            {},
+            {},
+            400,
+            "Please fill all the required fields."
+          );
+        }
         const subname = processString(name);
         const existingCategory = await Category.findOne({
           subname,
