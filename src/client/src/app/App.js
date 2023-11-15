@@ -16,12 +16,12 @@ import settingsConfig from "app/configs/settingsConfig";
 import withAppProviders from "./withAppProviders";
 import { AuthProvider } from "./auth/AuthContext";
 import { Server } from "@constants";
+import { useEffect } from "react";
 
 // Set Axios http default
 axios.defaults.baseURL = Server.SERVER_URL;
 axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
-axios.defaults.headers.common["Content-Type"] =
-  "multipart/form-data";
+axios.defaults.headers.common["Content-Type"] = "multipart/form-data";
 
 const emotionCacheOptions = {
   rtl: {
@@ -40,6 +40,34 @@ function App() {
   const user = useSelector(selectUser);
   const langDirection = useSelector(selectCurrentLanguageDirection);
   const mainTheme = useSelector(selectMainTheme);
+
+  useEffect(() => {
+    askNotificationPermission();
+  }, []);
+
+  const askNotificationPermission = () => {
+    // Let's check if the browser supports notifications
+    if (!("Notification" in window)) {
+      console.log("This browser does not support notifications.");
+    } else {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          createNotificationSubscription();
+        }
+      });
+    }
+  };
+
+  async function createNotificationSubscription() {
+    //wait for service worker installation to be ready
+    const serviceWorker = await navigator.serviceWorker.ready;
+    // subscribe and return the subscription
+    return await serviceWorker.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey:
+        "BBFzxIarfFTI3DYQX36XWU-V0ciXml6VWiEXMSbwvs53zMtJFfjRd44cl4veprgbxmB4Ji24FgYWoI1cmMdPP7M",
+    });
+  }
 
   return (
     <CacheProvider value={createCache(emotionCacheOptions[langDirection])}>
