@@ -8,7 +8,30 @@ const LOG_PATH = "staff/expensesController";
 
 const getAll = async (req, res) => {
   try {
-    const expenses = (await Expense.find({}).exec()) ?? [];
+    const expenses = await Expense.aggregate([
+      {
+        $group: {
+          _id: {
+            month: { $month: "$treatmented_at" },
+            year: { $year: "$treatmented_at" },
+          },
+          data: { $push: "$$ROOT" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          filter: "$_id",
+          data: 1,
+        },
+      },
+      {
+        $sort: {
+          "filter.year": 1,
+          "filter.month": 1,
+        },
+      },
+    ]).exec();
     return response(res, { expenses }, {}, 200);
   } catch (error) {
     console.log(`${LOG_PATH}@getAll`, error);
