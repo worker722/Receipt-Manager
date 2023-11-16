@@ -34,13 +34,6 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-sidebarContent": {},
 }));
 
-const a11yProps = (index) => {
-  return {
-    id: `expense-tab-${index}`,
-    "aria-controls": `expense-tabpanel-${index}`,
-  };
-};
-
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
   clipPath: "inset(50%)",
@@ -53,45 +46,69 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
+const a11yProps = (index) => {
+  return {
+    id: `expense-tab-${index}`,
+    "aria-controls": `expense-tabpanel-${index}`,
+  };
+};
+
 const ManageExpensesPage = (props) => {
   const { t } = useTranslation("ManageExpensesPage");
 
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
+  const [tabs, setTabs] = useState([]);
 
   const [value, setValue] = useState(0);
 
   const handleTabChange = (event, newValue) => {
     setValue(newValue);
+    setTabData(newValue);
   };
 
   const dispatch = useDispatch();
   const { expenses } = useSelector(selectExpenses);
 
   useEffect(() => {
-    setRows(expenses);
+    if (expenses.length > 0) {
+      var tab_data = [];
+      expenses.forEach((item) => {
+        tab_data.push({
+          title: `${item.filter.year}/${item.filter.month}`,
+        });
+      });
+      setTabs(tab_data);
+      setTabData(0);
+    }
   }, [expenses]);
 
+  const setTabData = (tabIndex) => {
+    if (expenses.length > tabIndex) setRows(expenses[tabIndex].data);
+    else setRows([]);
+  };
+
   useEffect(() => {
+    getAll();
+  }, [dispatch]);
+
+  const getAll = () => {
     setLoading(true);
     dispatch(getExpenses()).then((data) => {
       const { message = "" } = data.payload;
       if (!FuseUtils.isEmpty(message)) {
         _showMessage(message, "error");
       }
-
-      setRows(data?.payload.expenses);
       setLoading(false);
     });
-  }, [dispatch]);
+  };
 
   const handleUploadExpenseFile = (event) => {
     if (event.target.files.length == 0) return;
 
     setLoading(true);
     dispatch(createExpense(event.target.files[0])).then((data) => {
-      setLoading(false);
-      setRows([...rows, ...data?.payload]);
+      getAll();
     });
   };
 
@@ -207,20 +224,30 @@ const ManageExpensesPage = (props) => {
           <div className=" self-center flex-none">
             <h4>{t("PAGE_TITLE")}</h4>
           </div>
-          <div className=" pl-32 pr-32 w-full">
+          <div className=" pl-32 pr-32 w-10/12">
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
               <Tabs
                 value={value}
                 onChange={handleTabChange}
+                variant="scrollable"
+                scrollButtons="auto"
+                textColor="primary"
+                indicatorColor="secondary"
                 aria-label="expense month filter tab"
+                style={{ overflow: "auto" }}
               >
-                <Tab label="Item One" {...a11yProps(0)} />
-                <Tab label="Item Two" {...a11yProps(1)} />
-                <Tab label="Item Three" {...a11yProps(2)} />
+                {tabs.map((tab, index) => (
+                  <Tab
+                    tabIndex={index}
+                    label={`${tab.title}`}
+                    key={index}
+                    {...a11yProps(index)}
+                  />
+                ))}
               </Tabs>
             </Box>
           </div>
-          <div className=" mt-3">
+          <div className=" mt-5 w-full">
             <Button
               component="label"
               variant="contained"
