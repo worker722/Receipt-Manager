@@ -1,22 +1,25 @@
-import { styled } from "@mui/material/styles";
-import { useTranslation } from "react-i18next";
+import FuseLoading from "@fuse/core/FuseLoading";
 import FusePageSimple from "@fuse/core/FusePageSimple";
-import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
+import FuseUtils from "@fuse/utils/FuseUtils";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import { styled } from "@mui/material/styles";
+import { DataGrid } from "@mui/x-data-grid";
+import { showMessage } from "app/store/fuse/messageSlice";
+import withReducer from "app/store/withReducer";
+import moment from "moment";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import reducer from "./store";
 import {
+  createExpense,
   getExpenses,
   selectExpenses,
-  createExpense,
 } from "./store/expensesSlice";
-import { useDispatch, useSelector } from "react-redux";
-import withReducer from "app/store/withReducer";
-import reducer from "./store";
-import { useEffect, useState } from "react";
-import { showMessage } from "app/store/fuse/messageSlice";
-import FuseUtils from "@fuse/utils/FuseUtils";
-import moment from "moment";
-import FuseLoading from "@fuse/core/FuseLoading";
-import Button from "@mui/material/Button";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {
@@ -30,6 +33,13 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-sidebarHeader": {},
   "& .FusePageSimple-sidebarContent": {},
 }));
+
+const a11yProps = (index) => {
+  return {
+    id: `expense-tab-${index}`,
+    "aria-controls": `expense-tabpanel-${index}`,
+  };
+};
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -48,6 +58,12 @@ const ManageExpensesPage = (props) => {
 
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
+
+  const [value, setValue] = useState(0);
+
+  const handleTabChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
   const dispatch = useDispatch();
   const { expenses } = useSelector(selectExpenses);
@@ -88,88 +104,128 @@ const ManageExpensesPage = (props) => {
     );
   };
 
-  const toLocalTime = (time, format = "YYYY-MM-DD hh:mm:ss") => {
+  const toLocalTime = (time, format = "YYYY-MM-DD") => {
     return moment.utc(time).local().format(format);
   };
 
-  const generateRandomString = (length) => {
-    let result = "";
-    const characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-  };
-
   const columns = [
-    { field: "treatmented_at", headerName: "Treatment Date", width: 150 },
+    {
+      field: "treatmented_at",
+      headerName: "Treatment Date",
+      width: 150,
+      valueGetter: (params) => toLocalTime(params.row.treatmented_at),
+    },
     {
       field: "contracting_by_number",
-      headerName: "Treatment Date",
-      width: 150,
+      headerName: "Contracting by Number",
+      width: 200,
     },
-    { field: "contract_number", headerName: "Treatment Date", width: 150 },
+    { field: "contract_number", headerName: "Contract Number", width: 150 },
     {
       field: "operation_location_code",
-      headerName: "Treatment Date",
+      headerName: "Operation Location Code",
       width: 150,
     },
-    { field: "titular_name", headerName: "Treatment Date", width: 150 },
-    { field: "employee_identifier", headerName: "Treatment Date", width: 150 },
-    { field: "card_number", headerName: "Treatment Date", width: 150 },
-    { field: "card_created_at", headerName: "Treatment Date", width: 150 },
-    { field: "sold_at", headerName: "Treatment Date", width: 150 },
-    { field: "closed_at", headerName: "Treatment Date", width: 150 },
+    { field: "titular_name", headerName: "Titular Name", width: 100 },
+    {
+      field: "employee_identifier",
+      headerName: "Employee Identifier",
+      width: 100,
+    },
+    { field: "card_number", headerName: "Card Number", width: 150 },
+    {
+      field: "card_created_at",
+      headerName: "Card Create Date",
+      width: 150,
+      valueGetter: (params) => toLocalTime(params.row.card_created_at),
+    },
+    {
+      field: "sold_at",
+      headerName: "Sale Date",
+      width: 150,
+      valueGetter: (params) => toLocalTime(params.row.sold_at),
+    },
+    {
+      field: "closed_at",
+      headerName: "Closed Date",
+      width: 150,
+      valueGetter: (params) => toLocalTime(params.row.closed_at),
+    },
     {
       field: "taken_into_account_at",
-      headerName: "Treatment Date",
+      headerName: "Taken Into Account Date",
+      width: 150,
+      valueGetter: (params) => toLocalTime(params.row.taken_into_account_at),
+    },
+    { field: "operation_code", headerName: "Operation Code", width: 150 },
+    {
+      field: "under_code_operation",
+      headerName: "Under Operation Code",
       width: 150,
     },
-    { field: "operation_code", headerName: "Treatment Date", width: 150 },
-    { field: "under_code_operation", headerName: "Treatment Date", width: 150 },
     {
       field: "direction_of_operation",
-      headerName: "Treatment Date",
+      headerName: "Direction of Operation",
       width: 150,
     },
-    { field: "amount_charged", headerName: "Treatment Date", width: 150 },
-    { field: "origin_currency_code", headerName: "Treatment Date", width: 150 },
+    { field: "amount_charged", headerName: "Amount Charged", width: 150 },
+    {
+      field: "origin_currency_code",
+      headerName: "Origin Currency Code",
+      width: 150,
+    },
     {
       field: "total_amount_original_currency",
-      headerName: "Treatment Date",
+      headerName: "Total Amount Original Currency",
       width: 150,
     },
-    { field: "trader_company_name", headerName: "Treatment Date", width: 150 },
-    { field: "code_department", headerName: "Treatment Date", width: 150 },
-    { field: "country_code", headerName: "Treatment Date", width: 150 },
-    { field: "locality", headerName: "Treatment Date", width: 150 },
-    { field: "code_mcc", headerName: "Treatment Date", width: 150 },
-    { field: "operation_time", headerName: "Treatment Date", width: 150 },
-    { field: "execution_area", headerName: "Treatment Date", width: 150 },
+    {
+      field: "trader_company_name",
+      headerName: "Trader Company Name",
+      width: 150,
+    },
+    { field: "code_department", headerName: "Code Department", width: 150 },
+    { field: "country_code", headerName: "Country Code", width: 150 },
+    { field: "locality", headerName: "Locality", width: 150 },
+    { field: "code_mcc", headerName: "Code Mcc", width: 150 },
+    { field: "operation_time", headerName: "Operation Time", width: 150 },
+    { field: "execution_area", headerName: "Execution Area", width: 150 },
     {
       field: "merchant_siret_number",
-      headerName: "Treatment Date",
+      headerName: "Merchat Siret Number",
       width: 150,
     },
-    { field: "commission_amount_1", headerName: "Treatment Date", width: 150 },
-    { field: "commission_amount_2", headerName: "Treatment Date", width: 150 },
-    { field: "commission_amount_3", headerName: "Treatment Date", width: 150 },
+    { field: "commission_amount_1", headerName: "Commission 1", width: 150 },
+    { field: "commission_amount_2", headerName: "Commission 2", width: 150 },
+    { field: "commission_amount_3", headerName: "Commission 3", width: 150 },
   ];
 
   return (
     <Root
       header={
         <div className="p-24 flex">
-          <div className="w-full self-center">
+          <div className=" self-center flex-none">
             <h4>{t("PAGE_TITLE")}</h4>
           </div>
-          <div className="float-right">
+          <div className=" pl-32 pr-32 w-full">
+            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <Tabs
+                value={value}
+                onChange={handleTabChange}
+                aria-label="expense month filter tab"
+              >
+                <Tab label="Item One" {...a11yProps(0)} />
+                <Tab label="Item Two" {...a11yProps(1)} />
+                <Tab label="Item Three" {...a11yProps(2)} />
+              </Tabs>
+            </Box>
+          </div>
+          <div className=" mt-3">
             <Button
               component="label"
               variant="contained"
               color="primary"
+              className=" float-right"
               startIcon={<CloudUploadIcon />}
             >
               Upload
