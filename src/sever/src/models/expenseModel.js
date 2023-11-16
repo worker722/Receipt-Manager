@@ -1,6 +1,7 @@
 const { Schema, model } = require("mongoose");
 const ExpenseFile = require("./expenseFileModel");
 const { isEmpty } = require("../utils");
+const moment = require("moment");
 
 /** Bank expense model
  *{
@@ -46,7 +47,7 @@ const expenseSchema = new Schema({
   },
   // date traitement
   treatmented_at: {
-    type: String,
+    type: Date,
   },
   // numero contractant
   contracting_by_number: {
@@ -74,19 +75,19 @@ const expenseSchema = new Schema({
   },
   // date création carte
   card_created_at: {
-    type: String,
+    type: Date,
   },
   // date de vente
   sold_at: {
-    type: String,
+    type: Date,
   },
   // date d'arrêté
   closed_at: {
-    type: String,
+    type: Date,
   },
   // date de prise en compte
   taken_into_account_at: {
-    type: String,
+    type: Date,
   },
   // code opération
   operation_code: {
@@ -212,7 +213,15 @@ const parseExpenses = (_data, originFileID) => {
       originFile: originFileID,
     };
     Object.keys(match_key_model).forEach((key) => {
-      _object[key] = item[match_key_model[key]];
+      if (key.endsWith("_at")) {
+        _object[key] = moment(
+          item[match_key_model[key]],
+          "DD/MM/YYYY",
+          true
+        ).format("YYYY-MM-DD");
+      } else {
+        _object[key] = item[match_key_model[key]];
+      }
     });
     results.push(_object);
   });
