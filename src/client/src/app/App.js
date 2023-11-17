@@ -42,29 +42,29 @@ function App() {
   const mainTheme = useSelector(selectMainTheme);
 
   // Ntfy push notification via websocket
-  const socket = new WebSocket(
-    "wss://ntfy.sh/online-receipt-manager-notification-topic/ws"
-  );
+  // const socket = new WebSocket(
+  //   "wss://ntfy.sh/online-receipt-manager-notification-topic/ws"
+  // );
 
-  socket.onopen = function () {
-    console.log("Socket opened");
-  };
+  // socket.onopen = function () {
+  //   console.log("Socket opened");
+  // };
 
-  socket.onmessage = function (event) {
-    console.log(`On message : ${event.data}`);
-    const data = JSON.parse(event.data);
-    if (data?.message) {
-      alert(data.message);
-    }
-  };
+  // socket.onmessage = function (event) {
+  //   console.log(`On message : ${event.data}`);
+  //   const data = JSON.parse(event.data);
+  //   if (data?.message) {
+  //     alert(data.message);
+  //   }
+  // };
 
-  socket.onclose = function (event) {
-    console.log("Socket closed");
-  };
+  // socket.onclose = function (event) {
+  //   console.log("Socket closed");
+  // };
 
-  socket.onerror = function (error) {
-    console.log(`Error : ${error.message}`);
-  };
+  // socket.onerror = function (error) {
+  //   console.log(`Error : ${error.message}`);
+  // };
 
   useEffect(() => {
     askNotificationPermission();

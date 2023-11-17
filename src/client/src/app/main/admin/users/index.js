@@ -1,22 +1,22 @@
-import { styled } from "@mui/material/styles";
-import { useTranslation } from "react-i18next";
-import FusePageSimple from "@fuse/core/FusePageSimple";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
-import { deleteUser, getUsers, selectUsers } from "./store/usersSlice";
-import { useDispatch, useSelector } from "react-redux";
-import withReducer from "app/store/withReducer";
-import reducer from "./store";
-import { useEffect, useState } from "react";
-import EditUserModal from "./EditUserModal";
-import AddUserModal from "./AddUserModal";
-import { showMessage } from "app/store/fuse/messageSlice";
-import FuseUtils from "@fuse/utils/FuseUtils";
-import moment from "moment";
-import Button from "@mui/material/Button";
-import FuseLoading from "@fuse/core/FuseLoading";
 import ConfirmDialog from "@fuse/core/ConfirmDialog";
+import FuseLoading from "@fuse/core/FuseLoading";
+import FusePageSimple from "@fuse/core/FusePageSimple";
+import FuseUtils from "@fuse/utils/FuseUtils";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import EditIcon from "@mui/icons-material/Edit";
+import Button from "@mui/material/Button";
+import { styled } from "@mui/material/styles";
+import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
+import { showMessage } from "app/store/fuse/messageSlice";
+import withReducer from "app/store/withReducer";
+import moment from "moment";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import AddUserModal from "./AddUserModal";
+import EditUserModal from "./EditUserModal";
+import reducer from "./store";
+import { deleteUser, getUsers, selectUsers } from "./store/usersSlice";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {

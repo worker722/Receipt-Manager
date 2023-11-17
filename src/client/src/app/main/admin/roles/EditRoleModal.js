@@ -1,20 +1,18 @@
-import * as React from "react";
+import FuseUtils from "@fuse/utils/FuseUtils";
+import { yupResolver } from "@hookform/resolvers/yup";
+import LoadingButton from "@mui/lab/LoadingButton";
+import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { Controller, useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { updateRole } from "./store/rolesSlice";
-import { Box } from "@mui/material";
-import FuseLoading from "@fuse/core/FuseLoading";
-import FuseUtils from "@fuse/utils/FuseUtils";
+import TextField from "@mui/material/TextField";
 import { showMessage } from "app/store/fuse/messageSlice";
-import LoadingButton from "@mui/lab/LoadingButton";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import * as yup from "yup";
+import { updateRole } from "./store/rolesSlice";
 
 /**
  * Form Validation Schema

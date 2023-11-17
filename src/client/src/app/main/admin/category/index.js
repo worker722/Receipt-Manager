@@ -1,27 +1,27 @@
-import { styled } from "@mui/material/styles";
-import { useTranslation } from "react-i18next";
+import { Server } from "@constants";
+import ConfirmDialog from "@fuse/core/ConfirmDialog";
+import FuseLoading from "@fuse/core/FuseLoading";
 import FusePageSimple from "@fuse/core/FusePageSimple";
-import EditIcon from "@mui/icons-material/Edit";
+import FuseUtils from "@fuse/utils/FuseUtils";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import EditIcon from "@mui/icons-material/Edit";
+import Button from "@mui/material/Button";
+import { styled } from "@mui/material/styles";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
+import { showMessage } from "app/store/fuse/messageSlice";
+import withReducer from "app/store/withReducer";
+import moment from "moment";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import AddCategoryModal from "./AddCategoryModal";
+import EditCategoryModal from "./EditCategoryModal";
+import reducer from "./store";
 import {
   deleteCategory,
   getCategories,
   selectCategories,
 } from "./store/categorySlice";
-import { useDispatch, useSelector } from "react-redux";
-import withReducer from "app/store/withReducer";
-import reducer from "./store";
-import { useEffect, useState } from "react";
-import EditCategoryModal from "./EditCategoryModal";
-import AddCategoryModal from "./AddCategoryModal";
-import { showMessage } from "app/store/fuse/messageSlice";
-import FuseUtils from "@fuse/utils/FuseUtils";
-import moment from "moment";
-import Button from "@mui/material/Button";
-import FuseLoading from "@fuse/core/FuseLoading";
-import ConfirmDialog from "@fuse/core/ConfirmDialog";
-import { Server } from "@constants";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {
@@ -108,7 +108,6 @@ const ManageCategoryPage = (props) => {
   };
 
   const handleUpdatedCategory = (updatedCategory) => {
-    console.log({ updatedCategory });
     handleCloseEditModal();
     _showMessage("Successfully updated!", "info");
     setRows(
@@ -148,7 +147,6 @@ const ManageCategoryPage = (props) => {
               params.row.photo
             }?${Date.now()}?h=200w=248&fit=crop&auto=format`}
             loading="lazy"
-            onLoad={() => console.log(`${params.row._id} loaded`)}
           ></img>
         );
       },

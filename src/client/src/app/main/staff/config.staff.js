@@ -1,7 +1,5 @@
-import ExpensesPageConfig from './expenses/config.page';
+import ExpensesPageConfig from "./expenses/config.page";
 
-const StaffConfigs = [
-    ExpensesPageConfig,
-]
+const StaffConfigs = [ExpensesPageConfig];
 
 export default StaffConfigs;

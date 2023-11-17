@@ -159,7 +159,6 @@ const removeFile = (_file) => {
 
     fs.unlink(_file, (err) => {
       if (err) return reject(err);
-      console.log(`Deleted ${_file}`);
       resolve(`Deleted ${_file}`);
     });
   });

@@ -1,25 +1,24 @@
-import * as React from "react";
+import FuseUtils from "@fuse/utils/FuseUtils";
+import { yupResolver } from "@hookform/resolvers/yup";
+import LoadingButton from "@mui/lab/LoadingButton";
+import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { Controller, useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { updateUser } from "./store/usersSlice";
-import { Box } from "@mui/material";
-import FuseUtils from "@fuse/utils/FuseUtils";
+import TextField from "@mui/material/TextField";
 import { showMessage } from "app/store/fuse/messageSlice";
-import LoadingButton from "@mui/lab/LoadingButton";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import * as yup from "yup";
+import { updateUser } from "./store/usersSlice";
 
 /**
  * Form Validation Schema

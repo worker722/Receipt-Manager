@@ -1,22 +1,22 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Controller, useForm } from "react-hook-form";
+import _ from "@lodash";
+import Avatar from "@mui/material/Avatar";
+import AvatarGroup from "@mui/material/AvatarGroup";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import FormHelperText from "@mui/material/FormHelperText";
+import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { Link } from "react-router-dom";
-import * as yup from "yup";
-import _ from "@lodash";
-import AvatarGroup from "@mui/material/AvatarGroup";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Paper from "@mui/material/Paper";
-import FormHelperText from "@mui/material/FormHelperText";
-import JwtService from "src/app/auth/services/jwtService";
-import { useDispatch } from "react-redux";
 import { showMessage } from "app/store/fuse/messageSlice";
+import { Controller, useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+import JwtService from "src/app/auth/services/jwtService";
+import * as yup from "yup";
 
 /**
  * Form Validation Schema

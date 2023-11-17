@@ -1,18 +1,18 @@
-import { styled } from "@mui/material/styles";
-import { useTranslation } from "react-i18next";
-import FusePageSimple from "@fuse/core/FusePageSimple";
-import EditIcon from "@mui/icons-material/Edit";
-import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
-import { getRoles, selectRoles } from "./store/rolesSlice";
-import { useDispatch, useSelector } from "react-redux";
-import withReducer from "app/store/withReducer";
-import reducer from "./store";
-import { useEffect, useState } from "react";
-import EditRoleModal from "./EditRoleModal";
-import { showMessage } from "app/store/fuse/messageSlice";
-import FuseUtils from "@fuse/utils/FuseUtils";
-import moment from "moment";
 import FuseLoading from "@fuse/core/FuseLoading";
+import FusePageSimple from "@fuse/core/FusePageSimple";
+import FuseUtils from "@fuse/utils/FuseUtils";
+import EditIcon from "@mui/icons-material/Edit";
+import { styled } from "@mui/material/styles";
+import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
+import { showMessage } from "app/store/fuse/messageSlice";
+import withReducer from "app/store/withReducer";
+import moment from "moment";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import EditRoleModal from "./EditRoleModal";
+import reducer from "./store";
+import { getRoles, selectRoles } from "./store/rolesSlice";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {

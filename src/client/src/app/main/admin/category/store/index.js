@@ -1,5 +1,5 @@
-import { combineReducers } from '@reduxjs/toolkit';
-import categories from './categorySlice';
+import { combineReducers } from "@reduxjs/toolkit";
+import categories from "./categorySlice";
 
 const reducer = combineReducers({
   categories,

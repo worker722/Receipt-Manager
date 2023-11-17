@@ -1,7 +1,6 @@
+import FuseUtils from "@fuse/utils/FuseUtils";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import _ from "@lodash";
-import FuseUtils from "@fuse/utils/FuseUtils";
 
 const LOG_PATH = "staff/expenses/store/expensesSlice";
 const API = "/api/staff/expenses";

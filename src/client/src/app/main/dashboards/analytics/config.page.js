@@ -1,7 +1,6 @@
-import { lazy } from 'react';
-import { authRoles } from 'src/app/auth';
+import { lazy } from "react";
 
-const AnalyticsDashboardPage = lazy(() => import('./index'));
+const AnalyticsDashboardPage = lazy(() => import("./index"));
 
 const AnalyticsDashboardPageConfig = {
   settings: {
@@ -11,7 +10,7 @@ const AnalyticsDashboardPageConfig = {
   },
   routes: [
     {
-      path: '/dashboards',
+      path: "/dashboards",
       element: <AnalyticsDashboardPage />,
     },
   ],

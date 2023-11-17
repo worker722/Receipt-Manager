@@ -1,5 +1,5 @@
 const locale = {
-  PAGE_TITLE: 'ادارة المستخدمين',
+  PAGE_TITLE: "ادارة المستخدمين",
 };
 
 export default locale;

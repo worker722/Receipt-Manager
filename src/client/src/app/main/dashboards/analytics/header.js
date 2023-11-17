@@ -1,6 +1,4 @@
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
+import Typography from "@mui/material/Typography";
 
 function AnalyticsDashboardAppHeader(props) {
   return (
@@ -10,7 +8,10 @@ function AnalyticsDashboardAppHeader(props) {
           <Typography className="text-3xl font-semibold tracking-tight leading-8">
             Analytics dashboard
           </Typography>
-          <Typography className="font-medium tracking-tight" color="text.secondary">
+          <Typography
+            className="font-medium tracking-tight"
+            color="text.secondary"
+          >
             Monitor metrics, check reports and review performance
           </Typography>
         </div>

@@ -1,7 +1,5 @@
-import AnalyticsPageConfig from './analytics/config.page';
+import AnalyticsPageConfig from "./analytics/config.page";
 
-const dashboardsConfigs = [
-  AnalyticsPageConfig,
-];
+const dashboardsConfigs = [AnalyticsPageConfig];
 
 export default dashboardsConfigs;

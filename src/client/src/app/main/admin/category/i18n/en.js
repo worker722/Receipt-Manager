@@ -1,5 +1,5 @@
 const locale = {
-  PAGE_TITLE: 'Manage Expense Category',
+  PAGE_TITLE: "Manage Expense Category",
 };
 
 export default locale;

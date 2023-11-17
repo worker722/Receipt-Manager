@@ -1,5 +1,5 @@
-import { combineReducers } from '@reduxjs/toolkit';
-import users from './usersSlice';
+import { combineReducers } from "@reduxjs/toolkit";
+import users from "./usersSlice";
 
 const reducer = combineReducers({
   users,
