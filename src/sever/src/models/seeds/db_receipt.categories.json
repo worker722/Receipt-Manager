@@ -1,0 +1,200 @@
+[{
+  "_id": {
+    "$oid": "6552945a2b8fda34f24d7b9c"
+  },
+  "created_at": {
+    "$date": "2023-11-13T21:25:46.584Z"
+  },
+  "updated_at": {
+    "$date": "2023-11-14T12:50:08.603Z"
+  },
+  "name": "Gifts",
+  "subname": "gifts",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "655294712b8fda34f24d7ba0"
+  },
+  "created_at": {
+    "$date": "2023-11-13T21:26:09.707Z"
+  },
+  "updated_at": {
+    "$date": "2023-11-14T12:50:21.007Z"
+  },
+  "name": "Hotel - internal",
+  "subname": "hotel - internal",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "655294922b8fda34f24d7ba4"
+  },
+  "created_at": {
+    "$date": "2023-11-13T21:26:42.819Z"
+  },
+  "updated_at": {
+    "$date": "2023-11-14T12:50:54.549Z"
+  },
+  "name": "Restaurant Dinner",
+  "subname": "restaurant dinner",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6552959d7f21ae3538b53503"
+  },
+  "created_at": {
+    "$date": "2023-11-13T21:31:09.442Z"
+  },
+  "updated_at": {
+    "$date": "2023-11-14T12:50:51.244Z"
+  },
+  "name": "Restaurant Lunch",
+  "subname": "restaurant lunch",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "655295ad7f21ae3538b5350b"
+  },
+  "created_at": {
+    "$date": "2023-11-13T21:31:25.654Z"
+  },
+  "updated_at": {
+    "$date": "2023-11-17T10:56:21.033Z"
+  },
+  "name": "Fuel - Diesel",
+  "subname": "fuel - diesel",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "655297a35f51ba3df645956a"
+  },
+  "created_at": {
+    "$date": "2023-11-13T21:39:47.984Z"
+  },
+  "updated_at": {
+    "$date": "2023-11-14T12:51:23.273Z"
+  },
+  "name": "Fuel - Gasoline",
+  "subname": "fuel - gasoline",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "655297b55f51ba3df645956f"
+  },
+  "created_at": {
+    "$date": "2023-11-13T21:40:05.433Z"
+  },
+  "updated_at": {
+    "$date": "2023-11-14T12:51:31.604Z"
+  },
+  "name": "Toll",
+  "subname": "toll",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6552987b5f51ba3df6459583"
+  },
+  "created_at": {
+    "$date": "2023-11-13T21:43:23.947Z"
+  },
+  "updated_at": {
+    "$date": "2023-11-14T12:51:39.230Z"
+  },
+  "name": "Airplane",
+  "subname": "airplane",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "655298855f51ba3df6459588"
+  },
+  "created_at": {
+    "$date": "2023-11-13T21:43:33.718Z"
+  },
+  "updated_at": {
+    "$date": "2023-11-14T12:51:47.073Z"
+  },
+  "name": "Parking",
+  "subname": "parking",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6552c09fbe2119152a293592"
+  },
+  "created_at": {
+    "$date": "2023-11-14T00:34:39.688Z"
+  },
+  "updated_at": {
+    "$date": "2023-11-14T12:51:54.970Z"
+  },
+  "name": "Train",
+  "subname": "train",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65536d74691b684032cdf15a"
+  },
+  "photo": "public/assets/category_brand_default.png",
+  "created_at": {
+    "$date": "2023-11-14T12:52:04.106Z"
+  },
+  "updated_at": {
+    "$date": "2023-11-14T12:52:04.106Z"
+  },
+  "name": "Taxi",
+  "subname": "taxi",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65536d7a691b684032cdf15f"
+  },
+  "photo": "public/assets/category_brand_default.png",
+  "created_at": {
+    "$date": "2023-11-14T12:52:10.714Z"
+  },
+  "updated_at": {
+    "$date": "2023-11-14T12:52:10.714Z"
+  },
+  "name": "Car rental",
+  "subname": "car rental",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65536d81691b684032cdf164"
+  },
+  "photo": "public/assets/category_brand_default.png",
+  "created_at": {
+    "$date": "2023-11-14T12:52:17.839Z"
+  },
+  "updated_at": {
+    "$date": "2023-11-14T12:52:17.839Z"
+  },
+  "name": "Misc",
+  "subname": "misc",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "655751774a91dd69a7afb868"
+  },
+  "photo": "uploads\\category\\category_brand_1700221303475_726727844_mypic.png",
+  "created_at": {
+    "$date": "2023-11-17T11:41:43.487Z"
+  },
+  "updated_at": {
+    "$date": "2023-11-17T11:41:43.487Z"
+  },
+  "name": "s",
+  "subname": "s",
+  "__v": 0
+}]
