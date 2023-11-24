@@ -1,19 +1,21 @@
-import FuseUtils from "@fuse/utils";
 import FuseLoading from "@fuse/core/FuseLoading";
-import { Navigate } from "react-router-dom";
+import FuseUtils from "@fuse/utils";
 import settingsConfig from "app/configs/settingsConfig";
+import { Navigate } from "react-router-dom";
 
 // Page Configs
 import Error404Page from "../main/404/Error404Page";
-import DashboardConfigs from "../main/dashboards/config.dashboards";
 import AdminConfigs from "../main/admin/config.admin";
-import StaffConfigs from "../main/staff/config.staff";
 import AuthConfigs from "../main/auth/config.auth";
+import DashboardConfigs from "../main/dashboards/config.dashboards";
+import StaffConfigs from "../main/staff/config.staff";
+import UserConfigs from "../main/user/config.user";
 
 const routeConfigs = [
   ...DashboardConfigs,
   ...AdminConfigs,
   ...StaffConfigs,
+  ...UserConfigs,
   ...AuthConfigs,
 ];
 

@@ -6,6 +6,7 @@ const _DIR = {
   avatar: "uploads/profile/avatar",
   expense: "uploads/expense/",
   category: "uploads/category/",
+  receipt: "uploads/receipt/",
 };
 
 // Set up storage for uploaded profile images
@@ -152,6 +153,51 @@ const categoryUploader = multer({
   },
 }).single("category_photo");
 
+// Set up storage for uploaded user expense file
+const receiptStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, _DIR.receipt);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `receipt_${Date.now()}_${file.originalname}`);
+  },
+});
+
+// Create the multer instance for User expense file
+const receiptUploader = multer({
+  storage: receiptStorage,
+  fileFilter: function (req, file, cb) {
+    // Set the filetypes, it is optional
+    var filetypes = /xlsx|xls|csv|excel|sheet/;
+    var mimetype = filetypes.test(file.mimetype);
+
+    var extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
+    // App path/uploads/receipt
+    const BASE_DIR_PATH = path.join(path.resolve("./"), _DIR.receipt);
+
+    if (mimetype && extname) {
+      if (!fs.existsSync(BASE_DIR_PATH)) {
+        fs.mkdir(BASE_DIR_PATH, { recursive: true }, (err) => {
+          if (err) {
+            return cb("Directory cannot be created now!");
+          }
+          return cb(null, true);
+        });
+      } else {
+        return cb(null, true);
+      }
+    } else {
+      cb(
+        file.mimetype +
+          "Error: File upload only supports the " +
+          "following filetypes - " +
+          filetypes
+      );
+    }
+  },
+}).single("receipt");
+
 // Remove files
 const removeFile = (_file) => {
   return new Promise((resolve, reject) => {
@@ -168,5 +214,6 @@ module.exports = {
   avatarUploader,
   expenseUploader,
   categoryUploader,
+  receiptUploader,
   removeFile,
 };

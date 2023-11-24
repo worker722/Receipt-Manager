@@ -8,7 +8,7 @@ const categorySchema = new Schema({
   },
   photo: {
     type: String,
-    default: 'public/assets/category_brand_default.png'
+    default: "public/assets/category_brand_default.png",
   },
   subname: {
     type: String,
@@ -40,10 +40,8 @@ categorySchema.pre("find", async function (next) {
   this.where({ deleted_at: null });
 });
 
-const Category = mongoose.model("categories", categorySchema);
+const DB_COLLECTION_NAME = "categories";
 
-const REF_NAME = {
-  CATEGORY: "categories",
-};
+const Category = mongoose.model(DB_COLLECTION_NAME, categorySchema);
 
-module.exports = { Category, REF_NAME };
+module.exports = { Category, DB_COLLECTION_NAME };
