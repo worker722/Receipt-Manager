@@ -27,10 +27,18 @@ import { createReceipt } from "./store/receiptSlice";
 const schema = yup.object().shape({
   merchant_info: yup.string().required("You must enter merchant information."),
   issued_at: yup.date().required("You must enter expense issue date."),
-  total_amount: yup.date().required("You must enter total amount."),
-  currency: yup.date().required("You must enter transaction currency."),
-  country: yup.date().required("You must enter merchant country."),
+  total_amount: yup.string().required("You must enter total amount."),
+  currency: yup.string().required("You must enter transaction currency."),
+  country: yup.string().required("You must enter merchant country."),
 });
+
+const defaultValues = {
+  merchant_info: "",
+  issued_at: new Date().toISOString().substring(0, 10),
+  total_amount: "",
+  currency: "",
+  country: "",
+};
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -49,6 +57,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export default function AddReceiptModal({
+  report = {},
+  category = {},
+  expense = {},
   open = false,
   handleClose = {},
   handleAdded = {},
@@ -60,22 +71,31 @@ export default function AddReceiptModal({
 
   const { control, formState, handleSubmit, setValue } = useForm({
     mode: "onChange",
-    defaultValues: {
-      issued_at: new Date().toISOString().substring(0, 10),
-    },
+    defaultValues,
     resolver: yupResolver(schema),
   });
   const { isValid, dirtyFields, errors, setError } = formState;
 
-  const onSubmit = ({ name }) => {
+  const onSubmit = ({
+    merchant_info,
+    issued_at,
+    total_amount,
+    currency,
+    country,
+  }) => {
     setLoading(true);
     dispatch(
       createReceipt({
-        name,
-        receipt_photo: file,
+        merchant_info,
+        issued_at,
+        total_amount,
+        currency,
+        country,
+        report_id: report._id,
+        category_id: category._id,
+        expense_id: expense._id,
       })
     ).then((data) => {
-      fileReader.abort();
       setLoading(false);
       if (!FuseUtils.isEmpty(data?.payload?.message)) {
         dispatch(
@@ -134,11 +154,8 @@ export default function AddReceiptModal({
               <CloseIcon />
             </IconButton>
             <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-              Create Report
+              Create Receipt
             </Typography>
-            <Button autoFocus color="inherit" onClick={handleClose}>
-              Save
-            </Button>
           </Toolbar>
         </AppBar>
         <DialogContent>
@@ -146,7 +163,7 @@ export default function AddReceiptModal({
             <div
               name={"fileUploadForm"}
               onClick={handleUpload}
-              className="border-grey-600 border-solid rounded-6 border-2"
+              className="border-grey-600 border-solid rounded-6 border-2 cursor-pointer	"
               style={{ width: 800 }}
             >
               <VisuallyHiddenInput
@@ -164,7 +181,7 @@ export default function AddReceiptModal({
                 onSubmit={handleSubmit(onSubmit)}
               >
                 <Controller
-                  name="vendor"
+                  name="merchant_info"
                   control={control}
                   render={({ field }) => (
                     <TextField
@@ -173,7 +190,7 @@ export default function AddReceiptModal({
                       label="Description / Vendor"
                       autoFocus
                       type="name"
-                      placeholder="Taxi"
+                      placeholder=""
                       error={!!errors.merchant_info}
                       helperText={errors?.merchant_info?.message}
                       variant="outlined"
@@ -275,11 +292,11 @@ export default function AddReceiptModal({
                     variant="contained"
                     color="success"
                     className=" w-full mt-10 "
-                    aria-label="Save"
+                    aria-label="Create"
                     type="submit"
                     disabled={_.isEmpty(dirtyFields) || !isValid}
                   >
-                    Save
+                    Create
                   </LoadingButton>
                 </Box>
               </form>

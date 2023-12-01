@@ -12,6 +12,7 @@ const locale = {
   STAFF_LANG_EXPENSE_MANAGE: "Bank Expenses",
 
   // User
+  USER_LANG_ALL_EXPENSE: "All Expenses",
   USER_LANG_RECEIPT_MANAGE: "Manage Receipt",
 };
 

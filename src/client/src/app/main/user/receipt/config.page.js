@@ -20,7 +20,7 @@ const PageConfig = {
   auth: authRoles.user,
   routes: [
     {
-      path: "receipt",
+      path: "me/receipts",
       element: <ManageReceiptPage />,
     },
   ],

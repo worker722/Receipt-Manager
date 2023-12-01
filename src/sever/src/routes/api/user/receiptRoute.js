@@ -1,19 +1,16 @@
 const express = require("express");
 
 const {
-  getAll,
   uploadReceipt,
-  getCategories,
-  getExpenses,
+  createReceipt,
 } = require("../../../controllers/user/receiptController");
 
 const router = express.Router();
 
 const { Authenticated, isUser } = require("../../../middleware/authorized");
 
-router.get("/getAll", [Authenticated, isUser], getAll);
-router.get("/getExpenses", [Authenticated, isUser], getExpenses);
-router.get("/getCategories", [Authenticated, isUser], getCategories);
+// Receipts
 router.post("/upload", [Authenticated, isUser], uploadReceipt);
+router.post("/create", [Authenticated, isUser], createReceipt);
 
 module.exports = router;

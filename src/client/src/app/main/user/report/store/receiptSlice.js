@@ -2,42 +2,12 @@ import FuseUtils from "@fuse/utils/FuseUtils";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const LOG_PATH = "user/receipt/store/receiptSlice";
-
-export const getReceipts = createAsyncThunk(
-  "user/receipt/getReceipts",
-  async () => {
-    const response = await axios.get("/api/user/receipts/getAll");
-    if (response?.status == 200) {
-      const {
-        data = {},
-        error = {},
-        message = "",
-        status = -1,
-      } = response.data;
-      if (status == 200) {
-        return data ?? { receipts: [] };
-      } else {
-        if (!FuseUtils.isEmpty(error))
-          console.error(`${LOG_PATH}@getReceipts`, error);
-
-        return {
-          receipts: [],
-          ...response.data,
-        };
-      }
-    } else {
-      return {
-        receipts: [],
-      };
-    }
-  }
-);
+const LOG_PATH = "user/reports/store/receiptSlice";
 
 export const getCategories = createAsyncThunk(
   "user/receipts/getCategories",
   async () => {
-    const response = await axios.get("/api/user/receipts/getCategories");
+    const response = await axios.get("/api/user/reports/getCategories");
     if (response?.status == 200) {
       const {
         data = {},
@@ -103,10 +73,8 @@ export const uploadReceipt = createAsyncThunk(
 
 export const createReceipt = createAsyncThunk(
   "user/receipt/createReceipt",
-  async (receipt) => {
-    const response = await axios.post("/api/user/receipts/create", {
-      ...receipt,
-    });
+  async (data) => {
+    const response = await axios.post("/api/user/receipts/create", data);
     if (response?.status == 200) {
       const {
         data = {},
@@ -196,26 +164,8 @@ export const deleteReceipt = createAsyncThunk(
 
 const receiptSlice = createSlice({
   name: "user/receipt",
-  initialState: {
-    receipts: [],
-    categories: [],
-    createdReceipt: {},
-    updatedReceipt: {},
-    deletedReceipt: {},
-  },
+  initialState: {},
   reducers: {},
-  extraReducers: {
-    [getReceipts.fulfilled]: (state, action) => action.payload,
-    [createReceipt.fulfilled]: (state, action) => {
-      state.createdReceipt = action.payload;
-    },
-    [updateReceipt.fulfilled]: (state, action) => {
-      state.updatedReceipt = action.payload;
-    },
-    [deleteReceipt.fulfilled]: (state, action) => {
-      state.deletedReceipt = action.payload;
-    },
-  },
 });
 
 export const selectReceipts = ({ manageReceiptPage }) =>

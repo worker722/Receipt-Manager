@@ -30,6 +30,11 @@ const routes = [
     auth: settingsConfig.defaultAuth,
   },
   {
+    path: "/",
+    element: <Navigate to="/me/reports" />,
+    auth: "user",
+  },
+  {
     path: "loading",
     element: <FuseLoading />,
   },

@@ -80,13 +80,22 @@ const navigationConfig = [
 
   // User routes
   {
+    id: "expense_managements",
+    title: "Expenses",
+    type: "item",
+    auth: authRoles.user,
+    icon: "heroicons-outline:home",
+    translate: "USER_LANG_ALL_EXPENSE",
+    url: "me/expenses",
+  },
+  {
     id: "receipt_managements",
     title: "Receipt Manage",
     type: "item",
     auth: authRoles.user,
     icon: "heroicons-outline:home",
     translate: "USER_LANG_RECEIPT_MANAGE",
-    url: "receipt",
+    url: "me/receipts",
   },
 ];
 

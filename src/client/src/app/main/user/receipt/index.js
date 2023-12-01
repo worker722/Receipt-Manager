@@ -1,4 +1,3 @@
-import ConfirmDialog from "@fuse/core/ConfirmDialog";
 import FuseLoading from "@fuse/core/FuseLoading";
 import FusePageSimple from "@fuse/core/FusePageSimple";
 import FuseUtils from "@fuse/utils/FuseUtils";
@@ -264,15 +263,6 @@ const ManageReceiptPage = (props) => {
                   open={openAddModal}
                   handleClose={handleCloseAddModal}
                   handleAdded={handleCreatedReceipt}
-                />
-              )}
-              {openDeleteDialog && (
-                <ConfirmDialog
-                  open={openDeleteDialog}
-                  onCancel={() => setOpenDeleteDialog(false)}
-                  onAccept={handleConfirmDelete}
-                  question="Do you want to delete this receipt?"
-                  message="If you delete this receipt, all related receipts and bank expenses will be deleted."
                 />
               )}
             </>

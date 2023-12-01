@@ -1,6 +1,5 @@
 const { Schema, model } = require("mongoose");
 const ExpenseFile = require("./expenseFileModel");
-const { isEmpty } = require("../utils");
 const moment = require("moment");
 
 /** Bank expense model
