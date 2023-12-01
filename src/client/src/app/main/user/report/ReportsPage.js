@@ -1,19 +1,16 @@
 import FuseLoading from "@fuse/core/FuseLoading";
 import FusePageSimple from "@fuse/core/FusePageSimple";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Tab from "@mui/material/Tab";
-import Tabs from "@mui/material/Tabs";
 import { styled } from "@mui/material/styles";
 import { DataGrid } from "@mui/x-data-grid";
 import { showMessage } from "app/store/fuse/messageSlice";
 import withReducer from "app/store/withReducer";
 import moment from "moment";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
+import ReportStatus from "./ReportStatus";
 import reducer from "./store";
-import { selectReports } from "./store/reportsSlice";
+import { getAllReports, selectReports } from "./store/reportsSlice";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {
@@ -28,34 +25,22 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-sidebarContent": {},
 }));
 
-const a11yProps = (index) => {
-  return {
-    id: `expense-tab-${index}`,
-    "aria-controls": `expense-tabpanel-${index}`,
-  };
-};
-
-const ReportPage = (props) => {
-  const { t } = useTranslation("ReportPage");
+const ReportsPage = (props) => {
+  const { t } = useTranslation("ReportsPage");
 
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
-  const [tabs, setTabs] = useState([]);
-
-  const [selectionModel, setSelectionModel] = useState(() =>
-    rows.filter((r) => r)
-  );
-  const [selectedRows, setSelectedRows] = useState([]);
-
-  const [value, setValue] = useState(0);
-
-  const handleTabChange = (event, newValue) => {
-    setValue(newValue);
-    setTabData(newValue);
-  };
 
   const dispatch = useDispatch();
-  const { expenses } = useSelector(selectReports);
+  const { reports } = useSelector(selectReports);
+
+  useEffect(() => {
+    dispatch(getAllReports());
+  }, [dispatch]);
+
+  useEffect(() => {
+    setRows(reports);
+  }, [reports]);
 
   const handleCreateReport = () => {};
 
@@ -74,94 +59,42 @@ const ReportPage = (props) => {
 
   const columns = [
     {
-      field: "treatmented_at",
-      headerName: "Treatment Date",
-      width: 150,
-      valueGetter: (params) => toLocalTime(params.row.treatmented_at),
-    },
-    {
-      field: "contracting_by_number",
-      headerName: "Contracting by Number",
-      width: 200,
-    },
-    { field: "contract_number", headerName: "Contract Number", width: 150 },
-    {
-      field: "operation_location_code",
-      headerName: "Operation Location Code",
-      width: 150,
-    },
-    { field: "titular_name", headerName: "Titular Name", width: 100 },
-    {
-      field: "employee_identifier",
-      headerName: "Employee Identifier",
+      field: "public_id",
+      headerName: "ID",
       width: 100,
     },
-    { field: "card_number", headerName: "Card Number", width: 150 },
     {
-      field: "card_created_at",
-      headerName: "Card Create Date",
+      field: "expense_ids",
+      headerName: "Expenses",
       width: 150,
-      valueGetter: (params) => toLocalTime(params.row.card_created_at),
+      valueGetter: (params) => params.row.expense_ids.length,
     },
     {
-      field: "sold_at",
-      headerName: "Sale Date",
+      field: "receipt_ids",
+      headerName: "Receipts",
       width: 150,
-      valueGetter: (params) => toLocalTime(params.row.sold_at),
+      valueGetter: (params) => params.row.receipt_ids.length,
     },
     {
-      field: "closed_at",
-      headerName: "Closed Date",
+      field: "status",
+      headerName: "Status",
       width: 150,
-      valueGetter: (params) => toLocalTime(params.row.closed_at),
+      renderCell: (params) => {
+        return <ReportStatus value={params.row.status} />;
+      },
     },
     {
-      field: "taken_into_account_at",
-      headerName: "Taken Into Account Date",
-      width: 150,
-      valueGetter: (params) => toLocalTime(params.row.taken_into_account_at),
-    },
-    { field: "operation_code", headerName: "Operation Code", width: 150 },
-    {
-      field: "under_code_operation",
-      headerName: "Under Operation Code",
-      width: 150,
+      field: "created_at",
+      headerName: "Created at",
+      width: 200,
+      valueGetter: (params) => toLocalTime(params.row.created_at),
     },
     {
-      field: "direction_of_operation",
-      headerName: "Direction of Operation",
-      width: 150,
+      field: "updated_at",
+      headerName: "Updated at",
+      width: 200,
+      valueGetter: (params) => toLocalTime(params.row.updated_at),
     },
-    { field: "amount_charged", headerName: "Amount Charged", width: 150 },
-    {
-      field: "origin_currency_code",
-      headerName: "Origin Currency Code",
-      width: 150,
-    },
-    {
-      field: "total_amount_original_currency",
-      headerName: "Total Amount Original Currency",
-      width: 150,
-    },
-    {
-      field: "trader_company_name",
-      headerName: "Trader Company Name",
-      width: 150,
-    },
-    { field: "code_department", headerName: "Code Department", width: 150 },
-    { field: "country_code", headerName: "Country Code", width: 150 },
-    { field: "locality", headerName: "Locality", width: 150 },
-    { field: "code_mcc", headerName: "Code Mcc", width: 150 },
-    { field: "operation_time", headerName: "Operation Time", width: 150 },
-    { field: "execution_area", headerName: "Execution Area", width: 150 },
-    {
-      field: "merchant_siret_number",
-      headerName: "Merchat Siret Number",
-      width: 150,
-    },
-    { field: "commission_amount_1", headerName: "Commission 1", width: 150 },
-    { field: "commission_amount_2", headerName: "Commission 2", width: 150 },
-    { field: "commission_amount_3", headerName: "Commission 3", width: 150 },
   ];
 
   return (
@@ -169,41 +102,7 @@ const ReportPage = (props) => {
       header={
         <div className="p-24 flex">
           <div className=" self-center flex-none">
-            <h4>{t("PAGE_TITLE")}</h4>
-          </div>
-          <div className=" justify-center self-center ml-20">
-            <Button
-              component="label"
-              variant="contained"
-              color="primary"
-              disabled={selectedRows.length == 0}
-              onClick={handleCreateReport}
-            >
-              Create Report
-            </Button>
-          </div>
-          <div className=" pl-32 pr-32 w-8/12">
-            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-              <Tabs
-                value={value}
-                onChange={handleTabChange}
-                variant="scrollable"
-                scrollButtons="auto"
-                textColor="primary"
-                indicatorColor="secondary"
-                aria-label="expense month filter tab"
-                style={{ overflow: "auto" }}
-              >
-                {tabs.map((tab, index) => (
-                  <Tab
-                    tabIndex={index}
-                    label={`${tab.title}`}
-                    key={index}
-                    {...a11yProps(index)}
-                  />
-                ))}
-              </Tabs>
-            </Box>
+            <h4>{t("REPORTS_PAGE_TITLE")}</h4>
           </div>
         </div>
       }
@@ -218,22 +117,12 @@ const ReportPage = (props) => {
                   rows={rows}
                   columns={columns}
                   getRowId={(row) => row._id}
-                  selectionModel={selectionModel}
-                  onRowSelectionModelChange={(e) => {
-                    setSelectionModel(e);
-                    const selectedIDs = new Set(e);
-                    const selectedRows = rows.filter((r) =>
-                      selectedIDs.has(r._id)
-                    );
-                    setSelectedRows(selectedRows);
-                  }}
                   initialState={{
                     pagination: {
                       paginationModel: { page: 0, pageSize: 10 },
                     },
                   }}
                   pageSizeOptions={[5, 10]}
-                  checkboxSelection
                 />
               )}
             </>
@@ -245,4 +134,4 @@ const ReportPage = (props) => {
   );
 };
 
-export default withReducer("reportPage", reducer)(ReportPage);
+export default withReducer("reportsPage", reducer)(ReportsPage);

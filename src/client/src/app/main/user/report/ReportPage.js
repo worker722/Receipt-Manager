@@ -1,8 +1,10 @@
 import FuseLoading from "@fuse/core/FuseLoading";
 import FusePageSimple from "@fuse/core/FusePageSimple";
+import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import withRouter from "@fuse/core/withRouter";
 import FuseUtils from "@fuse/utils/FuseUtils";
 import { Button } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
 import { DataGrid } from "@mui/x-data-grid";
@@ -40,6 +42,7 @@ const ReportPage = (props) => {
 
   const [loading, setLoading] = useState(false);
   const [rowExpenses, setRowExpenses] = useState([]);
+  const [rowOriginExpenses, setRowOriginExpenses] = useState([]);
   const [rowReceipts, setRowReceipts] = useState([]);
   const [report, setReport] = useState({});
   const [categories, setCategories] = useState([]);
@@ -75,7 +78,21 @@ const ReportPage = (props) => {
 
   useEffect(() => {
     if (!FuseUtils.isEmpty(report)) {
-      setRowExpenses(report.expense_ids);
+      var expenses = [];
+      report.expense_ids.map((_expense) => {
+        var exists = false;
+        report.receipt_ids.map((_receipt) => {
+          if (_expense._id == _receipt.expense) {
+            exists = true;
+            return;
+          }
+        });
+        if (!exists) {
+          expenses.push(_expense);
+        }
+      });
+      setRowExpenses(expenses);
+      setRowOriginExpenses(report.expense_ids);
       setRowReceipts(report.receipt_ids);
     }
   }, [report]);
@@ -111,6 +128,11 @@ const ReportPage = (props) => {
     handleCloseAddReceiptModal();
 
     setRowReceipts([...rowReceipts, createdReceipt]);
+    setRowExpenses(
+      rowExpenses.filter(
+        (_expense) => _expense._id != createdReceipt.expense._id
+      )
+    );
 
     _showMessage("Successfully added!", "info");
   };
@@ -120,8 +142,22 @@ const ReportPage = (props) => {
     setOpenCategoryModal(true);
   };
 
+  const handelMatch = () => {};
+
   const receiptColumns = [
-    { field: "merchant_info", headerName: "Merchant Info", width: 200 },
+    {
+      field: "status",
+      headerName: "Validated",
+      width: 80,
+      renderCell: (params) => {
+        return (
+          <FuseSvgIcon className="text-grey" size={20}>
+            heroicons-outline:check-circle
+          </FuseSvgIcon>
+        );
+      },
+    },
+    { field: "merchant_info", headerName: "Merchant Info", width: 150 },
     {
       field: "issued_at",
       headerName: "Issued Date",
@@ -137,22 +173,116 @@ const ReportPage = (props) => {
     {
       field: "upload",
       type: "actions",
-      headerName: "Upload Receipt",
-      width: 150,
+      headerName: "Upload",
+      width: 80,
       cellClassName: "actions",
       getActions: (params) => {
         return [
           <Button
-            variant="contained"
+            variant="text"
             onClick={() => handelUploadReceipt(params.row)}
             color="info"
             aria-label="Add"
           >
-            Add
+            <FuseSvgIcon size={20}>heroicons-outline:upload</FuseSvgIcon>
           </Button>,
         ];
       },
     },
+    {
+      field: "treatmented_at",
+      headerName: "Treatment Date",
+      width: 150,
+      valueGetter: (params) => toLocalTime(params.row.treatmented_at),
+    },
+    { field: "titular_name", headerName: "Titular Name", width: 100 },
+    { field: "amount_charged", headerName: "Amount Charged", width: 150 },
+    {
+      field: "origin_currency_code",
+      headerName: "Origin Currency Code",
+      width: 150,
+    },
+    {
+      field: "total_amount_original_currency",
+      headerName: "Total Amount Original Currency",
+      width: 150,
+    },
+    { field: "commission_amount_1", headerName: "Commission 1", width: 150 },
+    { field: "commission_amount_2", headerName: "Commission 2", width: 150 },
+    { field: "commission_amount_3", headerName: "Commission 3", width: 150 },
+    { field: "country_code", headerName: "Country Code", width: 150 },
+    { field: "locality", headerName: "Locality", width: 150 },
+    {
+      field: "trader_company_name",
+      headerName: "Trader Company Name",
+      width: 150,
+    },
+    {
+      field: "operation_location_code",
+      headerName: "Operation Location Code",
+      width: 150,
+    },
+    {
+      field: "contracting_by_number",
+      headerName: "Contracting by Number",
+      width: 200,
+    },
+    { field: "contract_number", headerName: "Contract Number", width: 150 },
+
+    {
+      field: "employee_identifier",
+      headerName: "Employee Identifier",
+      width: 100,
+    },
+    { field: "card_number", headerName: "Card Number", width: 150 },
+    {
+      field: "card_created_at",
+      headerName: "Card Create Date",
+      width: 150,
+      valueGetter: (params) => toLocalTime(params.row.card_created_at),
+    },
+    {
+      field: "sold_at",
+      headerName: "Sale Date",
+      width: 150,
+      valueGetter: (params) => toLocalTime(params.row.sold_at),
+    },
+    {
+      field: "closed_at",
+      headerName: "Closed Date",
+      width: 150,
+      valueGetter: (params) => toLocalTime(params.row.closed_at),
+    },
+    {
+      field: "taken_into_account_at",
+      headerName: "Taken Into Account Date",
+      width: 150,
+      valueGetter: (params) => toLocalTime(params.row.taken_into_account_at),
+    },
+    { field: "operation_code", headerName: "Operation Code", width: 150 },
+    {
+      field: "under_code_operation",
+      headerName: "Under Operation Code",
+      width: 150,
+    },
+    {
+      field: "direction_of_operation",
+      headerName: "Direction of Operation",
+      width: 150,
+    },
+    { field: "code_department", headerName: "Code Department", width: 150 },
+
+    { field: "code_mcc", headerName: "Code Mcc", width: 150 },
+    { field: "operation_time", headerName: "Operation Time", width: 150 },
+    { field: "execution_area", headerName: "Execution Area", width: 150 },
+    {
+      field: "merchant_siret_number",
+      headerName: "Merchat Siret Number",
+      width: 150,
+    },
+  ];
+
+  const originExpenseColumns = [
     {
       field: "treatmented_at",
       headerName: "Treatment Date",
@@ -265,7 +395,7 @@ const ReportPage = (props) => {
           {loading ? (
             <FuseLoading />
           ) : (
-            <div className="w-full px-24 md:px-32 pb-24">
+            <div className="w-full px-5 md:px-5 pb-24">
               <Paper className="flex flex-col flex-auto p-24 mt-10 shadow rounded-2xl overflow-hidden">
                 <p>Bank Expenses</p>
                 {rowExpenses.length > 0 && (
@@ -282,22 +412,49 @@ const ReportPage = (props) => {
                   />
                 )}
               </Paper>
-              <Paper className="flex flex-col flex-auto p-24 mt-10 shadow rounded-2xl overflow-hidden">
-                <p>Receipts</p>
-                {rowReceipts.length > 0 && (
-                  <DataGrid
-                    rows={rowReceipts}
-                    columns={receiptColumns}
-                    getRowId={(row) => row._id}
-                    initialState={{
-                      pagination: {
-                        paginationModel: { page: 0, pageSize: 5 },
-                      },
-                    }}
-                    pageSizeOptions={[5, 10]}
-                  />
-                )}
-              </Paper>
+              <div className=" flex relative">
+                <IconButton
+                  onClick={handelMatch}
+                  style={{ backgroundColor: "#0f172a" }}
+                  className="absolute top-[calc(50%-20px)] left-[calc(50%-20px)]"
+                >
+                  <FuseSvgIcon className=" text-white" size={22}>
+                    heroicons-outline:switch-horizontal
+                  </FuseSvgIcon>
+                </IconButton>
+                <Paper className="flex flex-col w-1/2 p-24 mt-10 shadow rounded-2xl overflow-hidden">
+                  <p>Receipts</p>
+                  {rowReceipts.length > 0 && (
+                    <DataGrid
+                      rows={rowReceipts}
+                      columns={receiptColumns}
+                      getRowId={(row) => row._id}
+                      initialState={{
+                        pagination: {
+                          paginationModel: { page: 0, pageSize: 5 },
+                        },
+                      }}
+                      pageSizeOptions={[5, 10]}
+                    />
+                  )}
+                </Paper>
+                <Paper className="flex flex-col w-1/2 ml-10 p-24 mt-10 shadow rounded-2xl overflow-hidden">
+                  <p>Origin Expenses</p>
+                  {rowOriginExpenses.length > 0 && (
+                    <DataGrid
+                      rows={rowOriginExpenses}
+                      columns={originExpenseColumns}
+                      getRowId={(row) => row._id}
+                      initialState={{
+                        pagination: {
+                          paginationModel: { page: 0, pageSize: 5 },
+                        },
+                      }}
+                      pageSizeOptions={[5, 10]}
+                    />
+                  )}
+                </Paper>
+              </div>
             </div>
           )}
 

@@ -129,7 +129,6 @@ export default function AddReceiptModal({
       // Unknown event, cannot be closed without receipt interactions
     } else {
       // Can be added saving change confirmation like: 'There are some unsaved changes. Do you want to leave?'
-      fileReader.abort();
       handleClose && handleClose();
     }
   };

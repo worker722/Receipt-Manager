@@ -89,13 +89,13 @@ const navigationConfig = [
     url: "me/expenses",
   },
   {
-    id: "receipt_managements",
-    title: "Receipt Manage",
+    id: "report_managements",
+    title: "Report Manage",
     type: "item",
     auth: authRoles.user,
     icon: "heroicons-outline:home",
-    translate: "USER_LANG_RECEIPT_MANAGE",
-    url: "me/receipts",
+    translate: "USER_LANG_REPORT_MANAGE",
+    url: "me/reports",
   },
 ];
 

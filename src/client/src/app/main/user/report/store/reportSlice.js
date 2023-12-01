@@ -38,10 +38,10 @@ export const getReport = createAsyncThunk(
 
 export const REPORT_STATUS = {
   IN_PROGRESS: 0,
-  PENDING: 2,
-  APPROVED: 3,
-  REFUNDED: 4,
-  CLOSED: 5,
+  PENDING: 1,
+  APPROVED: 2,
+  REFUNDED: 3,
+  CLOSED: 4,
 };
 
 const reportSlice = createSlice({

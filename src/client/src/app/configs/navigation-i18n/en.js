@@ -13,7 +13,7 @@ const locale = {
 
   // User
   USER_LANG_ALL_EXPENSE: "All Expenses",
-  USER_LANG_RECEIPT_MANAGE: "Manage Receipt",
+  USER_LANG_REPORT_MANAGE: "Manage Reports",
 };
 
 export default locale;

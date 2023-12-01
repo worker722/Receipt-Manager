@@ -12,7 +12,7 @@ const locale = {
   STAFF_LANG_EXPENSE_MANAGE: "Gérer les dépenses",
 
   // User
-  USER_LANG_RECEIPT_MANAGE: "Gérer le reçu",
+  USER_LANG_REPORT_MANAGE: "Gérer le reçu",
 };
 
 export default locale;
