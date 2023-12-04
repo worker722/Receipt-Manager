@@ -3,13 +3,15 @@ import FusePageSimple from "@fuse/core/FusePageSimple";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import withRouter from "@fuse/core/withRouter";
 import FuseUtils from "@fuse/utils/FuseUtils";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import EditIcon from "@mui/icons-material/Edit";
 import { Button } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import { styled } from "@mui/material/styles";
+import { darken, lighten, styled } from "@mui/material/styles";
 import { useTheme } from "@mui/styles";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import { showMessage } from "app/store/fuse/messageSlice";
 import withReducer from "app/store/withReducer";
 import { motion } from "framer-motion";
@@ -19,10 +21,12 @@ import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import AddReceiptModal from "./AddReceiptModal";
+import EditReceiptModal from "./EditReceiptModal";
 import ExpenseCategoryModal from "./ExpenseCategoryModal";
+import ReportStatus from "./ReportStatus";
 import reducer from "./store";
 import { getCategories } from "./store/receiptSlice";
-import { getReport, matchReport } from "./store/reportSlice";
+import { REPORT_STATUS, getReport, matchReport } from "./store/reportSlice";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {
@@ -37,6 +41,45 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-sidebarContent": {},
 }));
 
+const getBackgroundColor = (color, mode) =>
+  mode === "dark" ? darken(color, 0.6) : lighten(color, 0.6);
+
+const getHoverBackgroundColor = (color, mode) =>
+  mode === "dark" ? darken(color, 0.5) : lighten(color, 0.5);
+
+const getSelectedBackgroundColor = (color, mode) =>
+  mode === "dark" ? darken(color, 0.4) : lighten(color, 0.4);
+
+const getSelectedHoverBackgroundColor = (color, mode) =>
+  mode === "dark" ? darken(color, 0.3) : lighten(color, 0.3);
+
+const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+  "& .super-app-theme--Matched": {
+    backgroundColor: getBackgroundColor(
+      theme.palette.success.light,
+      theme.palette.mode
+    ),
+    "&:hover": {
+      backgroundColor: getHoverBackgroundColor(
+        theme.palette.success.light,
+        theme.palette.mode
+      ),
+    },
+    "&.Mui-selected": {
+      backgroundColor: getSelectedBackgroundColor(
+        theme.palette.success.light,
+        theme.palette.mode
+      ),
+      "&:hover": {
+        backgroundColor: getSelectedHoverBackgroundColor(
+          theme.palette.success.light,
+          theme.palette.mode
+        ),
+      },
+    },
+  },
+}));
+
 const ReportPage = (props) => {
   const { t } = useTranslation("ReportsPage");
 
@@ -49,9 +92,11 @@ const ReportPage = (props) => {
   const [report, setReport] = useState({});
   const [categories, setCategories] = useState([]);
   const [currentCategory, setCurrentCategory] = useState({});
+  const [currentReceipt, setCurrentReceipt] = useState({});
   // Modal
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
   const [openAddReceiptModal, setOpenAddReceiptModal] = useState(false);
+  const [openEditReceiptModal, setOpenEditReceiptModal] = useState(false);
 
   const theme = useTheme();
 
@@ -81,8 +126,18 @@ const ReportPage = (props) => {
 
   useEffect(() => {
     if (!FuseUtils.isEmpty(report)) {
-      setRowExpenses(report.expense_ids);
       setRowReceipts(report.receipt_ids);
+      var _expenses = [];
+      report.expense_ids.map((_expense) => {
+        var temp_expense = _expense;
+        report.receipt_ids.map((_receipt) => {
+          if (_receipt.expense == temp_expense._id) {
+            temp_expense.matched = true;
+          }
+        });
+        _expenses.push(temp_expense);
+      });
+      setRowExpenses(_expenses);
     }
   }, [report]);
 
@@ -107,6 +162,10 @@ const ReportPage = (props) => {
     setOpenAddReceiptModal(false);
   };
 
+  const handleCloseEditReceiptModal = () => {
+    setOpenEditReceiptModal(false);
+  };
+
   const handleCategoryChoose = (category) => {
     setCurrentCategory(category);
     setOpenAddReceiptModal(true);
@@ -117,6 +176,16 @@ const ReportPage = (props) => {
     handleCloseAddReceiptModal();
 
     setRowReceipts([...rowReceipts, createdReceipt]);
+  };
+
+  const handleUpdatedReceipt = (updatedReceipt) => {
+    handleCloseEditReceiptModal();
+
+    setRowReceipts(
+      rowReceipts.map((row) =>
+        row._id === updatedReceipt._id ? updatedReceipt : row
+      )
+    );
   };
 
   const handelUploadReceipt = () => {
@@ -138,11 +207,22 @@ const ReportPage = (props) => {
     });
   };
 
+  const handleEditReceipt = (_receipt) => {
+    setCurrentReceipt(_receipt);
+    setOpenEditReceiptModal(true);
+  };
+
+  const handleDeleteReceipt = (id) => {};
+
+  const handleDoubleClick = (params) => {
+    handleEditReceipt(params.row);
+  };
+
   const receiptColumns = [
     {
       field: "status",
-      headerName: "Validated",
-      width: 80,
+      headerName: "",
+      width: 20,
       renderCell: (params) => {
         const validated = params.row.expense;
         return (
@@ -162,9 +242,33 @@ const ReportPage = (props) => {
       width: 150,
       valueGetter: (params) => toLocalTime(params.row.issued_at),
     },
-    { field: "total_amount", headerName: "Total Amount", width: 200 },
+    { field: "total_amount", headerName: "Total Amount", width: 150 },
     { field: "currency", headerName: "Currency", width: 100 },
-    { field: "country", headerName: "Country", width: 100 },
+    { field: "country_code", headerName: "Country", width: 100 },
+    {
+      field: "actions",
+      type: "actions",
+      headerName: "Actions",
+      width: 100,
+      cellClassName: "actions",
+      getActions: (params) => {
+        return [
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="Edit"
+            className="textPrimary"
+            onClick={() => handleEditReceipt(params.row)}
+            color="inherit"
+          />,
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Delete"
+            onClick={() => handleDeleteReceipt(params.row)}
+            color="inherit"
+          />,
+        ];
+      },
+    },
   ];
 
   const expenseColumns = [
@@ -265,7 +369,7 @@ const ReportPage = (props) => {
     <Root
       header={
         <div className="p-24 flex">
-          <div className="flex flex-col items-center self-center sm:items-start space-y-8 sm:space-y-0 w-full sm:max-w-full min-w-0">
+          <div className="flex items-center self-center sm:items-start space-y-8 sm:space-y-0 w-full sm:max-w-full min-w-0">
             <motion.div
               initial={{ x: 20, opacity: 0 }}
               animate={{ x: 0, opacity: 1, transition: { delay: 0.3 } }}
@@ -287,11 +391,17 @@ const ReportPage = (props) => {
                 </span>
               </Typography>
             </motion.div>
+            <div className=" ml-10 cursor-default select-none">
+              <ReportStatus value={report.status} />
+            </div>
           </div>
           <div className=" float-right">
-            <Button component="label" variant="contained" color="primary">
-              Submit
-            </Button>
+            {(report.status == REPORT_STATUS.IN_PROGRESS ||
+              report.status == REPORT_STATUS.REFUNDED) && (
+              <Button component="label" variant="contained" color="primary">
+                Submit
+              </Button>
+            )}
           </div>
         </div>
       }
@@ -330,7 +440,7 @@ const ReportPage = (props) => {
                   </IconButton>
                 </div>
                 {rowReceipts.length > 0 && (
-                  <DataGrid
+                  <StyledDataGrid
                     rows={rowReceipts}
                     columns={receiptColumns}
                     getRowId={(row) => row._id}
@@ -340,13 +450,14 @@ const ReportPage = (props) => {
                       },
                     }}
                     pageSizeOptions={[5, 10]}
+                    onRowDoubleClick={handleDoubleClick}
                   />
                 )}
               </Paper>
               <Paper className="flex flex-col w-1/2 ml-10 p-24 mt-10 shadow rounded-2xl overflow-hidden">
                 <p>Expenses</p>
                 {rowExpenses.length > 0 && (
-                  <DataGrid
+                  <StyledDataGrid
                     rows={rowExpenses}
                     columns={expenseColumns}
                     getRowId={(row) => row._id}
@@ -356,6 +467,11 @@ const ReportPage = (props) => {
                       },
                     }}
                     pageSizeOptions={[5, 10]}
+                    getRowClassName={(params) =>
+                      params.row.matched
+                        ? `super-app-theme--Matched`
+                        : `super-app-theme`
+                    }
                   />
                 )}
               </Paper>
@@ -377,6 +493,14 @@ const ReportPage = (props) => {
               open={openAddReceiptModal}
               handleClose={handleCloseAddReceiptModal}
               handleAdded={handleCreatedReceipt}
+            />
+          )}
+          {openEditReceiptModal && (
+            <EditReceiptModal
+              receipt={currentReceipt}
+              open={openEditReceiptModal}
+              handleClose={handleCloseEditReceiptModal}
+              handleAdded={handleUpdatedReceipt}
             />
           )}
         </div>

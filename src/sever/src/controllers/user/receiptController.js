@@ -35,7 +35,7 @@ const createReceipt = async (req, res) => {
     issued_at,
     total_amount,
     currency,
-    country,
+    country_code,
     category_id,
     report_id,
   } = req.body;
@@ -47,7 +47,7 @@ const createReceipt = async (req, res) => {
     receipt.issued_at = moment(issued_at).format("YYYY-MM-DD");
     receipt.total_amount = total_amount;
     receipt.currency = currency.toUpperCase();
-    receipt.country_code = country.toUpperCase();
+    receipt.country_code = country_code.toUpperCase();
 
     receipt.save().then(async (savedReceipt) => {
       const existReport = await Report.findById(report_id);
@@ -70,12 +70,30 @@ const createReceipt = async (req, res) => {
 };
 
 const updateReceipt = async (req, res) => {
-  const { report_id, receipt_id } = req.body;
-  const existReport = await Report.findById(report_id);
-  if (!existReport.receipt_ids.includes(receipt_id)) {
-    await Report.findByIdAndUpdate(report_id, {
-      $push: { receipt_ids: receipt_id },
+  const { id, merchant_info, issued_at, total_amount, currency, country_code } =
+    req.body;
+
+  try {
+    await Receipt.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          merchant_info,
+          issued_at: moment(issued_at).format("YYYY-MM-DD"),
+          total_amount,
+          currency,
+          country_code,
+        },
+      },
+      {
+        new: true,
+      }
+    ).then((updatedReceipt) => {
+      return response(res, { receipt: updatedReceipt }, {}, 200);
     });
+  } catch (error) {
+    console.log(`${LOG_PATH}@createReceipt`, error);
+    response(res, {}, error, 500, "Something went wrong!");
   }
 };
 

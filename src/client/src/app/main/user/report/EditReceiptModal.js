@@ -14,12 +14,13 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import { showMessage } from "app/store/fuse/messageSlice";
+import moment from "moment";
 import * as React from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import * as yup from "yup";
-import { createReceipt } from "./store/receiptSlice";
+import { updateReceipt } from "./store/receiptSlice";
 
 /**
  * Form Validation Schema
@@ -56,9 +57,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AddReceiptModal({
-  report = {},
-  category = {},
+export default function EditReceiptModal({
+  receipt = {},
   open = false,
   handleClose = {},
   handleAdded = {},
@@ -75,6 +75,33 @@ export default function AddReceiptModal({
   });
   const { isValid, dirtyFields, errors, setError } = formState;
 
+  useEffect(() => {
+    setValue("merchant_info", receipt?.merchant_info ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue(
+      "issued_at",
+      moment(receipt?.issued_at).format("YYYY-MM-DD") ?? "",
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      }
+    );
+    setValue("total_amount", receipt?.total_amount ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue("currency", receipt?.currency ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue("country_code", receipt?.country_code ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }, [setValue, receipt]);
+
   const onSubmit = ({
     merchant_info,
     issued_at,
@@ -84,14 +111,13 @@ export default function AddReceiptModal({
   }) => {
     setLoading(true);
     dispatch(
-      createReceipt({
+      updateReceipt({
+        id: receipt._id,
         merchant_info,
         issued_at,
         total_amount,
         currency,
         country_code,
-        report_id: report._id,
-        category_id: category._id,
       })
     ).then((data) => {
       setLoading(false);
@@ -151,7 +177,7 @@ export default function AddReceiptModal({
               <CloseIcon />
             </IconButton>
             <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-              Create Receipt
+              Edit Receipt
             </Typography>
           </Toolbar>
         </AppBar>
@@ -172,7 +198,7 @@ export default function AddReceiptModal({
             </div>
             <div className=" w-full ml-40">
               <form
-                name="addReceiptForm"
+                name="editReceiptForm"
                 noValidate
                 className="flex flex-col justify-center w-full mt-32"
                 onSubmit={handleSubmit(onSubmit)}
@@ -293,7 +319,7 @@ export default function AddReceiptModal({
                     type="submit"
                     disabled={_.isEmpty(dirtyFields) || !isValid}
                   >
-                    Create
+                    Update
                   </LoadingButton>
                 </Box>
               </form>

@@ -100,18 +100,8 @@ export const createReceipt = createAsyncThunk(
 
 export const updateReceipt = createAsyncThunk(
   "user/receipt/updateReceipt",
-  async (receipt) => {
-    const response = await axios.post(
-      "/api/user/receipts/update",
-      {
-        ...receipt,
-      },
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+  async (data) => {
+    const response = await axios.post("/api/user/receipts/update", data);
     if (response?.status == 200) {
       const {
         data = {},

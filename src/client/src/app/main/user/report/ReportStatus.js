@@ -38,14 +38,20 @@ export const statuses = [
 function ReportStatus(props) {
   const status = _.find(statuses, { value: props.value });
   return (
-    <div
-      className={clsx(
-        "inline text-12 font-semibold py-4 px-12 rounded-full truncate",
-        status.color
+    <>
+      {status ? (
+        <div
+          className={clsx(
+            "inline text-12 font-semibold py-4 px-12 rounded-full truncate",
+            status.color
+          )}
+        >
+          {status.name}
+        </div>
+      ) : (
+        <></>
       )}
-    >
-      {status.name}
-    </div>
+    </>
   );
 }
 
