@@ -92,7 +92,29 @@ const updateReceipt = async (req, res) => {
       return response(res, { receipt: updatedReceipt }, {}, 200);
     });
   } catch (error) {
-    console.log(`${LOG_PATH}@createReceipt`, error);
+    console.log(`${LOG_PATH}@updateReceipt`, error);
+    response(res, {}, error, 500, "Something went wrong!");
+  }
+};
+
+const deleteReceipt = async (req, res) => {
+  const { id } = req.body;
+
+  try {
+    await Receipt.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          deleted_at: new Date(),
+        },
+      },
+      {
+        new: true,
+      }
+    ).exec();
+    return response(res, {}, {}, 200);
+  } catch (error) {
+    console.log(`${LOG_PATH}@deleteReceipt`, error);
     response(res, {}, error, 500, "Something went wrong!");
   }
 };
@@ -101,4 +123,5 @@ module.exports = {
   uploadReceipt,
   createReceipt,
   updateReceipt,
+  deleteReceipt,
 };

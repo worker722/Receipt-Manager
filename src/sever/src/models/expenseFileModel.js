@@ -31,6 +31,11 @@ expenseFileSchema.pre("findOneAndUpdate", async function (next) {
   this.set({ updated_at: new Date() });
 });
 
+//Cannot be selected if deleted
+expenseFileSchema.pre("find", async function (next) {
+  this.where({ deleted_at: null });
+});
+
 const DB_COLLECTION_NAME = "expense_files";
 
 const ExpenseFile = model(DB_COLLECTION_NAME, expenseFileSchema);

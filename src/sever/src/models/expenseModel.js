@@ -248,6 +248,11 @@ expenseSchema.pre("findOneAndUpdate", async function (next) {
   this.set({ updated_at: new Date() });
 });
 
+//Cannot be selected if deleted
+expenseSchema.pre("find", async function (next) {
+  this.where({ deleted_at: null });
+});
+
 const REF_NAME = {
   ORIGIN_FILE: "originFile",
 };

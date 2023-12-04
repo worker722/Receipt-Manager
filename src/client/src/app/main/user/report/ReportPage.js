@@ -1,3 +1,4 @@
+import ConfirmDialog from "@fuse/core/ConfirmDialog";
 import FuseLoading from "@fuse/core/FuseLoading";
 import FusePageSimple from "@fuse/core/FusePageSimple";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
@@ -25,7 +26,7 @@ import EditReceiptModal from "./EditReceiptModal";
 import ExpenseCategoryModal from "./ExpenseCategoryModal";
 import ReportStatus from "./ReportStatus";
 import reducer from "./store";
-import { getCategories } from "./store/receiptSlice";
+import { deleteReceipt, getCategories } from "./store/receiptSlice";
 import { REPORT_STATUS, getReport, matchReport } from "./store/reportSlice";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
@@ -93,10 +94,12 @@ const ReportPage = (props) => {
   const [categories, setCategories] = useState([]);
   const [currentCategory, setCurrentCategory] = useState({});
   const [currentReceipt, setCurrentReceipt] = useState({});
+  const [deleteReceiptId, setDeleteReceiptID] = useState();
   // Modal
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
   const [openAddReceiptModal, setOpenAddReceiptModal] = useState(false);
   const [openEditReceiptModal, setOpenEditReceiptModal] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
   const theme = useTheme();
 
@@ -212,7 +215,27 @@ const ReportPage = (props) => {
     setOpenEditReceiptModal(true);
   };
 
-  const handleDeleteReceipt = (id) => {};
+  const handleDeleteReceipt = (_receipt) => {
+    setDeleteReceiptID(_receipt._id);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setOpenDeleteDialog(false);
+    setLoading(true);
+    dispatch(deleteReceipt(deleteReceiptId)).then((data) => {
+      setLoading(false);
+      const { message = "" } = data.payload;
+      if (!FuseUtils.isEmpty(message)) {
+        _showMessage(message, "error");
+      } else {
+        _showMessage("Deleted successfully", "info");
+        setRowReceipts(
+          rowReceipts.filter((row) => row._id !== deleteReceiptId)
+        );
+      }
+    });
+  };
 
   const handleDoubleClick = (params) => {
     handleEditReceipt(params.row);
@@ -396,12 +419,13 @@ const ReportPage = (props) => {
             </div>
           </div>
           <div className=" float-right">
-            {(report.status == REPORT_STATUS.IN_PROGRESS ||
-              report.status == REPORT_STATUS.REFUNDED) && (
-              <Button component="label" variant="contained" color="primary">
-                Submit
-              </Button>
-            )}
+            {rowReceipts.length > 0 &&
+              (report.status == REPORT_STATUS.IN_PROGRESS ||
+                report.status == REPORT_STATUS.REFUNDED) && (
+                <Button component="label" variant="contained" color="primary">
+                  Submit
+                </Button>
+              )}
           </div>
         </div>
       }
@@ -501,6 +525,14 @@ const ReportPage = (props) => {
               open={openEditReceiptModal}
               handleClose={handleCloseEditReceiptModal}
               handleAdded={handleUpdatedReceipt}
+            />
+          )}
+          {openDeleteDialog && (
+            <ConfirmDialog
+              open={openDeleteDialog}
+              onCancel={() => setOpenDeleteDialog(false)}
+              onAccept={handleConfirmDelete}
+              question="Do you want to delete this receipt?"
             />
           )}
         </div>
