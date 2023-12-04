@@ -267,7 +267,6 @@ const doMatch = (receipt, expense) => {
 
     // If total amount and currency, date are correct, passed now;
     if (totalAmountMatched && currencyMatched && processDateMatched) {
-      console.log("Passed");
       return true;
     }
     return false;
