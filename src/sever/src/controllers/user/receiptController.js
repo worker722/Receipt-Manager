@@ -1,6 +1,7 @@
 const { Receipt, REF_NAME } = require("../../models/receiptModel");
 const { Report } = require("../../models/reportModel");
 const { response, fileManager } = require("../../utils");
+const moment = require("moment");
 
 const LOG_PATH = "user/receiptController";
 
@@ -36,19 +37,17 @@ const createReceipt = async (req, res) => {
     currency,
     country,
     category_id,
-    expense_id,
     report_id,
   } = req.body;
 
   try {
     const receipt = new Receipt();
     receipt.category = category_id;
-    receipt.expense = expense_id;
     receipt.merchant_info = merchant_info;
-    receipt.issued_at = issued_at;
+    receipt.issued_at = moment(issued_at).format("YYYY-MM-DD");
     receipt.total_amount = total_amount;
-    receipt.currency = currency;
-    receipt.country = country;
+    receipt.currency = currency.toUpperCase();
+    receipt.country_code = country.toUpperCase();
 
     receipt.save().then(async (savedReceipt) => {
       const existReport = await Report.findById(report_id);

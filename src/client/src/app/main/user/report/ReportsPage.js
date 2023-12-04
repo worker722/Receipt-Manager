@@ -1,5 +1,6 @@
 import FuseLoading from "@fuse/core/FuseLoading";
 import FusePageSimple from "@fuse/core/FusePageSimple";
+import withRouter from "@fuse/core/withRouter";
 import { styled } from "@mui/material/styles";
 import { DataGrid } from "@mui/x-data-grid";
 import { showMessage } from "app/store/fuse/messageSlice";
@@ -42,7 +43,9 @@ const ReportsPage = (props) => {
     setRows(reports);
   }, [reports]);
 
-  const handleCreateReport = () => {};
+  const handleDoubleClick = (params) => {
+    props.navigate(`/me/reports/${params.row.public_id}`);
+  };
 
   const _showMessage = (message = "", variant = "info") => {
     dispatch(
@@ -123,6 +126,7 @@ const ReportsPage = (props) => {
                     },
                   }}
                   pageSizeOptions={[5, 10]}
+                  onRowDoubleClick={handleDoubleClick}
                 />
               )}
             </>
@@ -134,4 +138,4 @@ const ReportsPage = (props) => {
   );
 };
 
-export default withReducer("reportsPage", reducer)(ReportsPage);
+export default withReducer("reportsPage", reducer)(withRouter(ReportsPage));

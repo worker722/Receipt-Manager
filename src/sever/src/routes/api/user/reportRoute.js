@@ -6,6 +6,7 @@ const {
   getAllReports,
   createReport,
   getReport,
+  matchReport,
 } = require("../../../controllers/user/reportController");
 
 const router = express.Router();
@@ -22,5 +23,6 @@ router.get("/getCategories", [Authenticated, isUser], getCategories);
 router.get("/getAllReports", [Authenticated, isUser], getAllReports);
 router.post("/createReport", [Authenticated, isUser], createReport);
 router.post("/getReport", [Authenticated, isUser], getReport);
+router.post("/matchReport", [Authenticated, isUser], matchReport);
 
 module.exports = router;

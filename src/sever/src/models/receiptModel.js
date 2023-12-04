@@ -12,7 +12,6 @@ const receiptSchema = new Schema({
   expense: {
     type: Schema.Types.ObjectId,
     ref: EXPENSE,
-    required: true,
   },
   merchant_info: {
     type: String,
@@ -33,7 +32,10 @@ const receiptSchema = new Schema({
   currency: {
     type: String,
   },
-  country: {
+  country_code: {
+    type: String,
+  },
+  city: {
     type: String,
   },
   created_at: {

@@ -59,7 +59,6 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function AddReceiptModal({
   report = {},
   category = {},
-  expense = {},
   open = false,
   handleClose = {},
   handleAdded = {},
@@ -93,7 +92,6 @@ export default function AddReceiptModal({
         country,
         report_id: report._id,
         category_id: category._id,
-        expense_id: expense._id,
       })
     ).then((data) => {
       setLoading(false);
