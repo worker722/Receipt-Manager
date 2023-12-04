@@ -39,6 +39,11 @@ roleSchema.pre("findOneAndUpdate", async function (next) {
   this.set({ updated_at: new Date() });
 });
 
+//Cannot be selected if deleted
+roleSchema.pre("find", async function (next) {
+  this.where({ deleted_at: null });
+});
+
 const DB_COLLECTION_NAME = "roles";
 
 const Role = model(DB_COLLECTION_NAME, roleSchema);

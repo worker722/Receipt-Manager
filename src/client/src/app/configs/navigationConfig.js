@@ -77,6 +77,26 @@ const navigationConfig = [
       },
     ],
   },
+
+  // User routes
+  {
+    id: "expense_managements",
+    title: "Expenses",
+    type: "item",
+    auth: authRoles.user,
+    icon: "heroicons-outline:home",
+    translate: "USER_LANG_ALL_EXPENSE",
+    url: "me/expenses",
+  },
+  {
+    id: "report_managements",
+    title: "Report Manage",
+    type: "item",
+    auth: authRoles.user,
+    icon: "heroicons-outline:home",
+    translate: "USER_LANG_REPORT_MANAGE",
+    url: "me/reports",
+  },
 ];
 
 export default navigationConfig;

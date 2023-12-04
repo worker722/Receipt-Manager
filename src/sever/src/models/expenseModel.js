@@ -1,6 +1,5 @@
 const { Schema, model } = require("mongoose");
 const ExpenseFile = require("./expenseFileModel");
-const { isEmpty } = require("../utils");
 const moment = require("moment");
 
 /** Bank expense model
@@ -247,6 +246,11 @@ const getMatchModel = (item) => {
 //Set updated date before updating expense
 expenseSchema.pre("findOneAndUpdate", async function (next) {
   this.set({ updated_at: new Date() });
+});
+
+//Cannot be selected if deleted
+expenseSchema.pre("find", async function (next) {
+  this.where({ deleted_at: null });
 });
 
 const REF_NAME = {
