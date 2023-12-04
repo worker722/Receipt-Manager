@@ -1,7 +1,11 @@
 const { Receipt, REF_NAME } = require("../../models/receiptModel");
 const { Category } = require("../../models/categoryModel");
 const { Expense } = require("../../models/expenseModel");
-const { Report, REF_NAME: ReportRef } = require("../../models/reportModel");
+const {
+  Report,
+  REF_NAME: ReportRef,
+  STATUS,
+} = require("../../models/reportModel");
 const { response, fileManager, currencySymbolMap } = require("../../utils");
 const moment = require("moment");
 
@@ -276,6 +280,34 @@ const doMatch = (receipt, expense) => {
   }
 };
 
+const submitReport = (req, res) => {
+  const { public_id } = req.body;
+
+  try {
+    Report.findOneAndUpdate(
+      { public_id },
+      {
+        $set: {
+          status: STATUS.PENDING,
+        },
+      },
+      {
+        $new: true,
+      }
+    )
+      .then((updatedReport) => {
+        return response(res, { report: updatedReport }, {}, 200);
+      })
+      .catch((error) => {
+        console.log(`${LOG_PATH}@submitReport`, error);
+        response(res, {}, error, 500, "Something went wrong!");
+      });
+  } catch (error) {
+    console.log(`${LOG_PATH}@submitReport`, error);
+    response(res, {}, error, 500, "Something went wrong!");
+  }
+};
+
 module.exports = {
   getExpenses,
   getCategories,
@@ -283,4 +315,5 @@ module.exports = {
   getReport,
   getAllReports,
   matchReport,
+  submitReport,
 };

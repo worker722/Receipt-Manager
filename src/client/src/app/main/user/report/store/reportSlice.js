@@ -68,6 +68,33 @@ export const matchReport = createAsyncThunk(
   }
 );
 
+export const submitReport = createAsyncThunk(
+  "user/reports/submitReport",
+  async (public_id) => {
+    const response = await axios.post("/api/user/reports/submitReport", {
+      public_id,
+    });
+    if (response?.status == 200) {
+      const {
+        data = {},
+        error = {},
+        message = "",
+        status = -1,
+      } = response.data;
+      if (status == 200) {
+        return true;
+      } else {
+        if (!FuseUtils.isEmpty(error))
+          console.error(`${LOG_PATH}@submitReport`, error);
+
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+);
+
 export const REPORT_STATUS = {
   IN_PROGRESS: 0,
   PENDING: 1,

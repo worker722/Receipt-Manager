@@ -27,7 +27,12 @@ import ExpenseCategoryModal from "./ExpenseCategoryModal";
 import ReportStatus from "./ReportStatus";
 import reducer from "./store";
 import { deleteReceipt, getCategories } from "./store/receiptSlice";
-import { REPORT_STATUS, getReport, matchReport } from "./store/reportSlice";
+import {
+  REPORT_STATUS,
+  getReport,
+  matchReport,
+  submitReport,
+} from "./store/reportSlice";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {
@@ -95,6 +100,7 @@ const ReportPage = (props) => {
   const [currentCategory, setCurrentCategory] = useState({});
   const [currentReceipt, setCurrentReceipt] = useState({});
   const [deleteReceiptId, setDeleteReceiptID] = useState();
+  const [editable, setEditable] = useState(false);
   // Modal
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
   const [openAddReceiptModal, setOpenAddReceiptModal] = useState(false);
@@ -141,6 +147,12 @@ const ReportPage = (props) => {
         _expenses.push(temp_expense);
       });
       setRowExpenses(_expenses);
+
+      if (
+        report.status == REPORT_STATUS.IN_PROGRESS ||
+        report.status == REPORT_STATUS.REFUNDED
+      )
+        setEditable(true);
     }
   }, [report]);
 
@@ -233,6 +245,16 @@ const ReportPage = (props) => {
         setRowReceipts(
           rowReceipts.filter((row) => row._id !== deleteReceiptId)
         );
+      }
+    });
+  };
+
+  const handleSubmit = () => {
+    setLoading(true);
+    dispatch(submitReport(publicId)).then((data) => {
+      setLoading(false);
+      if (data?.payload) {
+        props.navigate("/me/reports");
       }
     });
   };
@@ -419,13 +441,16 @@ const ReportPage = (props) => {
             </div>
           </div>
           <div className=" float-right">
-            {rowReceipts.length > 0 &&
-              (report.status == REPORT_STATUS.IN_PROGRESS ||
-                report.status == REPORT_STATUS.REFUNDED) && (
-                <Button component="label" variant="contained" color="primary">
-                  Submit
-                </Button>
-              )}
+            {rowReceipts.length > 0 && editable && (
+              <Button
+                component="label"
+                variant="contained"
+                color="primary"
+                onClick={handleSubmit}
+              >
+                Submit
+              </Button>
+            )}
           </div>
         </div>
       }
@@ -435,33 +460,37 @@ const ReportPage = (props) => {
             <FuseLoading />
           ) : (
             <div className="w-full px-5 md:px-5 pb-24 flex relative">
-              <IconButton
-                onClick={handelMatch}
-                disabled={!rowReceipts.length > 0}
-                style={{
-                  backgroundColor:
-                    rowReceipts.length > 0 ? "#0f172a" : "#0f172a80",
-                }}
-                className="absolute top-[calc(50%-20px)] left-[calc(50%-20px)]"
-              >
-                <FuseSvgIcon className=" text-white" size={22}>
-                  heroicons-outline:switch-horizontal
-                </FuseSvgIcon>
-              </IconButton>
+              {editable && (
+                <IconButton
+                  onClick={handelMatch}
+                  disabled={!rowReceipts.length > 0}
+                  style={{
+                    backgroundColor:
+                      rowReceipts.length > 0 ? "#0f172a" : "#0f172a80",
+                  }}
+                  className="absolute top-[calc(50%-20px)] left-[calc(50%-20px)]"
+                >
+                  <FuseSvgIcon className=" text-white" size={22}>
+                    heroicons-outline:switch-horizontal
+                  </FuseSvgIcon>
+                </IconButton>
+              )}
               <Paper className="flex flex-col w-1/2 p-24 mt-10 shadow rounded-2xl overflow-hidden">
                 <div className="flex items-center">
                   <p className="w-full">Receipts</p>
-                  <IconButton
-                    className=" float-right"
-                    variant="text"
-                    color="info"
-                    aria-label="Add"
-                    onClick={handelUploadReceipt}
-                  >
-                    <FuseSvgIcon size={30}>
-                      heroicons-outline:plus-circle
-                    </FuseSvgIcon>
-                  </IconButton>
+                  {editable && (
+                    <IconButton
+                      className=" float-right"
+                      variant="text"
+                      color="info"
+                      aria-label="Add"
+                      onClick={handelUploadReceipt}
+                    >
+                      <FuseSvgIcon size={30}>
+                        heroicons-outline:plus-circle
+                      </FuseSvgIcon>
+                    </IconButton>
+                  )}
                 </div>
                 {rowReceipts.length > 0 && (
                   <StyledDataGrid
@@ -474,7 +503,12 @@ const ReportPage = (props) => {
                       },
                     }}
                     pageSizeOptions={[5, 10]}
-                    onRowDoubleClick={handleDoubleClick}
+                    onRowDoubleClick={(row) =>
+                      editable && handleDoubleClick(row)
+                    }
+                    columnVisibilityModel={{
+                      actions: editable,
+                    }}
                   />
                 )}
               </Paper>
