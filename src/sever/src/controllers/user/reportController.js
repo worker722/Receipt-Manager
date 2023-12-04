@@ -1,4 +1,8 @@
-const { Receipt, REF_NAME } = require("../../models/receiptModel");
+const {
+  Receipt,
+  REF_NAME,
+  STATUS: RECEIPT_STATUS,
+} = require("../../models/receiptModel");
 const { Category } = require("../../models/categoryModel");
 const { Expense } = require("../../models/expenseModel");
 const {
@@ -296,7 +300,36 @@ const submitReport = (req, res) => {
       }
     )
       .then((updatedReport) => {
-        return response(res, { report: updatedReport }, {}, 200);
+        var promisses = [];
+        Report.findById(updatedReport._id)
+          .populate(ReportRef.RECEIPT_IDS)
+          .then((report) => {
+            report.receipt_ids.map((_receipt) => {
+              const newProimss = new Promise((resolve, reject) => {
+                Receipt.findByIdAndUpdate(
+                  _receipt._id,
+                  {
+                    $set: {
+                      status: RECEIPT_STATUS.PENDING,
+                    },
+                  },
+                  {
+                    $new: true,
+                  }
+                )
+                  .then((updatedReceipt) => {
+                    resolve();
+                  })
+                  .catch((_error) => {
+                    reject();
+                  });
+              });
+              promisses.push(newProimss);
+            });
+          });
+        Promise.all(promisses).then(() => {
+          return response(res, { report: updatedReport }, {}, 200);
+        });
       })
       .catch((error) => {
         console.log(`${LOG_PATH}@submitReport`, error);

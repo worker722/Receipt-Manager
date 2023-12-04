@@ -3,6 +3,14 @@ const { Schema } = mongoose;
 const { DB_COLLECTION_NAME: EXPENSE } = require("./expenseModel");
 const { DB_COLLECTION_NAME: RECEIPT } = require("./receiptModel");
 
+const STATUS = {
+  IN_PROGRESS: 0,
+  PENDING: 1,
+  APPROVED: 2,
+  REFUNDED: 3,
+  CLOSED: 4,
+};
+
 const reportSchema = new Schema({
   public_id: {
     type: Number,
@@ -23,7 +31,7 @@ const reportSchema = new Schema({
   status: {
     type: Number,
     require: true,
-    default: 0,
+    default: STATUS.IN_PROGRESS,
   },
   created_at: {
     type: Date,
@@ -72,14 +80,6 @@ reportSchema.pre("find", async function (next) {
 const DB_COLLECTION_NAME = "reports";
 
 const Report = mongoose.model(DB_COLLECTION_NAME, reportSchema);
-
-const STATUS = {
-  IN_PROGRESS: 0,
-  PENDING: 1,
-  APPROVED: 2,
-  REFUNDED: 3,
-  CLOSED: 4,
-};
 
 const REF_NAME = {
   RECEIPT_IDS: "receipt_ids",

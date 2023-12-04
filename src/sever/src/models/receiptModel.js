@@ -3,6 +3,14 @@ const { Schema } = mongoose;
 const { DB_COLLECTION_NAME: CATEGORY } = require("./categoryModel");
 const { DB_COLLECTION_NAME: EXPENSE } = require("./expenseModel");
 
+const STATUS = {
+  IN_PROGRESS: 0,
+  PENDING: 1,
+  APPROVED: 2,
+  REFUNDED: 3,
+  CLOSED: 4,
+};
+
 const receiptSchema = new Schema({
   category: {
     type: Schema.Types.ObjectId,
@@ -38,6 +46,11 @@ const receiptSchema = new Schema({
   city: {
     type: String,
   },
+  status: {
+    type: Number,
+    require: true,
+    default: STATUS.IN_PROGRESS,
+  },
   created_at: {
     type: Date,
     default: Date.now,
@@ -70,4 +83,4 @@ const REF_NAME = {
   EXPENSE: "expense",
 };
 
-module.exports = { Receipt, DB_COLLECTION_NAME, REF_NAME };
+module.exports = { Receipt, DB_COLLECTION_NAME, REF_NAME, STATUS };

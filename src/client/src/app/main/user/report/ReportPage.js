@@ -26,7 +26,11 @@ import EditReceiptModal from "./EditReceiptModal";
 import ExpenseCategoryModal from "./ExpenseCategoryModal";
 import ReportStatus from "./ReportStatus";
 import reducer from "./store";
-import { deleteReceipt, getCategories } from "./store/receiptSlice";
+import {
+  RECEIPT_STATUS,
+  deleteReceipt,
+  getCategories,
+} from "./store/receiptSlice";
 import {
   REPORT_STATUS,
   getReport,
@@ -265,7 +269,7 @@ const ReportPage = (props) => {
 
   const receiptColumns = [
     {
-      field: "status",
+      field: "matched",
       headerName: "",
       width: 20,
       renderCell: (params) => {
@@ -278,6 +282,14 @@ const ReportPage = (props) => {
             heroicons-outline:check-circle
           </FuseSvgIcon>
         );
+      },
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 120,
+      renderCell: (params) => {
+        return <ReportStatus value={params.row.status} />;
       },
     },
     { field: "merchant_info", headerName: "Merchant Info", width: 150 },
@@ -504,7 +516,10 @@ const ReportPage = (props) => {
                     }}
                     pageSizeOptions={[5, 10]}
                     onRowDoubleClick={(row) =>
-                      editable && handleDoubleClick(row)
+                      editable &&
+                      (row.status != RECEIPT_STATUS.APPROVED &&
+                        row.status != RECEIPT_STATUS.CLOSED) &&
+                      handleDoubleClick(row)
                     }
                     columnVisibilityModel={{
                       actions: editable,
