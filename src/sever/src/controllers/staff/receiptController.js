@@ -1,24 +1,19 @@
-const { Receipt, REF_NAME } = require("../../models/receiptModel");
-const { Report } = require("../../models/reportModel");
+const { Receipt, REF_NAME, STATUS } = require("../../models/receiptModel");
+const { Report, STATUS: REPORT_STATUS } = require("../../models/reportModel");
 const { response, fileManager } = require("../../utils");
 const moment = require("moment");
 
 const LOG_PATH = "user/receiptController";
 
-const updateReceipt = async (req, res) => {
-  const { id, merchant_info, issued_at, total_amount, currency, country_code } =
-    req.body;
+const approveReceipt = async (req, res) => {
+  const { id } = req.body;
 
   try {
     await Receipt.findByIdAndUpdate(
       id,
       {
         $set: {
-          merchant_info,
-          issued_at: moment(issued_at).format("YYYY-MM-DD"),
-          total_amount,
-          currency,
-          country_code,
+          status: STATUS.APPROVED,
         },
       },
       {
@@ -28,11 +23,41 @@ const updateReceipt = async (req, res) => {
       return response(res, { receipt: updatedReceipt }, {}, 200);
     });
   } catch (error) {
-    console.log(`${LOG_PATH}@updateReceipt`, error);
+    console.log(`${LOG_PATH}@approveReceipt`, error);
+    response(res, {}, error, 500, "Something went wrong!");
+  }
+};
+
+const refundReceipt = async (req, res) => {
+  const { id, report_id } = req.body;
+
+  try {
+    await Report.findByIdAndUpdate(report_id, {
+      $set: {
+        status: REPORT_STATUS.REFUNDED,
+      },
+    }).exec();
+
+    await Receipt.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          status: STATUS.REFUNDED,
+        },
+      },
+      {
+        new: true,
+      }
+    ).then((updatedReceipt) => {
+      return response(res, { receipt: updatedReceipt }, {}, 200);
+    });
+  } catch (error) {
+    console.log(`${LOG_PATH}@refundReceipt`, error);
     response(res, {}, error, 500, "Something went wrong!");
   }
 };
 
 module.exports = {
-  updateReceipt,
+  approveReceipt,
+  refundReceipt,
 };

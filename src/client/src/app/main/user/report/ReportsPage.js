@@ -26,7 +26,7 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-sidebarContent": {},
 }));
 
-const ReportsPage = (props) => {
+const UserReportsPage = (props) => {
   const { t } = useTranslation("ReportsPage");
 
   const [loading, setLoading] = useState(false);
@@ -138,4 +138,7 @@ const ReportsPage = (props) => {
   );
 };
 
-export default withReducer("reportsPage", reducer)(withRouter(ReportsPage));
+export default withReducer(
+  "userReportsPage",
+  reducer
+)(withRouter(UserReportsPage));

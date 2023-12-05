@@ -45,6 +45,6 @@ const reportsSlice = createSlice({
   },
 });
 
-export const selectReports = ({ reportsPage }) => reportsPage.reports;
+export const selectReports = ({ userReportsPage }) => userReportsPage.reports;
 
 export default reportsSlice.reducer;

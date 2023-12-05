@@ -306,8 +306,16 @@ const submitReport = (req, res) => {
           .then((report) => {
             report.receipt_ids.map((_receipt) => {
               const newProimss = new Promise((resolve, reject) => {
-                Receipt.findByIdAndUpdate(
-                  _receipt._id,
+                Receipt.findOneAndUpdate(
+                  {
+                    _id: _receipt._id,
+                    status: {
+                      $in: [
+                        RECEIPT_STATUS.IN_PROGRESS,
+                        RECEIPT_STATUS.REFUNDED,
+                      ],
+                    },
+                  },
                   {
                     $set: {
                       status: RECEIPT_STATUS.PENDING,

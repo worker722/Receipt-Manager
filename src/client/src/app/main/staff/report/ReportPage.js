@@ -22,7 +22,7 @@ import { useDispatch } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import ReportStatus from "./ReportStatus";
 import reducer from "./store";
-import { RECEIPT_STATUS } from "./store/receiptSlice";
+import { approveReceipt, refundReceipt } from "./store/receiptSlice";
 import { REPORT_STATUS, getReport } from "./store/reportSlice";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
@@ -109,9 +109,7 @@ const ReportPage = (props) => {
   const [rowExpenses, setRowExpenses] = useState([]);
   const [rowReceipts, setRowReceipts] = useState([]);
   const [report, setReport] = useState({});
-  const [categories, setCategories] = useState([]);
-  const [deleteReceiptId, setDeleteReceiptID] = useState();
-  const [editable, setEditable] = useState(false);
+  const [reportStatus, setReportStatus] = useState(false);
   // Modal
 
   const theme = useTheme();
@@ -133,6 +131,7 @@ const ReportPage = (props) => {
 
   useEffect(() => {
     if (!FuseUtils.isEmpty(report)) {
+      setReportStatus(report.status);
       setRowReceipts(report.receipt_ids);
       var _expenses = [];
       report.expense_ids.map((_expense) => {
@@ -145,18 +144,43 @@ const ReportPage = (props) => {
         _expenses.push(temp_expense);
       });
       setRowExpenses(_expenses);
-
-      if (
-        report.status == REPORT_STATUS.IN_PROGRESS ||
-        report.status == REPORT_STATUS.REFUNDED
-      )
-        setEditable(true);
     }
   }, [report]);
 
-  const handleApprove = (row) => {};
+  const handleApprove = (row) => {
+    dispatch(approveReceipt(row._id)).then((data) => {
+      const { message = "" } = data.payload;
+      if (!FuseUtils.isEmpty(message)) {
+        _showMessage(message, "error");
+      } else {
+        const updatedReceipt = data.payload;
+        setRowReceipts(
+          rowReceipts.map((row) =>
+            row._id === updatedReceipt._id ? updatedReceipt : row
+          )
+        );
+      }
+    });
+  };
 
-  const handleRefund = (row) => {};
+  const handleRefund = (row) => {
+    dispatch(refundReceipt({ id: row._id, report_id: report._id })).then(
+      (data) => {
+        const { message = "" } = data.payload;
+        if (!FuseUtils.isEmpty(message)) {
+          _showMessage(message, "error");
+        } else {
+          const updatedReceipt = data.payload;
+          setRowReceipts(
+            rowReceipts.map((row) =>
+              row._id === updatedReceipt._id ? updatedReceipt : row
+            )
+          );
+          setReportStatus(REPORT_STATUS.REFUNDED);
+        }
+      }
+    );
+  };
 
   const _showMessage = (message = "", variant = "info") => {
     dispatch(
@@ -357,15 +381,13 @@ const ReportPage = (props) => {
               </Typography>
             </motion.div>
             <div className=" ml-10 cursor-default select-none">
-              <ReportStatus value={report.status} />
+              <ReportStatus value={reportStatus} />
             </div>
           </div>
           <div className=" float-right">
-            {rowReceipts.length > 0 && editable && (
-              <Button component="label" variant="contained" color="primary">
-                Submit
-              </Button>
-            )}
+            <Button component="label" variant="contained" color="primary">
+              Submit
+            </Button>
           </div>
         </div>
       }
@@ -390,12 +412,6 @@ const ReportPage = (props) => {
                       },
                     }}
                     pageSizeOptions={[5, 10]}
-                    onRowDoubleClick={(row) =>
-                      editable &&
-                      row.status != RECEIPT_STATUS.APPROVED &&
-                      row.status != RECEIPT_STATUS.CLOSED &&
-                      handleDoubleClick(row)
-                    }
                   />
                 )}
               </Paper>

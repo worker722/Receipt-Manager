@@ -1,7 +1,8 @@
 const express = require("express");
 
 const {
-  updateReceipt,
+  approveReceipt,
+  refundReceipt,
 } = require("../../../controllers/staff/receiptController");
 
 const router = express.Router();
@@ -9,6 +10,7 @@ const router = express.Router();
 const { Authenticated, isStaff } = require("../../../middleware/authorized");
 
 // Receipts
-router.post("/update", [Authenticated, isStaff], updateReceipt);
+router.post("/approve", [Authenticated, isStaff], approveReceipt);
+router.post("/refund", [Authenticated, isStaff], refundReceipt);
 
 module.exports = router;
