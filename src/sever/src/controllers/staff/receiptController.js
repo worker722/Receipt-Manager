@@ -1,4 +1,8 @@
-const { Receipt, REF_NAME, STATUS } = require("../../models/receiptModel");
+const {
+  Receipt,
+  REF_NAME,
+  STATUS: RECEIPT_STATUS,
+} = require("../../models/receiptModel");
 const { Report, STATUS: REPORT_STATUS } = require("../../models/reportModel");
 const { response, fileManager } = require("../../utils");
 const moment = require("moment");
@@ -13,7 +17,7 @@ const approveReceipt = async (req, res) => {
       id,
       {
         $set: {
-          status: STATUS.APPROVED,
+          status: RECEIPT_STATUS.APPROVED,
         },
       },
       {
@@ -34,7 +38,7 @@ const refundReceipt = async (req, res) => {
   try {
     await Report.findByIdAndUpdate(report_id, {
       $set: {
-        status: REPORT_STATUS.REFUNDED,
+        status: REPORT_STATUS.REJECTED,
       },
     }).exec();
 
@@ -42,7 +46,7 @@ const refundReceipt = async (req, res) => {
       id,
       {
         $set: {
-          status: STATUS.REFUNDED,
+          status: RECEIPT_STATUS.REFUNDED,
         },
       },
       {

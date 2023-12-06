@@ -5,9 +5,9 @@ const { DB_COLLECTION_NAME: RECEIPT } = require("./receiptModel");
 
 const STATUS = {
   IN_PROGRESS: 0,
-  PENDING: 1,
-  APPROVED: 2,
-  REFUNDED: 3,
+  IN_REVIEW: 1,
+  ACCEPTED: 2,
+  REJECTED: 3,
   CLOSED: 4,
 };
 

@@ -97,9 +97,9 @@ export const submitReport = createAsyncThunk(
 
 export const REPORT_STATUS = {
   IN_PROGRESS: 0,
-  PENDING: 1,
+  IN_REVIEW: 1,
   APPROVED: 2,
-  REFUNDED: 3,
+  REJECTED: 3,
   CLOSED: 4,
 };
 

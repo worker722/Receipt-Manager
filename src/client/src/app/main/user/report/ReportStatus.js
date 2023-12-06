@@ -11,8 +11,8 @@ export const statuses = [
   },
   {
     id: 2,
-    value: REPORT_STATUS.PENDING,
-    name: "Pending",
+    value: REPORT_STATUS.IN_REVIEW,
+    name: "In Review",
     color: "bg-purple text-white",
   },
   {
@@ -23,8 +23,8 @@ export const statuses = [
   },
   {
     id: 4,
-    value: REPORT_STATUS.REFUNDED,
-    name: "Refunded",
+    value: REPORT_STATUS.REJECTED,
+    name: "Rejected",
     color: "bg-red text-white",
   },
   {

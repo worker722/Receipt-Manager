@@ -24,6 +24,7 @@ import { Link, useParams } from "react-router-dom";
 import AddReceiptModal from "./AddReceiptModal";
 import EditReceiptModal from "./EditReceiptModal";
 import ExpenseCategoryModal from "./ExpenseCategoryModal";
+import ReceiptStatus from "./ReceiptStatus";
 import ReportStatus from "./ReportStatus";
 import reducer from "./store";
 import {
@@ -116,7 +117,9 @@ const ReportPage = (props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    setLoading(true);
     dispatch(getReport(publicId)).then((data) => {
+      setLoading(false);
       const { message = "" } = data.payload;
 
       if (!FuseUtils.isEmpty(message)) {
@@ -154,7 +157,7 @@ const ReportPage = (props) => {
 
       if (
         report.status == REPORT_STATUS.IN_PROGRESS ||
-        report.status == REPORT_STATUS.REFUNDED
+        report.status == REPORT_STATUS.REJECTED
       )
         setEditable(true);
     }
@@ -289,7 +292,7 @@ const ReportPage = (props) => {
       headerName: "Status",
       width: 120,
       renderCell: (params) => {
-        return <ReportStatus value={params.row.status} />;
+        return <ReceiptStatus value={params.row.status} />;
       },
     },
     { field: "merchant_info", headerName: "Merchant Info", width: 150 },
@@ -515,11 +518,11 @@ const ReportPage = (props) => {
                       },
                     }}
                     pageSizeOptions={[5, 10]}
-                    onRowDoubleClick={(row) =>
+                    onRowDoubleClick={(rowParams) =>
                       editable &&
-                      (row.status != RECEIPT_STATUS.APPROVED &&
-                        row.status != RECEIPT_STATUS.CLOSED) &&
-                      handleDoubleClick(row)
+                      (rowParams.row.status == RECEIPT_STATUS.IN_PROGRESS ||
+                        rowParams.row.status == RECEIPT_STATUS.REFUNDED) &&
+                      handleDoubleClick(rowParams)
                     }
                     columnVisibilityModel={{
                       actions: editable,

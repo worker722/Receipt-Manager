@@ -36,7 +36,10 @@ const UserReportsPage = (props) => {
   const { reports } = useSelector(selectReports);
 
   useEffect(() => {
-    dispatch(getAllReports());
+    setLoading(true);
+    dispatch(getAllReports()).then((data) => {
+      setLoading(false);
+    });
   }, [dispatch]);
 
   useEffect(() => {

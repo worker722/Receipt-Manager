@@ -68,42 +68,11 @@ export const approveReport = createAsyncThunk(
   }
 );
 
-export const refundReport = createAsyncThunk(
-  "staff/reports/refundReport",
-  async (public_id) => {
-    const response = await axios.post("/api/staff/reports/refundReport", {
-      public_id,
-    });
-    if (response?.status == 200) {
-      const {
-        data = {},
-        error = {},
-        message = "",
-        status = -1,
-      } = response.data;
-      if (status == 200) {
-        return data ?? { reports: [] };
-      } else {
-        if (!FuseUtils.isEmpty(error))
-          console.error(`${LOG_PATH}@refundReport`, error);
-
-        return {
-          reports: [],
-        };
-      }
-    } else {
-      return {
-        reports: [],
-      };
-    }
-  }
-);
-
 export const REPORT_STATUS = {
   IN_PROGRESS: 0,
-  PENDING: 1,
+  IN_REVIEW: 1,
   APPROVED: 2,
-  REFUNDED: 3,
+  REJECTED: 3,
   CLOSED: 4,
 };
 

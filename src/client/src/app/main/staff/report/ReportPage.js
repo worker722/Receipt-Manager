@@ -20,10 +20,15 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { Link, useParams } from "react-router-dom";
+import ReceiptStatus from "./ReceiptStatus";
 import ReportStatus from "./ReportStatus";
 import reducer from "./store";
-import { approveReceipt, refundReceipt } from "./store/receiptSlice";
-import { REPORT_STATUS, getReport } from "./store/reportSlice";
+import {
+  RECEIPT_STATUS,
+  approveReceipt,
+  refundReceipt,
+} from "./store/receiptSlice";
+import { REPORT_STATUS, approveReport, getReport } from "./store/reportSlice";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {
@@ -110,14 +115,16 @@ const ReportPage = (props) => {
   const [rowReceipts, setRowReceipts] = useState([]);
   const [report, setReport] = useState({});
   const [reportStatus, setReportStatus] = useState(false);
-  // Modal
+  const [allResolved, setAllResolved] = useState(false);
 
   const theme = useTheme();
 
   const dispatch = useDispatch();
 
   useEffect(() => {
+    setLoading(true);
     dispatch(getReport(publicId)).then((data) => {
+      setLoading(false);
       const { message = "" } = data.payload;
 
       if (!FuseUtils.isEmpty(message)) {
@@ -130,9 +137,22 @@ const ReportPage = (props) => {
   }, [dispatch]);
 
   useEffect(() => {
+    if (rowReceipts.length > 0) {
+      const _approvedReceipts = rowReceipts.filter(
+        (_receipt) => _receipt.status == RECEIPT_STATUS.APPROVED
+      );
+      setAllResolved(
+        _approvedReceipts.length == rowReceipts.length &&
+          report.status != REPORT_STATUS.APPROVED
+      );
+    }
+  }, [rowReceipts]);
+
+  useEffect(() => {
     if (!FuseUtils.isEmpty(report)) {
       setReportStatus(report.status);
       setRowReceipts(report.receipt_ids);
+
       var _expenses = [];
       report.expense_ids.map((_expense) => {
         var temp_expense = _expense;
@@ -147,8 +167,10 @@ const ReportPage = (props) => {
     }
   }, [report]);
 
-  const handleApprove = (row) => {
+  const handleApproveReceipt = (row) => {
+    setLoading(true);
     dispatch(approveReceipt(row._id)).then((data) => {
+      setLoading(false);
       const { message = "" } = data.payload;
       if (!FuseUtils.isEmpty(message)) {
         _showMessage(message, "error");
@@ -163,23 +185,38 @@ const ReportPage = (props) => {
     });
   };
 
-  const handleRefund = (row) => {
+  const handleRefundReceipt = (row) => {
+    setLoading(true);
     dispatch(refundReceipt({ id: row._id, report_id: report._id })).then(
       (data) => {
+        setLoading(false);
         const { message = "" } = data.payload;
         if (!FuseUtils.isEmpty(message)) {
           _showMessage(message, "error");
         } else {
           const updatedReceipt = data.payload;
+          setReportStatus(REPORT_STATUS.REJECTED);
           setRowReceipts(
             rowReceipts.map((row) =>
               row._id === updatedReceipt._id ? updatedReceipt : row
             )
           );
-          setReportStatus(REPORT_STATUS.REFUNDED);
         }
       }
     );
+  };
+
+  const handleApproveReport = () => {
+    setLoading(true);
+    dispatch(approveReport(publicId)).then((data) => {
+      setLoading(false);
+      const { message = "" } = data.payload;
+      if (!FuseUtils.isEmpty(message)) {
+        _showMessage(message, "error");
+      } else {
+        props.navigate("/reports");
+      }
+    });
   };
 
   const _showMessage = (message = "", variant = "info") => {
@@ -217,7 +254,7 @@ const ReportPage = (props) => {
       headerName: "Status",
       width: 120,
       renderCell: (params) => {
-        return <ReportStatus value={params.row.status} />;
+        return <ReceiptStatus value={params.row.status} />;
       },
     },
     {
@@ -233,7 +270,7 @@ const ReportPage = (props) => {
               icon={<VerifiedIcon />}
               label="Approve"
               className="textPrimary"
-              onClick={() => handleApprove(params.row)}
+              onClick={() => handleApproveReceipt(params.row)}
               color="success"
             />
           </ApproveTooltip>,
@@ -241,7 +278,7 @@ const ReportPage = (props) => {
             <GridActionsCellItem
               icon={<CurrencyExchangeIcon />}
               label="Refund"
-              onClick={() => handleRefund(params.row)}
+              onClick={() => handleRefundReceipt(params.row)}
               color="error"
             />
           </RefundTooltip>,
@@ -385,9 +422,16 @@ const ReportPage = (props) => {
             </div>
           </div>
           <div className=" float-right">
-            <Button component="label" variant="contained" color="primary">
-              Submit
-            </Button>
+            {allResolved && (
+              <Button
+                onClick={handleApproveReport}
+                component="label"
+                variant="contained"
+                color="primary"
+              >
+                Approve
+              </Button>
+            )}
           </div>
         </div>
       }
@@ -412,6 +456,9 @@ const ReportPage = (props) => {
                       },
                     }}
                     pageSizeOptions={[5, 10]}
+                    columnVisibilityModel={{
+                      actions: reportStatus == REPORT_STATUS.IN_REVIEW,
+                    }}
                   />
                 )}
               </Paper>
