@@ -168,9 +168,7 @@ const ReportPage = (props) => {
   }, [report]);
 
   const handleApproveReceipt = (row) => {
-    setLoading(true);
     dispatch(approveReceipt(row._id)).then((data) => {
-      setLoading(false);
       const { message = "" } = data.payload;
       if (!FuseUtils.isEmpty(message)) {
         _showMessage(message, "error");
@@ -186,16 +184,13 @@ const ReportPage = (props) => {
   };
 
   const handleRefundReceipt = (row) => {
-    setLoading(true);
     dispatch(refundReceipt({ id: row._id, report_id: report._id })).then(
       (data) => {
-        setLoading(false);
         const { message = "" } = data.payload;
         if (!FuseUtils.isEmpty(message)) {
           _showMessage(message, "error");
         } else {
           const updatedReceipt = data.payload;
-          setReportStatus(REPORT_STATUS.REJECTED);
           setRowReceipts(
             rowReceipts.map((row) =>
               row._id === updatedReceipt._id ? updatedReceipt : row
