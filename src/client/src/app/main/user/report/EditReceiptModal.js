@@ -211,7 +211,6 @@ export default function EditReceiptModal({
                       {...field}
                       className="mb-24"
                       label="Description / Vendor"
-                      autoFocus
                       type="name"
                       placeholder=""
                       error={!!errors.merchant_info}
@@ -231,7 +230,6 @@ export default function EditReceiptModal({
                       {...field}
                       className="mb-24"
                       label="Issued Date"
-                      autoFocus
                       type="date"
                       error={!!errors.issued_at}
                       helperText={errors?.issued_at?.message}
@@ -250,7 +248,6 @@ export default function EditReceiptModal({
                       {...field}
                       className="mb-24"
                       label="Total"
-                      autoFocus
                       type="number"
                       error={!!errors.total_amount}
                       helperText={errors?.total_amount?.message}
@@ -269,7 +266,6 @@ export default function EditReceiptModal({
                       {...field}
                       className="mb-24"
                       label="Currency"
-                      autoFocus
                       type="string"
                       error={!!errors.currency}
                       helperText={errors?.currency?.message}
@@ -288,7 +284,6 @@ export default function EditReceiptModal({
                       {...field}
                       className="mb-24"
                       label="Country"
-                      autoFocus
                       type="string"
                       error={!!errors.country_code}
                       helperText={errors?.country_code?.message}

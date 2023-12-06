@@ -26,6 +26,7 @@ const getCategories = async (req, res) => {
 const getExpenses = async (req, res) => {
   try {
     const expenses = await Expense.aggregate([
+      { $match: { report: { $exists: false } } },
       {
         $group: {
           _id: {
@@ -48,7 +49,6 @@ const getExpenses = async (req, res) => {
           "filter.month": 1,
         },
       },
-      { $match: { report: { $exists: false } } },
     ]).exec();
     return response(res, { expenses }, {}, 200);
   } catch (error) {
