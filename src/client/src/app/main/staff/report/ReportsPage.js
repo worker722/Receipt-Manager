@@ -26,7 +26,7 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-sidebarContent": {},
 }));
 
-const UserReportsPage = (props) => {
+const ReportsPage = (props) => {
   const { t } = useTranslation("ReportsPage");
 
   const [loading, setLoading] = useState(false);
@@ -47,7 +47,7 @@ const UserReportsPage = (props) => {
   }, [reports]);
 
   const handleDoubleClick = (params) => {
-    props.navigate(`/me/reports/${params.row.public_id}`);
+    props.navigate(`/reports/${params.row.public_id}`);
   };
 
   const _showMessage = (message = "", variant = "info") => {
@@ -141,7 +141,4 @@ const UserReportsPage = (props) => {
   );
 };
 
-export default withReducer(
-  "userReportsPage",
-  reducer
-)(withRouter(UserReportsPage));
+export default withReducer("reportsPage", reducer)(withRouter(ReportsPage));

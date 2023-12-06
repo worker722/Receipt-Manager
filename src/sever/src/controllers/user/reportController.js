@@ -1,10 +1,13 @@
-const { Receipt, REF_NAME } = require("../../models/receiptModel");
+const {
+  Receipt,
+  STATUS: RECEIPT_STATUS,
+} = require("../../models/receiptModel");
 const { Category } = require("../../models/categoryModel");
 const { Expense } = require("../../models/expenseModel");
 const {
   Report,
   REF_NAME: ReportRef,
-  STATUS,
+  STATUS: REPORT_STATUS,
 } = require("../../models/reportModel");
 const { response, fileManager, currencySymbolMap } = require("../../utils");
 const moment = require("moment");
@@ -23,6 +26,7 @@ const getCategories = async (req, res) => {
 const getExpenses = async (req, res) => {
   try {
     const expenses = await Expense.aggregate([
+      { $match: { report: { $exists: false } } },
       {
         $group: {
           _id: {
@@ -48,13 +52,17 @@ const getExpenses = async (req, res) => {
     ]).exec();
     return response(res, { expenses }, {}, 200);
   } catch (error) {
+    console.log(`${LOG_PATH}@getExpenses`, error);
     response(res, {}, error, 500, "Something went wrong!");
   }
 };
 
 const getAllReports = async (req, res) => {
   try {
-    Report.find()
+    Report.find({
+      status: { $nin: [REPORT_STATUS.CLOSED] },
+    })
+      .sort({ status: 1 })
       .populate(ReportRef.EXPENSE_IDS)
       .populate(ReportRef.RECEIPT_IDS)
       .then((reports) => {
@@ -68,31 +76,6 @@ const getAllReports = async (req, res) => {
       });
   } catch (error) {
     console.log(`${LOG_PATH}@getAllReports`, error);
-    response(res, {}, error, 500, "Something went wrong!");
-  }
-};
-
-const createReport = async (req, res) => {
-  const { expense_ids = [] } = req.body;
-
-  try {
-    const newReport = new Report();
-    newReport.expense_ids = expense_ids;
-    newReport.public_id = 0;
-
-    newReport
-      .save()
-      .then(async (savedReport) => {
-        return response(res, {
-          report: savedReport,
-        });
-      })
-      .catch((_error) => {
-        console.log(`${LOG_PATH}@createReport`, _error);
-        response(res, {}, _error, 500, "Something went wrong!");
-      });
-  } catch (error) {
-    console.log(`${LOG_PATH}@createReport`, error);
     response(res, {}, error, 500, "Something went wrong!");
   }
 };
@@ -115,6 +98,37 @@ const getReport = async (req, res) => {
       });
   } catch (error) {
     console.log(`${LOG_PATH}@getReport`, error);
+    response(res, {}, error, 500, "Something went wrong!");
+  }
+};
+
+const createReport = async (req, res) => {
+  const { expense_ids = [] } = req.body;
+
+  try {
+    const newReport = new Report();
+    newReport.expense_ids = expense_ids;
+    newReport.public_id = 0;
+
+    newReport
+      .save()
+      .then(async (savedReport) => {
+        await Expense.updateMany(
+          { _id: { $in: expense_ids } },
+          { $set: { report: savedReport._id } },
+          { upsert: true }
+        ).exec();
+
+        return response(res, {
+          report: savedReport,
+        });
+      })
+      .catch((_error) => {
+        console.log(`${LOG_PATH}@createReport`, _error);
+        response(res, {}, _error, 500, "Something went wrong!");
+      });
+  } catch (error) {
+    console.log(`${LOG_PATH}@createReport`, error);
     response(res, {}, error, 500, "Something went wrong!");
   }
 };
@@ -288,7 +302,7 @@ const submitReport = (req, res) => {
       { public_id },
       {
         $set: {
-          status: STATUS.PENDING,
+          status: REPORT_STATUS.IN_REVIEW,
         },
       },
       {
@@ -296,7 +310,44 @@ const submitReport = (req, res) => {
       }
     )
       .then((updatedReport) => {
-        return response(res, { report: updatedReport }, {}, 200);
+        var promisses = [];
+        Report.findById(updatedReport._id)
+          .populate(ReportRef.RECEIPT_IDS)
+          .then((report) => {
+            report.receipt_ids.map((_receipt) => {
+              const newProimss = new Promise((resolve, reject) => {
+                Receipt.findOneAndUpdate(
+                  {
+                    _id: _receipt._id,
+                    status: {
+                      $in: [
+                        RECEIPT_STATUS.IN_PROGRESS,
+                        RECEIPT_STATUS.REFUNDED,
+                      ],
+                    },
+                  },
+                  {
+                    $set: {
+                      status: RECEIPT_STATUS.PENDING,
+                    },
+                  },
+                  {
+                    $new: true,
+                  }
+                )
+                  .then((updatedReceipt) => {
+                    resolve();
+                  })
+                  .catch((_error) => {
+                    reject();
+                  });
+              });
+              promisses.push(newProimss);
+            });
+          });
+        Promise.all(promisses).then(() => {
+          return response(res, { report: updatedReport }, {}, 200);
+        });
       })
       .catch((error) => {
         console.log(`${LOG_PATH}@submitReport`, error);
@@ -311,9 +362,9 @@ const submitReport = (req, res) => {
 module.exports = {
   getExpenses,
   getCategories,
-  createReport,
   getReport,
   getAllReports,
+  createReport,
   matchReport,
   submitReport,
 };

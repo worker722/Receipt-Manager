@@ -68,12 +68,20 @@ const navigationConfig = [
     translate: "LANG_MANAGEMENTS",
     children: [
       {
-        id: "page-expensed",
+        id: "page-expenses",
         title: "Bank Expense Manage",
         translate: "STAFF_LANG_EXPENSE_MANAGE",
         type: "item",
         icon: "heroicons-outline:star",
         url: "expenses",
+      },
+      {
+        id: "page-reports",
+        title: "Reports Manage",
+        translate: "STAFF_LANG_REPORT_MANAGE",
+        type: "item",
+        icon: "heroicons-outline:star",
+        url: "reports",
       },
     ],
   },

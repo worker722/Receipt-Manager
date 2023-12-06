@@ -1,41 +1,41 @@
 import _ from "@lodash";
 import clsx from "clsx";
-import { REPORT_STATUS } from "./store/reportSlice";
+import { RECEIPT_STATUS } from "./store/receiptSlice";
 
 export const statuses = [
   {
     id: 1,
-    value: REPORT_STATUS.IN_PROGRESS,
+    value: RECEIPT_STATUS.IN_PROGRESS,
     name: "In Progress",
     color: "bg-blue text-white",
   },
   {
     id: 2,
-    value: REPORT_STATUS.IN_REVIEW,
-    name: "In Review",
+    value: RECEIPT_STATUS.PENDING,
+    name: "Pending",
     color: "bg-purple text-white",
   },
   {
     id: 3,
-    value: REPORT_STATUS.APPROVED,
+    value: RECEIPT_STATUS.APPROVED,
     name: "Approved",
     color: "bg-green-800 text-white",
   },
   {
     id: 4,
-    value: REPORT_STATUS.REJECTED,
-    name: "Rejected",
+    value: RECEIPT_STATUS.REFUNDED,
+    name: "Refunded",
     color: "bg-red text-white",
   },
   {
     id: 5,
-    value: REPORT_STATUS.CLOSED,
+    value: RECEIPT_STATUS.CLOSED,
     name: "Closed",
     color: "bg-grey text-white",
   },
 ];
 
-function ReportStatus(props) {
+function ReceiptStatus(props) {
   const status = _.find(statuses, { value: props.value });
   return (
     <>
@@ -55,4 +55,4 @@ function ReportStatus(props) {
   );
 }
 
-export default ReportStatus;
+export default ReceiptStatus;

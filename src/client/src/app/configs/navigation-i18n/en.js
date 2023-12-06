@@ -10,6 +10,7 @@ const locale = {
 
   // Staff
   STAFF_LANG_EXPENSE_MANAGE: "Bank Expenses",
+  STAFF_LANG_REPORT_MANAGE: "Manage Reports",
 
   // User
   USER_LANG_ALL_EXPENSE: "All Expenses",

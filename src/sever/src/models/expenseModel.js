@@ -39,6 +39,10 @@ const moment = require("moment");
   }
  */
 const expenseSchema = new Schema({
+  report: {
+    type: Schema.Types.ObjectId,
+    ref: "reports",
+  },
   originFile: {
     type: Schema.Types.ObjectId,
     ref: ExpenseFile.DB_COLLECTION_NAME,

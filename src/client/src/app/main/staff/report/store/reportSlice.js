@@ -2,12 +2,12 @@ import FuseUtils from "@fuse/utils/FuseUtils";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const LOG_PATH = "user/reports/store/reportSlice";
+const LOG_PATH = "staff/reports/store/reportSlice";
 
 export const getReport = createAsyncThunk(
-  "user/reports/getReport",
+  "staff/reports/getReport",
   async (public_id) => {
-    const response = await axios.post("/api/user/reports/getReport", {
+    const response = await axios.post("/api/staff/reports/getReport", {
       public_id,
     });
     if (response?.status == 200) {
@@ -36,10 +36,10 @@ export const getReport = createAsyncThunk(
   }
 );
 
-export const matchReport = createAsyncThunk(
-  "user/reports/matchReport",
+export const approveReport = createAsyncThunk(
+  "staff/reports/approveReport",
   async (public_id) => {
-    const response = await axios.post("/api/user/reports/matchReport", {
+    const response = await axios.post("/api/staff/reports/approveReport", {
       public_id,
     });
     if (response?.status == 200) {
@@ -53,7 +53,7 @@ export const matchReport = createAsyncThunk(
         return data ?? { reports: [] };
       } else {
         if (!FuseUtils.isEmpty(error))
-          console.error(`${LOG_PATH}@matchReport`, error);
+          console.error(`${LOG_PATH}@approveReport`, error);
 
         return {
           reports: [],
@@ -68,33 +68,6 @@ export const matchReport = createAsyncThunk(
   }
 );
 
-export const submitReport = createAsyncThunk(
-  "user/reports/submitReport",
-  async (public_id) => {
-    const response = await axios.post("/api/user/reports/submitReport", {
-      public_id,
-    });
-    if (response?.status == 200) {
-      const {
-        data = {},
-        error = {},
-        message = "",
-        status = -1,
-      } = response.data;
-      if (status == 200) {
-        return true;
-      } else {
-        if (!FuseUtils.isEmpty(error))
-          console.error(`${LOG_PATH}@submitReport`, error);
-
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-);
-
 export const REPORT_STATUS = {
   IN_PROGRESS: 0,
   IN_REVIEW: 1,
@@ -104,7 +77,7 @@ export const REPORT_STATUS = {
 };
 
 const reportSlice = createSlice({
-  name: "user/report",
+  name: "staff/report",
   initialState: {},
   reducers: {},
 });

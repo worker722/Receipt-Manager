@@ -152,6 +152,14 @@ export const deleteReceipt = createAsyncThunk(
   }
 );
 
+export const RECEIPT_STATUS = {
+  IN_PROGRESS: 0,
+  PENDING: 1,
+  APPROVED: 2,
+  REFUNDED: 3,
+  CLOSED: 4,
+};
+
 const receiptSlice = createSlice({
   name: "user/receipt",
   initialState: {},

@@ -2,12 +2,12 @@ import FuseUtils from "@fuse/utils/FuseUtils";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const LOG_PATH = "user/reports/store/reportsSlice";
+const LOG_PATH = "staff/reports/store/reportsSlice";
 
 export const getAllReports = createAsyncThunk(
-  "user/reports/getAllReports",
+  "staff/reports/getAllReports",
   async () => {
-    const response = await axios.get("/api/user/reports/getAllReports");
+    const response = await axios.get("/api/staff/reports/getAllReports");
     if (response?.status == 200) {
       const {
         data = {},
@@ -35,7 +35,7 @@ export const getAllReports = createAsyncThunk(
 );
 
 const reportsSlice = createSlice({
-  name: "user/reports",
+  name: "staff/reports",
   initialState: {
     reports: [],
   },
@@ -45,6 +45,6 @@ const reportsSlice = createSlice({
   },
 });
 
-export const selectReports = ({ userReportsPage }) => userReportsPage.reports;
+export const selectReports = ({ reportsPage }) => reportsPage.reports;
 
 export default reportsSlice.reducer;
