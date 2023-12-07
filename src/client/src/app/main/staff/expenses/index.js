@@ -126,95 +126,24 @@ const ManageExpensesPage = (props) => {
   };
 
   const columns = [
+    { field: "titular_name", headerName: "Merchant", width: 100 },
     {
       field: "treatmented_at",
-      headerName: "Treatment Date",
+      headerName: "Issued Date",
       width: 150,
       valueGetter: (params) => toLocalTime(params.row.treatmented_at),
     },
-    {
-      field: "contracting_by_number",
-      headerName: "Contracting by Number",
-      width: 200,
-    },
-    { field: "contract_number", headerName: "Contract Number", width: 150 },
-    {
-      field: "operation_location_code",
-      headerName: "Operation Location Code",
-      width: 150,
-    },
-    { field: "titular_name", headerName: "Titular Name", width: 100 },
-    {
-      field: "employee_identifier",
-      headerName: "Employee Identifier",
-      width: 100,
-    },
-    { field: "card_number", headerName: "Card Number", width: 150 },
-    {
-      field: "card_created_at",
-      headerName: "Card Create Date",
-      width: 150,
-      valueGetter: (params) => toLocalTime(params.row.card_created_at),
-    },
-    {
-      field: "sold_at",
-      headerName: "Sale Date",
-      width: 150,
-      valueGetter: (params) => toLocalTime(params.row.sold_at),
-    },
-    {
-      field: "closed_at",
-      headerName: "Closed Date",
-      width: 150,
-      valueGetter: (params) => toLocalTime(params.row.closed_at),
-    },
-    {
-      field: "taken_into_account_at",
-      headerName: "Taken Into Account Date",
-      width: 150,
-      valueGetter: (params) => toLocalTime(params.row.taken_into_account_at),
-    },
-    { field: "operation_code", headerName: "Operation Code", width: 150 },
-    {
-      field: "under_code_operation",
-      headerName: "Under Operation Code",
-      width: 150,
-    },
-    {
-      field: "direction_of_operation",
-      headerName: "Direction of Operation",
-      width: 150,
-    },
-    { field: "amount_charged", headerName: "Amount Charged", width: 150 },
+    { field: "amount_charged", headerName: "Amount", width: 100 },
     {
       field: "origin_currency_code",
-      headerName: "Origin Currency Code",
-      width: 150,
+      headerName: "Currency",
+      width: 100,
     },
-    {
-      field: "total_amount_original_currency",
-      headerName: "Total Amount Original Currency",
-      width: 150,
-    },
-    {
-      field: "trader_company_name",
-      headerName: "Trader Company Name",
-      width: 150,
-    },
-    { field: "code_department", headerName: "Code Department", width: 150 },
-    { field: "country_code", headerName: "Country Code", width: 150 },
-    { field: "locality", headerName: "Locality", width: 150 },
-    { field: "code_mcc", headerName: "Code Mcc", width: 150 },
-    { field: "operation_time", headerName: "Operation Time", width: 150 },
-    { field: "execution_area", headerName: "Execution Area", width: 150 },
-    {
-      field: "merchant_siret_number",
-      headerName: "Merchat Siret Number",
-      width: 150,
-    },
-    { field: "commission_amount_1", headerName: "Commission 1", width: 150 },
-    { field: "commission_amount_2", headerName: "Commission 2", width: 150 },
-    { field: "commission_amount_3", headerName: "Commission 3", width: 150 },
+    { field: "country_code", headerName: "Country", width: 100 },
+    { field: "locality", headerName: "City", width: 150 },
+    { field: "commission_amount_1", headerName: "Vat 1", width: 100 },
+    { field: "commission_amount_2", headerName: "Vat 2", width: 100 },
+    { field: "commission_amount_3", headerName: "Vat 3", width: 100 },
   ];
 
   return (
