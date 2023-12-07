@@ -3,14 +3,13 @@ const { Report } = require("../../models/reportModel");
 const { response, fileManager } = require("../../utils");
 const moment = require("moment");
 const { createWorker } = require("tesseract.js");
-const extractDate = require("extract-date");
-const extractPrice = require("extract-price");
+const extractDate = require("../../utils/extract-date");
+const extractPrice = require("../../utils/extract-price");
 
 const LOG_PATH = "user/receiptController";
 
 const uploadReceipt = (req, res) => {
-  console.log(extractPrice.default("extracts currency symbols $2.00"));
-  console.log(extractPrice.default("Total-EFT USD1485"));
+  console.log(extractPrice("my salary is 3100EUR per money, 240 EUR per day"));
   try {
     fileManager.receiptUploader(req, res, async function (_err) {
       if (_err) {
@@ -23,9 +22,6 @@ const uploadReceipt = (req, res) => {
         );
       } else {
         if (req?.file?.path) {
-          // console.log(
-          //   extractDate("0044180 0011206 007 0031 12.10.2022 06:48:0")
-          // );
           const result = await parseData(req?.file?.path);
           return response(res, { file: result }, {}, 200);
         }
