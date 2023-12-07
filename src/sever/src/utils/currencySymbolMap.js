@@ -1,12 +1,12 @@
 module.exports = currencySymbolMap = {
   _NONE: {
-    symbol: "",
-    name: "",
-    symbol_native: "",
+    symbol: "_",
+    name: "_",
+    symbol_native: "_",
     decimal_digits: -1,
     rounding: -1,
-    code: "",
-    name_plural: "",
+    code: "_",
+    name_plural: "_",
   },
   USD: {
     symbol: "$",
@@ -101,7 +101,7 @@ module.exports = currencySymbolMap = {
   BAM: {
     symbol: "KM",
     name: "Bosnia-Herzegovina Convertible Mark",
-    symbol_native: "KM",
+    symbol_native: "_KM",
     decimal_digits: 2,
     rounding: 0,
     code: "BAM",
@@ -137,7 +137,7 @@ module.exports = currencySymbolMap = {
   BIF: {
     symbol: "FBu",
     name: "Burundian Franc",
-    symbol_native: "FBu",
+    symbol_native: "__FBu__",
     decimal_digits: 0,
     rounding: 0,
     code: "BIF",
@@ -155,7 +155,7 @@ module.exports = currencySymbolMap = {
   BOB: {
     symbol: "Bs",
     name: "Bolivian Boliviano",
-    symbol_native: "Bs",
+    symbol_native: "__Bs__",
     decimal_digits: 2,
     rounding: 0,
     code: "BOB",
@@ -173,7 +173,7 @@ module.exports = currencySymbolMap = {
   BWP: {
     symbol: "BWP",
     name: "Botswanan Pula",
-    symbol_native: "P",
+    symbol_native: "__P__",
     decimal_digits: 2,
     rounding: 0,
     code: "BWP",
@@ -281,7 +281,7 @@ module.exports = currencySymbolMap = {
   DKK: {
     symbol: "Dkr",
     name: "Danish Krone",
-    symbol_native: "kr",
+    symbol_native: "__kr__",
     decimal_digits: 2,
     rounding: 0,
     code: "DKK",
@@ -308,7 +308,7 @@ module.exports = currencySymbolMap = {
   EEK: {
     symbol: "Ekr",
     name: "Estonian Kroon",
-    symbol_native: "kr",
+    symbol_native: "__kr__",
     decimal_digits: 2,
     rounding: 0,
     code: "EEK",
@@ -335,7 +335,7 @@ module.exports = currencySymbolMap = {
   ETB: {
     symbol: "Br",
     name: "Ethiopian Birr",
-    symbol_native: "Br",
+    symbol_native: "__Br__",
     decimal_digits: 2,
     rounding: 0,
     code: "ETB",
@@ -353,7 +353,7 @@ module.exports = currencySymbolMap = {
   GEL: {
     symbol: "GEL",
     name: "Georgian Lari",
-    symbol_native: "GEL",
+    symbol_native: "__GEL__",
     decimal_digits: 2,
     rounding: 0,
     code: "GEL",
@@ -371,7 +371,7 @@ module.exports = currencySymbolMap = {
   GNF: {
     symbol: "FG",
     name: "Guinean Franc",
-    symbol_native: "FG",
+    symbol_native: "__FG__",
     decimal_digits: 0,
     rounding: 0,
     code: "GNF",
@@ -380,7 +380,7 @@ module.exports = currencySymbolMap = {
   GTQ: {
     symbol: "GTQ",
     name: "Guatemalan Quetzal",
-    symbol_native: "Q",
+    symbol_native: "__Q__",
     decimal_digits: 2,
     rounding: 0,
     code: "GTQ",
@@ -398,7 +398,7 @@ module.exports = currencySymbolMap = {
   HNL: {
     symbol: "HNL",
     name: "Honduran Lempira",
-    symbol_native: "L",
+    symbol_native: "__L__",
     decimal_digits: 2,
     rounding: 0,
     code: "HNL",
@@ -407,7 +407,7 @@ module.exports = currencySymbolMap = {
   HRK: {
     symbol: "kn",
     name: "Croatian Kuna",
-    symbol_native: "kn",
+    symbol_native: "__kn__",
     decimal_digits: 2,
     rounding: 0,
     code: "HRK",
@@ -416,7 +416,7 @@ module.exports = currencySymbolMap = {
   HUF: {
     symbol: "Ft",
     name: "Hungarian Forint",
-    symbol_native: "Ft",
+    symbol_native: "__Ft__",
     decimal_digits: 0,
     rounding: 0,
     code: "HUF",
@@ -425,7 +425,7 @@ module.exports = currencySymbolMap = {
   IDR: {
     symbol: "Rp",
     name: "Indonesian Rupiah",
-    symbol_native: "Rp",
+    symbol_native: "__Rp__",
     decimal_digits: 0,
     rounding: 0,
     code: "IDR",
@@ -470,7 +470,7 @@ module.exports = currencySymbolMap = {
   ISK: {
     symbol: "Ikr",
     name: "Icelandic Króna",
-    symbol_native: "kr",
+    symbol_native: "__kr__",
     decimal_digits: 0,
     rounding: 0,
     code: "ISK",
@@ -524,7 +524,7 @@ module.exports = currencySymbolMap = {
   KMF: {
     symbol: "CF",
     name: "Comorian Franc",
-    symbol_native: "FC",
+    symbol_native: "__FC__",
     decimal_digits: 0,
     rounding: 0,
     code: "KMF",
@@ -578,7 +578,7 @@ module.exports = currencySymbolMap = {
   LTL: {
     symbol: "Lt",
     name: "Lithuanian Litas",
-    symbol_native: "Lt",
+    symbol_native: "__Lt__",
     decimal_digits: 2,
     rounding: 0,
     code: "LTL",
@@ -587,7 +587,7 @@ module.exports = currencySymbolMap = {
   LVL: {
     symbol: "Ls",
     name: "Latvian Lats",
-    symbol_native: "Ls",
+    symbol_native: "__Ls__",
     decimal_digits: 2,
     rounding: 0,
     code: "LVL",
@@ -641,7 +641,7 @@ module.exports = currencySymbolMap = {
   MMK: {
     symbol: "MMK",
     name: "Myanma Kyat",
-    symbol_native: "K",
+    symbol_native: "__K__",
     decimal_digits: 0,
     rounding: 0,
     code: "MMK",
@@ -677,7 +677,7 @@ module.exports = currencySymbolMap = {
   MYR: {
     symbol: "RM",
     name: "Malaysian Ringgit",
-    symbol_native: "RM",
+    symbol_native: "__RM__",
     decimal_digits: 2,
     rounding: 0,
     code: "MYR",
@@ -722,7 +722,7 @@ module.exports = currencySymbolMap = {
   NOK: {
     symbol: "Nkr",
     name: "Norwegian Krone",
-    symbol_native: "kr",
+    symbol_native: "__kr__",
     decimal_digits: 2,
     rounding: 0,
     code: "NOK",
@@ -848,7 +848,7 @@ module.exports = currencySymbolMap = {
   RWF: {
     symbol: "RWF",
     name: "Rwandan Franc",
-    symbol_native: "FR",
+    symbol_native: "__FR__",
     decimal_digits: 0,
     rounding: 0,
     code: "RWF",
@@ -875,7 +875,7 @@ module.exports = currencySymbolMap = {
   SEK: {
     symbol: "Skr",
     name: "Swedish Krona",
-    symbol_native: "kr",
+    symbol_native: "__kr__",
     decimal_digits: 2,
     rounding: 0,
     code: "SEK",
@@ -938,7 +938,7 @@ module.exports = currencySymbolMap = {
   TRY: {
     symbol: "TL",
     name: "Turkish Lira",
-    symbol_native: "TL",
+    symbol_native: "__TL__",
     decimal_digits: 2,
     rounding: 0,
     code: "TRY",
@@ -1055,7 +1055,7 @@ module.exports = currencySymbolMap = {
   ZAR: {
     symbol: "R",
     name: "South African Rand",
-    symbol_native: "R",
+    symbol_native: "__R__",
     decimal_digits: 2,
     rounding: 0,
     code: "ZAR",

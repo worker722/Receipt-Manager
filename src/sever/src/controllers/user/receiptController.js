@@ -5,11 +5,11 @@ const moment = require("moment");
 const { createWorker } = require("tesseract.js");
 const extractDate = require("../../utils/extract-date");
 const extractPrice = require("../../utils/extract-price");
+const currencySymbolMap = require("../../utils/currencySymbolMap");
 
 const LOG_PATH = "user/receiptController";
 
 const uploadReceipt = (req, res) => {
-  console.log(extractPrice("my salary is 3100EUR per money, 240 EUR per day"));
   try {
     fileManager.receiptUploader(req, res, async function (_err) {
       if (_err) {
@@ -39,12 +39,77 @@ const parseData = async (imagePath) => {
   try {
     const worker = await createWorker("eng");
     const ret = await worker.recognize(imagePath);
+    const procesedData = processData(ret.data);
     await worker.terminate();
-    return ret.data.lines;
+    return procesedData;
   } catch (error) {
     console.log({ error });
     return error;
   }
+};
+
+const processData = (data) => {
+  const { text = "", lines = [] } = data;
+
+  // Extract date
+  const dates = extractDate(text);
+
+  // Extract total price
+  const totolPricesLine = lines
+    .reverse()
+    .find((_line) => _line.text.includes("Total") && /\d/.test(_line.text));
+
+  var totalPrice;
+  var currencyCode, currencySymbol;
+  if (totolPricesLine && totolPricesLine?.text != "") {
+    const extractPrices = extractPrice(totolPricesLine.text);
+    if (extractPrices.length > 0) {
+      totalPrice = extractPrices[0].amount;
+      currencySymbol = extractPrices[0].currencySymbol;
+      currencyCode = extractPrices[0].currencyCode;
+    }
+  }
+
+  // Extract currency
+  var currencySymbolMapKeys = Object.keys(currencySymbolMap);
+  if (currencyCode || currencySymbol) {
+    currencySymbolMapKeys.map((key) => {
+      if (currencyCode) {
+        if (currencyCode == currencySymbolMap[key].code) {
+          currencySymbol = currencySymbolMap[key].symbol_native;
+          return;
+        }
+      } else if (currencySymbol) {
+        if (currencySymbol == currencySymbolMap[key].symbol_native) {
+          currencyCode = currencySymbolMap[key].code;
+          return;
+        }
+      }
+    });
+  }
+
+  // If extractPrice module didn't get currency, will find manually from whole content
+  if (!currencyCode && !currencySymbol) {
+    currencySymbolMapKeys.map((key) => {
+      if (
+        text.includes(currencySymbolMap[key].code) ||
+        text.includes(currencySymbolMap[key].symbol_native)
+      ) {
+        currencyCode = currencySymbolMap[key].code;
+        currencySymbol = currencySymbolMap[key].symbol_native;
+        return;
+      }
+    });
+  }
+
+  const result = {
+    date: dates.length > 0 ? dates[0].date : "",
+    totalPrice,
+    currencyCode,
+    currencySymbol,
+  };
+
+  return result;
 };
 
 const createReceipt = async (req, res) => {

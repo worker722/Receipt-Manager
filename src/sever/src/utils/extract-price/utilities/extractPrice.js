@@ -10,9 +10,11 @@ module.exports = (subject) => {
   const normalizedSubject = normalizeInput(subject);
 
   const formats = [
-    /(?:^|\s)(?:\$|£|€|USD|EUR|GBP)?(\d{1,3}(?:,\d{3})*(?:\.\d{2}))(?:\$|£|€|USD|EUR|GBP)?(?:\s|$|, |\. )/,
-    /(?:^|\s)(?:\$|£|€|USD|EUR|GBP)?(\d{1,3}(?:\.\d{3})*(?:,\d{2}))(?:\$|£|€|USD|EUR|GBP)?(?:\s|$|, |\. )/,
-    /(?:^|\s)(?:\$|£|€|USD|EUR|GBP)?(\d+)(?:\$|£|€|USD|EUR|GBP)?(?:\s|$|, |\. )/,
+    /(?:^|\s)(?:\$|£|€|USD|EUR|GBP|JPY|CAD|AUD|CHF|HKD|KRW|NZD|PLN|SGD)?(\d{1,}(?:,\d{1,})*(?:\.\d{1,}))(?:\$|£|€|USD|EUR|GBP|JPY|CAD|AUD|CHF|HKD|KRW|NZD|PLN|SGD)?(?:\s|$|, |\. )/,
+    /(?:^|\s)(?:\$|£|€|USD|EUR|GBP|JPY|CAD|AUD|CHF|HKD|KRW|NZD|PLN|SGD)?(\d{1,}(?:\.\d{1,}))(?:\$|£|€|USD|EUR|GBP|JPY|CAD|AUD|CHF|HKD|KRW|NZD|PLN|SGD)?(?:\s|$|, |\. )/,
+    /(?:^|\s)(?:\$|£|€|USD|EUR|GBP|JPY|CAD|AUD|CHF|HKD|KRW|NZD|PLN|SGD)?(\d{1,})(?:\$|£|€|USD|EUR|GBP|JPY|CAD|AUD|CHF|HKD|KRW|NZD|PLN|SGD)?(?:\s|$|, |\. )/,
+    /(?:^|\s)(?:\$|£|€|USD|EUR|GBP|JPY|CAD|AUD|CHF|HKD|KRW|NZD|PLN|SGD)?(\d{1,}(?:\.\d{1,})*(?:,\d{1}))(?:\$|£|€|USD|EUR|GBP|JPY|CAD|AUD|CHF|HKD|KRW|NZD|PLN|SGD)?(?:\s|$|, |\. )/,
+    /(?:^|\s)(?:\$|£|€|USD|EUR|GBP|JPY|CAD|AUD|CHF|HKD|KRW|NZD|PLN|SGD)?(\d+)(?:\$|£|€|USD|EUR|GBP|JPY|CAD|AUD|CHF|HKD|KRW|NZD|PLN|SGD)?(?:\s|$|, |\. )/,
   ];
 
   const matches = [];
@@ -28,15 +30,15 @@ module.exports = (subject) => {
 
     let amount;
 
-    if (isCommaCentSeparatorNotation(maybeLongestLowestMatch.match)) {
-      amount = parsePrice(maybeLongestLowestMatch.match, ".,");
-    } else if (isDotCentSeparatorNotation(maybeLongestLowestMatch.match)) {
-      amount = parsePrice(maybeLongestLowestMatch.match, ",.");
-    } else {
-      amount = parseInt(maybeLongestLowestMatch.match, 10) * 100;
-    }
+    // if (isCommaCentSeparatorNotation(maybeLongestLowestMatch.match)) {
+    //   amount = parsePrice(maybeLongestLowestMatch.match, ".,");
+    // } else if (isDotCentSeparatorNotation(maybeLongestLowestMatch.match)) {
+    //   amount = parsePrice(maybeLongestLowestMatch.match, ",.");
+    // } else {
+    //   amount = parseInt(maybeLongestLowestMatch.match, 10) * 100;
+    // }
 
-    match.amount = amount;
+    match.amount = maybeLongestLowestMatch.match;
 
     const subjectBeforeMatch = subject.slice(0, maybeLongestLowestMatch.index);
 
@@ -46,7 +48,7 @@ module.exports = (subject) => {
       match.currencySymbol = beforeCurrencySymbolMatch[1];
     } else {
       const beforeCurrencyCodeMatch = subjectBeforeMatch.match(
-        /[\^|\s]((?:USD|EUR|GBP))\s?$/
+        /[\^|\s]((?:USD|EUR|GBP|JPY|CAD|AUD|CHF|HKD|KRW|NZD|PLN|SGD))\s?$/
       );
 
       if (beforeCurrencyCodeMatch) {
@@ -63,7 +65,7 @@ module.exports = (subject) => {
           match.currencySymbol = afterCurrencySymbolMatch[1];
         } else {
           const afterCurrencyCodeMatch = subjectAfterMatch.match(
-            /^\s?((?:USD|EUR|GBP))[,|;|$|\s]/
+            /^\s?((?:USD|EUR|GBP|JPY|CAD|AUD|CHF|HKD|KRW|NZD|PLN|SGD))[,|;|$|\s]/
           );
 
           if (afterCurrencyCodeMatch) {
