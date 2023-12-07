@@ -168,7 +168,7 @@ const receiptUploader = multer({
   storage: receiptStorage,
   fileFilter: function (req, file, cb) {
     // Set the filetypes, it is optional
-    var filetypes = /xlsx|xls|csv|excel|sheet/;
+    var filetypes = /jpeg|jpg|png/;
     var mimetype = filetypes.test(file.mimetype);
 
     var extname = filetypes.test(path.extname(file.originalname).toLowerCase());

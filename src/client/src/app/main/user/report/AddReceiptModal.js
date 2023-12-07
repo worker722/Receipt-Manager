@@ -15,11 +15,11 @@ import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import { showMessage } from "app/store/fuse/messageSlice";
 import * as React from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import * as yup from "yup";
-import { createReceipt } from "./store/receiptSlice";
+import { createReceipt, uploadReceipt } from "./store/receiptSlice";
 
 /**
  * Form Validation Schema
@@ -67,6 +67,13 @@ export default function AddReceiptModal({
   const [loading, setLoading] = useState(false);
   const uploadInputRef = useRef(false);
   const [file, setFile] = useState(false);
+  const [uploadedReceipt, setUploadedReceipt] = useState(false);
+
+  useEffect(() => {
+    let str = "something 01.12.2020 something";
+    let result = str.match(/\d{2}.\d{2}.\d{4}/);
+    console.log(result);
+  }, []);
 
   const { control, formState, handleSubmit, setValue } = useForm({
     mode: "onChange",
@@ -119,8 +126,31 @@ export default function AddReceiptModal({
     if (event.target.files.length > 0) {
       const selectedFile = event.target.files[0];
       setFile(selectedFile);
+
+      console.log({ selectedFile });
+
+      setLoading(true);
+      dispatch(uploadReceipt(selectedFile)).then((data) => {
+        setLoading(false);
+        if (!FuseUtils.isEmpty(data?.payload?.message)) {
+          dispatch(
+            showMessage({
+              message: data.payload?.message,
+              variant: "error",
+            })
+          );
+        } else {
+          if (!FuseUtils.isEmpty(data?.payload)) {
+            console.log(data.payload);
+            parseData(data.payload);
+            setUploadedReceipt(data.payload);
+          }
+        }
+      });
     }
   };
+
+  const parseData = (data) => {};
 
   const _onClose = (event, reason) => {
     if (reason == "escapeKeyDown" || reason == "backdropClick") {

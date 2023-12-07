@@ -2,10 +2,15 @@ const { Receipt, REF_NAME } = require("../../models/receiptModel");
 const { Report } = require("../../models/reportModel");
 const { response, fileManager } = require("../../utils");
 const moment = require("moment");
+const { createWorker } = require("tesseract.js");
+const extractDate = require("extract-date");
+const extractPrice = require("extract-price");
 
 const LOG_PATH = "user/receiptController";
 
-const uploadReceipt = () => {
+const uploadReceipt = (req, res) => {
+  console.log(extractPrice.default("extracts currency symbols $2.00"));
+  console.log(extractPrice.default("Total-EFT USD1485"));
   try {
     fileManager.receiptUploader(req, res, async function (_err) {
       if (_err) {
@@ -18,7 +23,11 @@ const uploadReceipt = () => {
         );
       } else {
         if (req?.file?.path) {
-          return response(res, { file: req.file }, {}, 200);
+          // console.log(
+          //   extractDate("0044180 0011206 007 0031 12.10.2022 06:48:0")
+          // );
+          const result = await parseData(req?.file?.path);
+          return response(res, { file: result }, {}, 200);
         }
         response(res, {}, {}, 500, "Something went wrong!");
       }
@@ -26,6 +35,19 @@ const uploadReceipt = () => {
   } catch (error) {
     console.log(`${LOG_PATH}@uploadReceipt`, error);
     response(res, {}, error, 500, "Something went wrong!");
+  }
+};
+
+// Parse data from image file using OCR
+const parseData = async (imagePath) => {
+  try {
+    const worker = await createWorker("eng");
+    const ret = await worker.recognize(imagePath);
+    await worker.terminate();
+    return ret.data.lines;
+  } catch (error) {
+    console.log({ error });
+    return error;
   }
 };
 
