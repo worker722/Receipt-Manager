@@ -159,7 +159,12 @@ const receiptStorage = multer.diskStorage({
     cb(null, _DIR.receipt);
   },
   filename: (req, file, cb) => {
-    cb(null, `receipt_${Date.now()}_${file.originalname}`);
+    cb(
+      null,
+      `receipt_${
+        file.mimetype.includes("pdf") ? "pdf" : "image"
+      }_${Date.now()}_${file.originalname}`
+    );
   },
 });
 
@@ -168,7 +173,7 @@ const receiptUploader = multer({
   storage: receiptStorage,
   fileFilter: function (req, file, cb) {
     // Set the filetypes, it is optional
-    var filetypes = /jpeg|jpg|png/;
+    var filetypes = /jpeg|jpg|png|pdf/;
     var mimetype = filetypes.test(file.mimetype);
 
     var extname = filetypes.test(path.extname(file.originalname).toLowerCase());

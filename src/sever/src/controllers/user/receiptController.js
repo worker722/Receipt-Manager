@@ -6,6 +6,8 @@ const { createWorker } = require("tesseract.js");
 const extractDate = require("../../utils/extract-date");
 const extractPrice = require("../../utils/extract-price");
 const currencySymbolMap = require("../../utils/currencySymbolMap");
+const fs = require("node:fs");
+const pdf2img = require("pdf-img-convert");
 
 const LOG_PATH = "user/receiptController";
 
@@ -22,8 +24,27 @@ const uploadReceipt = (req, res) => {
         );
       } else {
         if (req?.file?.path) {
-          const result = await parseData(req?.file?.path);
-          return response(res, { data: result }, {}, 200);
+          var imagePath = req?.file?.path;
+          if (req.file.mimetype.includes("pdf")) {
+            imagePath = await convertPDFtoImage(req.file.path);
+            if (!imagePath) {
+              return response(res, {}, {}, 500, "Something went wrong!");
+            }
+          }
+
+          const result = await parseData(imagePath);
+          return response(
+            res,
+            {
+              data: result,
+              originFile: {
+                pdf: req.file.path,
+                image: imagePath,
+              },
+            },
+            {},
+            200
+          );
         }
         response(res, {}, {}, 500, "Something went wrong!");
       }
@@ -31,6 +52,29 @@ const uploadReceipt = (req, res) => {
   } catch (error) {
     console.log(`${LOG_PATH}@uploadReceipt`, error);
     response(res, {}, error, 500, "Something went wrong!");
+  }
+};
+
+const convertPDFtoImage = async (path) => {
+  try {
+    var outputImages = await pdf2img.convert(path, {
+      width: 600, //Number in px
+      height: 900, // Number in px
+      page_numbers: [1], // A list of pages to render instead of all of them
+    });
+
+    // From here, the images can be used for other stuff or just saved if that's required:
+    const imagePath = "./uploads/receipt/receipt_image_" + Date.now() + ".png";
+    fs.writeFile(imagePath, outputImages[0], function (error) {
+      if (error) {
+        console.error("Error: " + error);
+      }
+    });
+
+    return imagePath;
+  } catch (error) {
+    console.log(`${LOG_PATH}@convertPDFtoImage`, error);
+    return false;
   }
 };
 
@@ -43,73 +87,81 @@ const parseData = async (imagePath) => {
     await worker.terminate();
     return procesedData;
   } catch (error) {
-    console.log({ error });
-    return error;
+    console.log(`${LOG_PATH}@parseData`, error);
+    return {};
   }
 };
 
 const processData = (data) => {
-  const { text = "", lines = [] } = data;
+  try {
+    const { text = "", lines = [] } = data;
 
-  // Extract date
-  const dates = extractDate(text);
+    // Extract date
+    const dates = extractDate(text);
 
-  // Extract total price
-  const totolPricesLine = lines
-    .reverse()
-    .find((_line) => _line.text.includes("Total") && /\d/.test(_line.text));
+    // Extract total price
+    const totolPricesLine = lines
+      .reverse()
+      .find((_line) => _line.text.includes("Total") && /\d/.test(_line.text));
 
-  var totalPrice;
-  var currencyCode, currencySymbol;
-  if (totolPricesLine && totolPricesLine?.text != "") {
-    const extractPrices = extractPrice(totolPricesLine.text);
-    if (extractPrices.length > 0) {
-      totalPrice = extractPrices[0].amount;
-      currencySymbol = extractPrices[0].currencySymbol;
-      currencyCode = extractPrices[0].currencyCode;
+    var totalPrice;
+    var currencyCode, currencySymbol;
+    if (totolPricesLine && totolPricesLine?.text != "") {
+      const extractPrices = extractPrice(totolPricesLine.text);
+      if (extractPrices.length > 0) {
+        totalPrice = extractPrices[0].amount;
+        currencySymbol = extractPrices[0].currencySymbol;
+        currencyCode = extractPrices[0].currencyCode;
+      }
     }
-  }
 
-  // Extract currency
-  var currencySymbolMapKeys = Object.keys(currencySymbolMap);
-  if (currencyCode || currencySymbol) {
-    currencySymbolMapKeys.map((key) => {
-      if (currencyCode) {
-        if (currencyCode == currencySymbolMap[key].code) {
+    // Extract currency
+    var currencySymbolMapKeys = Object.keys(currencySymbolMap);
+    if (currencyCode || currencySymbol) {
+      currencySymbolMapKeys.map((key) => {
+        if (currencyCode) {
+          if (currencyCode == currencySymbolMap[key].code) {
+            currencySymbol = currencySymbolMap[key].symbol_native;
+            return;
+          }
+        } else if (currencySymbol) {
+          if (currencySymbol == currencySymbolMap[key].symbol_native) {
+            currencyCode = currencySymbolMap[key].code;
+            return;
+          }
+        }
+      });
+    }
+
+    // If extractPrice module didn't get currency, will find manually from whole content
+    if (!currencyCode && !currencySymbol) {
+      currencySymbolMapKeys.map((key) => {
+        if (
+          text.includes(currencySymbolMap[key].code) ||
+          text.includes(currencySymbolMap[key].symbol_native)
+        ) {
+          currencyCode = currencySymbolMap[key].code;
           currencySymbol = currencySymbolMap[key].symbol_native;
           return;
         }
-      } else if (currencySymbol) {
-        if (currencySymbol == currencySymbolMap[key].symbol_native) {
-          currencyCode = currencySymbolMap[key].code;
-          return;
-        }
-      }
-    });
+      });
+    }
+
+    const result = {
+      issued_at: dates.length > 0 ? dates[0].date : "",
+      total_amount: totalPrice,
+      currencyCode: currencyCode ? currencyCode : currencySymbolMap.EUR.code,
+      currencySymbol: currencySymbol
+        ? currencySymbol
+        : currencySymbolMap.EUR.symbol_native,
+      parsedData: data,
+    };
+
+    return result;
+  } catch (error) {
+    console.log(`${LOG_PATH}@processData`, error);
+    return;
   }
-
-  // If extractPrice module didn't get currency, will find manually from whole content
-  if (!currencyCode && !currencySymbol) {
-    currencySymbolMapKeys.map((key) => {
-      if (
-        text.includes(currencySymbolMap[key].code) ||
-        text.includes(currencySymbolMap[key].symbol_native)
-      ) {
-        currencyCode = currencySymbolMap[key].code;
-        currencySymbol = currencySymbolMap[key].symbol_native;
-        return;
-      }
-    });
-  }
-
-  const result = {
-    issued_at: dates.length > 0 ? dates[0].date : "",
-    total_amount: totalPrice,
-    currencyCode,
-    currencySymbol,
-  };
-
-  return result;
 };
 
 const createReceipt = async (req, res) => {

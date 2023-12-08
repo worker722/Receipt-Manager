@@ -13,6 +13,7 @@ const dictionary = require("relative-date-names");
 const createMovingChunks = require("./createMovingChunks");
 const extractRelativeDate = require("./extractRelativeDate");
 const createFormats = require("./createFormats");
+const correctDate = require("./correctDate");
 const normalizeInput = require("./normalizeInput");
 const Logger = require("./Logger");
 
@@ -94,7 +95,9 @@ module.exports = (input, userConfiguration = defaultConfiguration) => {
     for (const movingChunk of movingChunks) {
       const wordOffset = ++chunkIndex * format.wordCount;
 
-      const subject = movingChunk.join(" ");
+      const _movingChunk = correctDate(movingChunk.join(" "));
+
+      const subject = _movingChunk ? _movingChunk : movingChunk.join(" ");
 
       if (format.dateFnsFormat === "R") {
         if (!configuration.locale) {
