@@ -1,3 +1,4 @@
+import { Server } from "@constants";
 import FuseUtils from "@fuse/utils/FuseUtils";
 import { yupResolver } from "@hookform/resolvers/yup";
 import CloseIcon from "@mui/icons-material/Close";
@@ -8,6 +9,7 @@ import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import IconButton from "@mui/material/IconButton";
+import Skeleton from "@mui/material/Skeleton";
 import Slide from "@mui/material/Slide";
 import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
@@ -68,6 +70,7 @@ export default function AddReceiptModal({
   const uploadInputRef = useRef(false);
   const [file, setFile] = useState(false);
   const [uploadedReceipt, setUploadedReceipt] = useState(false);
+  const [receiptImage, setReceiptImage] = useState(false);
 
   const { control, formState, handleSubmit, setValue } = useForm({
     mode: "onChange",
@@ -148,6 +151,7 @@ export default function AddReceiptModal({
       currencyCode = "",
       currencySymbol,
     } = data?.data ?? {};
+    const { pdf, image } = data.originFile;
     console.log({ data });
     if (issued_at) {
       setValue("issued_at", issued_at, {
@@ -155,16 +159,17 @@ export default function AddReceiptModal({
         shouldValidate: true,
       });
     }
-    if (total_amount) {
-      setValue("total_amount", total_amount, {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-    }
+    setValue("total_amount", total_amount ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
     setValue("currency", currencyCode, {
       shouldDirty: true,
       shouldValidate: true,
     });
+
+    if (image[0] === ".") setReceiptImage(image.slice(1));
+    else setReceiptImage("/" + image);
   };
 
   const _onClose = (event, reason) => {
@@ -205,9 +210,22 @@ export default function AddReceiptModal({
             <div
               name={"fileUploadForm"}
               onClick={handleUpload}
-              className="border-grey-600 border-solid rounded-6 border-2 cursor-pointer	"
-              style={{ width: 800 }}
+              className="border-grey-600 border-solid rounded-6 border-2 cursor-pointer justify-center items-center w-1/3	"
             >
+              {!loading && receiptImage && (
+                <img
+                  src={`${Server.SERVER_URL}${receiptImage}`}
+                  className="w-full h-full object-contain"
+                ></img>
+              )}
+              {loading && (
+                <Skeleton
+                  animation="wave"
+                  width="100%"
+                  height="100%"
+                  className="scale-100"
+                />
+              )}
               <VisuallyHiddenInput
                 ref={uploadInputRef}
                 onChange={handleChange}

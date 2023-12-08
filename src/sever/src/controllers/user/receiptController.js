@@ -103,14 +103,40 @@ const processData = (data) => {
     // Extract date
     const dates = extractDate(text);
 
-    // Extract total price
-    const totolPricesLine = lines
-      .reverse()
-      .find((_line) => _line.text.includes("Total") && /\d/.test(_line.text));
-
     var totalPrice;
+
+    // Extract total price
+    const reversedLines = lines.reverse();
+    const totolPricesLine = reversedLines.find((_line) => {
+      if (
+        (_line.text.includes("Total") ||
+          _line.text.includes("TOTAL") ||
+          _line.text.includes("total")) &&
+        !_line.text.includes("sub") &&
+        !_line.text.includes("Sub") &&
+        !_line.text.includes("SUB")
+      ) {
+        var prices = [];
+        const subjects = _line.text.split(" ");
+        subjects.forEach((_subject) => {
+          _subject = _subject.replace(",", ".");
+          let numbers = _subject.match(/[0-9.]+/g);
+          numbers &&
+            numbers.forEach((_number) => {
+              prices.push(parseFloat(_number));
+            });
+        });
+        if (prices.length > 0) {
+          prices.sort((a, b) => b - a);
+          totalPrice = prices[0];
+
+          return true;
+        }
+      }
+    });
+
     var currencyCode, currencySymbol;
-    if (totolPricesLine && totolPricesLine?.text != "") {
+    if (!totalPrice && totolPricesLine && totolPricesLine?.text != "") {
       const extractPrices = extractPrice(totolPricesLine.text);
       if (extractPrices.length > 0) {
         totalPrice = extractPrices[0].amount;

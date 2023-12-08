@@ -818,15 +818,6 @@ module.exports = currencySymbolMap = {
     code: "QAR",
     name_plural: "Qatari rials",
   },
-  RON: {
-    symbol: "RON",
-    name: "Romanian Leu",
-    symbol_native: "RON",
-    decimal_digits: 2,
-    rounding: 0,
-    code: "RON",
-    name_plural: "Romanian lei",
-  },
   RSD: {
     symbol: "din.",
     name: "Serbian Dinar",
