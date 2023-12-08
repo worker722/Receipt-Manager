@@ -64,14 +64,18 @@ const convertPDFtoImage = async (path) => {
     });
 
     // From here, the images can be used for other stuff or just saved if that's required:
-    const imagePath = "./uploads/receipt/receipt_image_" + Date.now() + ".png";
-    fs.writeFile(imagePath, outputImages[0], function (error) {
-      if (error) {
-        console.error("Error: " + error);
-      }
-    });
+    if (outputImages.length > 0) {
+      const imagePath =
+        "./uploads/receipt/receipt_image_from_pdf_" + Date.now() + ".png";
+      fs.writeFile(imagePath, outputImages[0], function (error) {
+        if (error) {
+          console.error("Error: " + error);
+        }
+      });
 
-    return imagePath;
+      return imagePath;
+    }
+    return false;
   } catch (error) {
     console.log(`${LOG_PATH}@convertPDFtoImage`, error);
     return false;
