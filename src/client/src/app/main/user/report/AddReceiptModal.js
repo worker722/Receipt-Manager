@@ -15,7 +15,7 @@ import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import { showMessage } from "app/store/fuse/messageSlice";
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import * as yup from "yup";
@@ -26,10 +26,10 @@ import { createReceipt, uploadReceipt } from "./store/receiptSlice";
  */
 const schema = yup.object().shape({
   merchant_info: yup.string().required("You must enter merchant information."),
-  issued_at: yup.date().required("You must enter expense issue date."),
-  total_amount: yup.string().required("You must enter total amount."),
-  currency: yup.string().required("You must enter transaction currency."),
-  country_code: yup.string().required("You must enter merchant country code."),
+  issued_at: yup.date().required("You must enter expense date."),
+  total_amount: yup.string().required("You must enter amount."),
+  currency: yup.string().required("You must enter currency."),
+  country_code: yup.string().required("You must enter country code."),
 });
 
 const defaultValues = {
@@ -68,12 +68,6 @@ export default function AddReceiptModal({
   const uploadInputRef = useRef(false);
   const [file, setFile] = useState(false);
   const [uploadedReceipt, setUploadedReceipt] = useState(false);
-
-  useEffect(() => {
-    let str = "something 01.12.2020 something";
-    let result = str.match(/\d{2}.\d{2}.\d{4}/);
-    console.log(result);
-  }, []);
 
   const { control, formState, handleSubmit, setValue } = useForm({
     mode: "onChange",
@@ -127,8 +121,6 @@ export default function AddReceiptModal({
       const selectedFile = event.target.files[0];
       setFile(selectedFile);
 
-      console.log({ selectedFile });
-
       setLoading(true);
       dispatch(uploadReceipt(selectedFile)).then((data) => {
         setLoading(false);
@@ -141,7 +133,6 @@ export default function AddReceiptModal({
           );
         } else {
           if (!FuseUtils.isEmpty(data?.payload)) {
-            console.log(data.payload);
             parseData(data.payload);
             setUploadedReceipt(data.payload);
           }
@@ -150,7 +141,31 @@ export default function AddReceiptModal({
     }
   };
 
-  const parseData = (data) => {};
+  const parseData = (data) => {
+    const {
+      issued_at,
+      total_amount,
+      currencyCode = "",
+      currencySymbol,
+    } = data?.data ?? {};
+    console.log({ data });
+    if (issued_at) {
+      setValue("issued_at", issued_at, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+    if (total_amount) {
+      setValue("total_amount", total_amount, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+    setValue("currency", currencyCode, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
 
   const _onClose = (event, reason) => {
     if (reason == "escapeKeyDown" || reason == "backdropClick") {

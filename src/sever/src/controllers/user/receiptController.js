@@ -23,7 +23,7 @@ const uploadReceipt = (req, res) => {
       } else {
         if (req?.file?.path) {
           const result = await parseData(req?.file?.path);
-          return response(res, { file: result }, {}, 200);
+          return response(res, { data: result }, {}, 200);
         }
         response(res, {}, {}, 500, "Something went wrong!");
       }
@@ -103,8 +103,8 @@ const processData = (data) => {
   }
 
   const result = {
-    date: dates.length > 0 ? dates[0].date : "",
-    totalPrice,
+    issued_at: dates.length > 0 ? dates[0].date : "",
+    total_amount: totalPrice,
     currencyCode,
     currencySymbol,
   };

@@ -20,7 +20,7 @@ import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import * as yup from "yup";
-import { updateReceipt } from "./store/receiptSlice";
+import { updateReceipt, uploadReceipt } from "./store/receiptSlice";
 
 /**
  * Form Validation Schema
@@ -67,6 +67,7 @@ export default function EditReceiptModal({
   const [loading, setLoading] = useState(false);
   const uploadInputRef = useRef(false);
   const [file, setFile] = useState(false);
+  const [uploadedReceipt, setUploadedReceipt] = useState(false);
 
   const { control, formState, handleSubmit, setValue } = useForm({
     mode: "onChange",
@@ -145,7 +146,51 @@ export default function EditReceiptModal({
     if (event.target.files.length > 0) {
       const selectedFile = event.target.files[0];
       setFile(selectedFile);
+
+      setLoading(true);
+      dispatch(uploadReceipt(selectedFile)).then((data) => {
+        setLoading(false);
+        if (!FuseUtils.isEmpty(data?.payload?.message)) {
+          dispatch(
+            showMessage({
+              message: data.payload?.message,
+              variant: "error",
+            })
+          );
+        } else {
+          if (!FuseUtils.isEmpty(data?.payload)) {
+            parseData(data.payload);
+            setUploadedReceipt(data.payload);
+          }
+        }
+      });
     }
+  };
+
+  const parseData = (data) => {
+    const {
+      issued_at,
+      total_amount,
+      currencyCode = "",
+      currencySymbol,
+    } = data?.data ?? {};
+    console.log({ data });
+    if (issued_at) {
+      setValue("issued_at", issued_at, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+    if (total_amount) {
+      setValue("total_amount", total_amount, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+    setValue("currency", currencyCode, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
   };
 
   const _onClose = (event, reason) => {
