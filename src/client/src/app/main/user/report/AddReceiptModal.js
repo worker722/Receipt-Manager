@@ -210,7 +210,7 @@ export default function AddReceiptModal({
             <div
               name={"fileUploadForm"}
               onClick={handleUpload}
-              className="border-grey-600 border-solid rounded-6 border-2 cursor-pointer justify-center items-center w-1/3	"
+              className="border-grey-600 border-solid rounded-6 border-2 cursor-pointer justify-center items-center w-1/2	"
             >
               {!loading && receiptImage && (
                 <img

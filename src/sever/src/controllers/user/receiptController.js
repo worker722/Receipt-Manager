@@ -82,11 +82,30 @@ const convertPDFtoImage = async (path) => {
   }
 };
 
+const convertImage = (imageSrc) => {
+  const data = atob(imageSrc.split(",")[1])
+    .split("")
+    .map((c) => c.charCodeAt(0));
+
+  return new Uint8Array(data);
+};
+
 // Parse data from image file using OCR
 const parseData = async (imagePath) => {
   try {
     const worker = await createWorker("eng");
-    const ret = await worker.recognize(imagePath);
+    const ret = await worker.recognize(
+      imagePath
+      // { rotateAuto: true },
+      // { imageColor: true, imageGrey: true, imageBinary: true }
+    );
+
+    // const { imageColor, imageGrey, imageBinary } = ret.data;
+
+    // fs.writeFileSync("imageColor.png", convertImage(imageColor));
+    // fs.writeFileSync("imageGrey.png", convertImage(imageGrey));
+    // fs.writeFileSync("imageBinary.png", convertImage(imageBinary));
+
     const procesedData = processData(ret.data);
     await worker.terminate();
     return procesedData;
