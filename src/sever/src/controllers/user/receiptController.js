@@ -2,10 +2,16 @@ const { Receipt, REF_NAME } = require("../../models/receiptModel");
 const { Report } = require("../../models/reportModel");
 const { response, fileManager } = require("../../utils");
 const moment = require("moment");
+const { createWorker } = require("tesseract.js");
+const extractDate = require("../../utils/extract-date");
+const extractPrice = require("../../utils/extract-price");
+const currencySymbolMap = require("../../utils/currencySymbolMap");
+const fs = require("node:fs");
+const pdf2img = require("pdf-img-convert");
 
 const LOG_PATH = "user/receiptController";
 
-const uploadReceipt = () => {
+const uploadReceipt = (req, res) => {
   try {
     fileManager.receiptUploader(req, res, async function (_err) {
       if (_err) {
@@ -18,7 +24,27 @@ const uploadReceipt = () => {
         );
       } else {
         if (req?.file?.path) {
-          return response(res, { file: req.file }, {}, 200);
+          var imagePath = req?.file?.path;
+          if (req.file.mimetype.includes("pdf")) {
+            imagePath = await convertPDFtoImage(req.file.path);
+            if (!imagePath) {
+              return response(res, {}, {}, 500, "Something went wrong!");
+            }
+          }
+
+          const result = await parseData(imagePath);
+          return response(
+            res,
+            {
+              data: result,
+              originFile: {
+                pdf: req.file.path,
+                image: imagePath,
+              },
+            },
+            {},
+            200
+          );
         }
         response(res, {}, {}, 500, "Something went wrong!");
       }
@@ -26,6 +52,164 @@ const uploadReceipt = () => {
   } catch (error) {
     console.log(`${LOG_PATH}@uploadReceipt`, error);
     response(res, {}, error, 500, "Something went wrong!");
+  }
+};
+
+const convertPDFtoImage = async (path) => {
+  try {
+    var outputImages = await pdf2img.convert(path, {
+      width: 600, //Number in px
+      height: 900, // Number in px
+      page_numbers: [1], // A list of pages to render instead of all of them
+    });
+
+    // From here, the images can be used for other stuff or just saved if that's required:
+    if (outputImages.length > 0) {
+      const imagePath =
+        "./uploads/receipt/receipt_image_from_pdf_" + Date.now() + ".png";
+      fs.writeFile(imagePath, outputImages[0], function (error) {
+        if (error) {
+          console.error("Error: " + error);
+        }
+      });
+
+      return imagePath;
+    }
+    return false;
+  } catch (error) {
+    console.log(`${LOG_PATH}@convertPDFtoImage`, error);
+    return false;
+  }
+};
+
+const convertImage = (imageSrc) => {
+  const data = atob(imageSrc.split(",")[1])
+    .split("")
+    .map((c) => c.charCodeAt(0));
+
+  return new Uint8Array(data);
+};
+
+// Parse data from image file using OCR
+const parseData = async (imagePath) => {
+  try {
+    const worker = await createWorker("eng");
+    const ret = await worker.recognize(
+      imagePath
+      // { rotateAuto: true },
+      // { imageColor: true, imageGrey: true, imageBinary: true }
+    );
+
+    // const { imageColor, imageGrey, imageBinary } = ret.data;
+
+    // fs.writeFileSync("imageColor.png", convertImage(imageColor));
+    // fs.writeFileSync("imageGrey.png", convertImage(imageGrey));
+    // fs.writeFileSync("imageBinary.png", convertImage(imageBinary));
+
+    const procesedData = processData(ret.data);
+    await worker.terminate();
+    return procesedData;
+  } catch (error) {
+    console.log(`${LOG_PATH}@parseData`, error);
+    return {};
+  }
+};
+
+const processData = (data) => {
+  try {
+    const { text = "", lines = [] } = data;
+
+    // Extract date
+    const dates = extractDate(text);
+
+    var totalPrice;
+
+    // Extract total price
+    const reversedLines = lines.reverse();
+    const totolPricesLine = reversedLines.find((_line) => {
+      if (
+        (_line.text.includes("Total") ||
+          _line.text.includes("TOTAL") ||
+          _line.text.includes("total")) &&
+        !_line.text.includes("sub") &&
+        !_line.text.includes("Sub") &&
+        !_line.text.includes("SUB")
+      ) {
+        var prices = [];
+        const subjects = _line.text.split(" ");
+        subjects.forEach((_subject) => {
+          _subject = _subject.replace(",", ".");
+          let numbers = _subject.match(/[0-9.]+/g);
+          numbers &&
+            numbers.forEach((_number) => {
+              prices.push(parseFloat(_number));
+            });
+        });
+        if (prices.length > 0) {
+          prices.sort((a, b) => b - a);
+          totalPrice = prices[0];
+
+          return true;
+        }
+      }
+    });
+
+    var currencyCode, currencySymbol;
+    if (!totalPrice && totolPricesLine && totolPricesLine?.text != "") {
+      const extractPrices = extractPrice(totolPricesLine.text);
+      if (extractPrices.length > 0) {
+        totalPrice = extractPrices[0].amount;
+        currencySymbol = extractPrices[0].currencySymbol;
+        currencyCode = extractPrices[0].currencyCode;
+      }
+    }
+
+    // Extract currency
+    var currencySymbolMapKeys = Object.keys(currencySymbolMap);
+    if (currencyCode || currencySymbol) {
+      currencySymbolMapKeys.map((key) => {
+        if (currencyCode) {
+          if (currencyCode == currencySymbolMap[key].code) {
+            currencySymbol = currencySymbolMap[key].symbol_native;
+            return;
+          }
+        } else if (currencySymbol) {
+          if (currencySymbol == currencySymbolMap[key].symbol_native) {
+            currencyCode = currencySymbolMap[key].code;
+            return;
+          }
+        }
+      });
+    }
+
+    // If extractPrice module didn't get currency, will find manually from whole content
+    if (!currencyCode && !currencySymbol) {
+      currencySymbolMapKeys.map((key) => {
+        if (
+          text.includes(currencySymbolMap[key].code) ||
+          text.includes(currencySymbolMap[key].symbol_native)
+        ) {
+          currencyCode = currencySymbolMap[key].code;
+          currencySymbol = currencySymbolMap[key].symbol_native;
+          return;
+        }
+      });
+    }
+
+    const result = {
+      issued_at: dates.length > 0 ? dates[0].date : "",
+      total_amount: totalPrice,
+      currencyCode: currencyCode ? currencyCode : currencySymbolMap.EUR.code,
+      currencySymbol: currencySymbol
+        ? currencySymbol
+        : currencySymbolMap.EUR.symbol_native,
+      parsedData: data,
+    };
+
+    return result;
+  } catch (error) {
+    console.log(`${LOG_PATH}@processData`, error);
+    return;
   }
 };
 
@@ -38,6 +222,7 @@ const createReceipt = async (req, res) => {
     country_code,
     category_id,
     report_id,
+    image,
   } = req.body;
 
   try {
@@ -48,6 +233,7 @@ const createReceipt = async (req, res) => {
     receipt.total_amount = total_amount;
     receipt.currency = currency.toUpperCase();
     receipt.country_code = country_code.toUpperCase();
+    if (image) receipt.image = image;
 
     receipt.save().then(async (savedReceipt) => {
       const existReport = await Report.findById(report_id);
@@ -70,8 +256,15 @@ const createReceipt = async (req, res) => {
 };
 
 const updateReceipt = async (req, res) => {
-  const { id, merchant_info, issued_at, total_amount, currency, country_code } =
-    req.body;
+  const {
+    id,
+    merchant_info,
+    issued_at,
+    total_amount,
+    currency,
+    country_code,
+    image,
+  } = req.body;
 
   try {
     await Receipt.findByIdAndUpdate(
@@ -83,6 +276,7 @@ const updateReceipt = async (req, res) => {
           total_amount,
           currency,
           country_code,
+          image: image ?? null,
         },
       },
       {

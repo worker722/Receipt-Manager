@@ -40,7 +40,7 @@ export const uploadReceipt = createAsyncThunk(
     const response = await axios.post(
       "/api/user/receipts/upload",
       {
-        ...receipt,
+        receipt,
       },
       {
         headers: {
