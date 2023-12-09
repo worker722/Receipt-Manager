@@ -1,8 +1,9 @@
+import { Server } from "@constants";
 import FuseUtils from "@fuse/utils/FuseUtils";
 import { yupResolver } from "@hookform/resolvers/yup";
 import CloseIcon from "@mui/icons-material/Close";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { Box } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -68,6 +69,7 @@ export default function EditReceiptModal({
   const uploadInputRef = useRef(false);
   const [file, setFile] = useState(false);
   const [uploadedReceipt, setUploadedReceipt] = useState(false);
+  const [receiptImage, setReceiptImage] = useState(false);
 
   const { control, formState, handleSubmit, setValue } = useForm({
     mode: "onChange",
@@ -101,6 +103,11 @@ export default function EditReceiptModal({
       shouldDirty: true,
       shouldValidate: true,
     });
+
+    if (receipt.image) {
+      console.log(receipt.image);
+      setReceiptImage(receipt.image);
+    }
   }, [setValue, receipt]);
 
   const onSubmit = ({
@@ -119,6 +126,7 @@ export default function EditReceiptModal({
         total_amount,
         currency,
         country_code,
+        image: receiptImage,
       })
     ).then((data) => {
       setLoading(false);
@@ -174,23 +182,26 @@ export default function EditReceiptModal({
       currencyCode = "",
       currencySymbol,
     } = data?.data ?? {};
+    const { pdf, image } = data.originFile;
     console.log({ data });
+
     if (issued_at) {
-      setValue("issued_at", issued_at, {
+      setValue("issued_at", issued_at ?? "", {
         shouldDirty: true,
         shouldValidate: true,
       });
     }
-    if (total_amount) {
-      setValue("total_amount", total_amount, {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-    }
+    setValue("total_amount", total_amount ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
     setValue("currency", currencyCode, {
       shouldDirty: true,
       shouldValidate: true,
     });
+
+    if (image[0] === ".") setReceiptImage(image.slice(1));
+    else setReceiptImage("/" + image);
   };
 
   const _onClose = (event, reason) => {
@@ -231,9 +242,22 @@ export default function EditReceiptModal({
             <div
               name={"fileUploadForm"}
               onClick={handleUpload}
-              className="border-grey-600 border-solid rounded-6 border-2 cursor-pointer	"
-              style={{ width: 800 }}
+              className="border-grey-600 border-solid rounded-6 border-2 cursor-pointer	justify-center items-center w-1/2	"
             >
+              {!loading && receiptImage && (
+                <img
+                  src={`${Server.SERVER_URL}/${receiptImage}`}
+                  className="w-full h-full object-contain"
+                ></img>
+              )}
+              {loading && (
+                <Skeleton
+                  animation="wave"
+                  width="100%"
+                  height="100%"
+                  className="scale-100"
+                />
+              )}
               <VisuallyHiddenInput
                 ref={uploadInputRef}
                 onChange={handleChange}

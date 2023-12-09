@@ -222,6 +222,7 @@ const createReceipt = async (req, res) => {
     country_code,
     category_id,
     report_id,
+    image,
   } = req.body;
 
   try {
@@ -232,6 +233,7 @@ const createReceipt = async (req, res) => {
     receipt.total_amount = total_amount;
     receipt.currency = currency.toUpperCase();
     receipt.country_code = country_code.toUpperCase();
+    if (image) receipt.image = image;
 
     receipt.save().then(async (savedReceipt) => {
       const existReport = await Report.findById(report_id);
@@ -254,8 +256,15 @@ const createReceipt = async (req, res) => {
 };
 
 const updateReceipt = async (req, res) => {
-  const { id, merchant_info, issued_at, total_amount, currency, country_code } =
-    req.body;
+  const {
+    id,
+    merchant_info,
+    issued_at,
+    total_amount,
+    currency,
+    country_code,
+    image,
+  } = req.body;
 
   try {
     await Receipt.findByIdAndUpdate(
@@ -267,6 +276,7 @@ const updateReceipt = async (req, res) => {
           total_amount,
           currency,
           country_code,
+          image: image ?? null,
         },
       },
       {

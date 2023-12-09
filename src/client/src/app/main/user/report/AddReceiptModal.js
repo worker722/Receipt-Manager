@@ -96,6 +96,7 @@ export default function AddReceiptModal({
         country_code,
         report_id: report._id,
         category_id: category._id,
+        image: receiptImage,
       })
     ).then((data) => {
       setLoading(false);
@@ -168,8 +169,8 @@ export default function AddReceiptModal({
       shouldValidate: true,
     });
 
-    if (image[0] === ".") setReceiptImage(image.slice(1));
-    else setReceiptImage("/" + image);
+    if (image[0] === ".") setReceiptImage(image.slice(2));
+    else setReceiptImage(image);
   };
 
   const _onClose = (event, reason) => {
@@ -214,7 +215,7 @@ export default function AddReceiptModal({
             >
               {!loading && receiptImage && (
                 <img
-                  src={`${Server.SERVER_URL}${receiptImage}`}
+                  src={`${Server.SERVER_URL}/${receiptImage}`}
                   className="w-full h-full object-contain"
                 ></img>
               )}

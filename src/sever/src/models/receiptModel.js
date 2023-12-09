@@ -51,6 +51,9 @@ const receiptSchema = new Schema({
     require: true,
     default: STATUS.IN_PROGRESS,
   },
+  image: {
+    type: String,
+  },
   created_at: {
     type: Date,
     default: Date.now,
