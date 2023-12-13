@@ -40,6 +40,7 @@ const defaultValues = {
   total_amount: "",
   currency: "",
   country_code: "",
+  vat_amount: "",
 };
 
 const VisuallyHiddenInput = styled("input")({
@@ -85,6 +86,7 @@ export default function AddReceiptModal({
     total_amount,
     currency,
     country_code,
+    vat_amount,
   }) => {
     setLoading(true);
     dispatch(
@@ -94,6 +96,7 @@ export default function AddReceiptModal({
         total_amount,
         currency,
         country_code,
+        vat_amount,
         report_id: report._id,
         category_id: category._id,
         image: receiptImage,
@@ -151,6 +154,7 @@ export default function AddReceiptModal({
       total_amount,
       currencyCode = "",
       currencySymbol,
+      vat_amount,
     } = data?.data ?? {};
     const { pdf, image } = data.originFile;
     console.log({ data });
@@ -161,6 +165,10 @@ export default function AddReceiptModal({
       });
     }
     setValue("total_amount", total_amount ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue("vat_amount", vat_amount ?? "", {
       shouldDirty: true,
       shouldValidate: true,
     });
@@ -285,12 +293,29 @@ export default function AddReceiptModal({
                     <TextField
                       {...field}
                       className="mb-24"
-                      label="Total"
+                      label="Amount"
                       type="number"
                       error={!!errors.total_amount}
                       helperText={errors?.total_amount?.message}
                       variant="outlined"
                       required
+                      fullWidth
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="vat_amount"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      className="mb-24"
+                      label="Vat"
+                      type="number"
+                      error={!!errors.vat_amount}
+                      helperText={errors?.vat_amount?.message}
+                      variant="outlined"
                       fullWidth
                     />
                   )}

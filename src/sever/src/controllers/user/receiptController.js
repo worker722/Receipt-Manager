@@ -196,13 +196,81 @@ const processData = (data) => {
       });
     }
 
+    const vatTextArray = [
+      "vat",
+      "Vat",
+      "VAT",
+      "tva",
+      "Tva",
+      "TVA",
+      "Tax",
+      "TAX",
+      "tax",
+      "Impot",
+      "impot",
+      "IMPOT",
+      "impôt",
+      "Impôt",
+      "IMPÔT",
+      "%",
+    ];
+
+    var vatAmount = 0.0;
+    var vatLines = [];
+    lines.forEach((_line) => {
+      vatTextArray.forEach((_item) => {
+        if (
+          _line.text.includes(_item) &&
+          !_line.text.includes("Taxi") &&
+          !_line.text.includes("taxi") &&
+          !_line.text.includes("TAXI") &&
+          !_line.text.includes("id") &&
+          !_line.text.includes("ID") &&
+          !_line.text.includes("Id")
+        ) {
+          var exists = false;
+          vatLines.forEach((_item) => {
+            if (_line.text == _item.text) {
+              exists = true;
+              return true;
+            }
+          });
+          if (!exists) vatLines.push(_line);
+        }
+      });
+    });
+    if (vatLines.length > 0) {
+      vatLines.forEach((_line) => {
+        const _symbols = _line.text.split(" ");
+        const lastSymbol = _symbols.pop().replace(",", ".");
+        var prices = [];
+        let numbers = lastSymbol.match(/[0-9.]+/g);
+        numbers &&
+          numbers.forEach((_number) => {
+            if (parseFloat(_number) < 10000) prices.push(parseFloat(_number));
+          });
+        if (prices.length > 0) {
+          var result = prices.reduce((unique, o) => {
+            if (!unique.some((obj) => obj == o)) {
+              unique.push(o);
+            }
+            return unique;
+          }, []);
+          console.log(result);
+          vatAmount += result.pop();
+        }
+      });
+    }
+
     const result = {
       issued_at: dates.length > 0 ? dates[0].date : "",
       total_amount: totalPrice,
+      vat_amount: vatAmount,
       currencyCode: currencyCode ? currencyCode : currencySymbolMap.EUR.code,
       currencySymbol: currencySymbol
         ? currencySymbol
         : currencySymbolMap.EUR.symbol_native,
+      parseData: data,
     };
 
     return result;
@@ -219,6 +287,7 @@ const createReceipt = async (req, res) => {
     total_amount,
     currency,
     country_code,
+    vat_amount,
     category_id,
     report_id,
     image,
@@ -230,6 +299,7 @@ const createReceipt = async (req, res) => {
     receipt.merchant_info = merchant_info;
     receipt.issued_at = moment(issued_at).format("YYYY-MM-DD");
     receipt.total_amount = total_amount;
+    receipt.vat_amount = vat_amount;
     receipt.currency = currency.toUpperCase();
     receipt.country_code = country_code.toUpperCase();
     if (image) receipt.image = image;
@@ -262,6 +332,7 @@ const updateReceipt = async (req, res) => {
     total_amount,
     currency,
     country_code,
+    vat_amount,
     image,
   } = req.body;
 
@@ -273,6 +344,7 @@ const updateReceipt = async (req, res) => {
           merchant_info,
           issued_at: moment(issued_at).format("YYYY-MM-DD"),
           total_amount,
+          vat_amount,
           currency,
           country_code,
           image: image ?? null,

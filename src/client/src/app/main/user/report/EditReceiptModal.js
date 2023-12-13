@@ -38,6 +38,7 @@ const defaultValues = {
   merchant_info: "",
   issued_at: new Date().toISOString().substring(0, 10),
   total_amount: "",
+  vat_amount: "",
   currency: "",
   country_code: "",
 };
@@ -95,6 +96,10 @@ export default function EditReceiptModal({
       shouldDirty: true,
       shouldValidate: true,
     });
+    setValue("vat_amount", receipt?.vat_amount ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
     setValue("currency", receipt?.currency ?? "", {
       shouldDirty: true,
       shouldValidate: true,
@@ -114,6 +119,7 @@ export default function EditReceiptModal({
     merchant_info,
     issued_at,
     total_amount,
+    vat_amount,
     currency,
     country_code,
   }) => {
@@ -124,6 +130,7 @@ export default function EditReceiptModal({
         merchant_info,
         issued_at,
         total_amount,
+        vat_amount,
         currency,
         country_code,
         image: receiptImage,
@@ -179,6 +186,7 @@ export default function EditReceiptModal({
     const {
       issued_at,
       total_amount,
+      vat_amount,
       currencyCode = "",
       currencySymbol,
     } = data?.data ?? {};
@@ -191,6 +199,10 @@ export default function EditReceiptModal({
         shouldValidate: true,
       });
     }
+    setValue("vat_amount", vat_amount ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
     setValue("total_amount", total_amount ?? "", {
       shouldDirty: true,
       shouldValidate: true,
@@ -200,8 +212,8 @@ export default function EditReceiptModal({
       shouldValidate: true,
     });
 
-    if (image[0] === ".") setReceiptImage(image.slice(1));
-    else setReceiptImage("/" + image);
+    if (image[0] === ".") setReceiptImage(image.slice(2));
+    else setReceiptImage(image);
   };
 
   const _onClose = (event, reason) => {
@@ -316,12 +328,29 @@ export default function EditReceiptModal({
                     <TextField
                       {...field}
                       className="mb-24"
-                      label="Total"
+                      label="Amount"
                       type="number"
                       error={!!errors.total_amount}
                       helperText={errors?.total_amount?.message}
                       variant="outlined"
                       required
+                      fullWidth
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="vat_amount"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      className="mb-24"
+                      label="Vat"
+                      type="number"
+                      error={!!errors.vat_amount}
+                      helperText={errors?.vat_amount?.message}
+                      variant="outlined"
                       fullWidth
                     />
                   )}

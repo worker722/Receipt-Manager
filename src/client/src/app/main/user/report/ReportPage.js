@@ -302,7 +302,8 @@ const ReportPage = (props) => {
       width: 150,
       valueGetter: (params) => toLocalTime(params.row.issued_at),
     },
-    { field: "total_amount", headerName: "Amount", width: 150 },
+    { field: "total_amount", headerName: "Amount", width: 100 },
+    { field: "vat_amount", headerName: "Vat", width: 100 },
     { field: "currency", headerName: "Currency", width: 100 },
     { field: "country_code", headerName: "Country", width: 100 },
     {
