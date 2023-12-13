@@ -1,6 +1,7 @@
 const { Schema, model } = require("mongoose");
 const ExpenseFile = require("./expenseFileModel");
 const moment = require("moment");
+const XLSX = require("xlsx");
 
 /** Bank expense model
  *{
@@ -217,11 +218,22 @@ const parseExpenses = (_data, originFileID) => {
     };
     Object.keys(match_key_model).forEach((key) => {
       if (key.endsWith("_at")) {
-        _object[key] = moment(
-          item[match_key_model[key]],
-          "DD/MM/YYYY",
-          true
-        ).format("YYYY-MM-DD");
+        var dateField = item[match_key_model[key]];
+        // Convert number format date to date format using SSF
+        if (typeof item[match_key_model[key]] == "number") {
+          const parsedDate = XLSX.SSF.parse_date_code(
+            item[match_key_model[key]]
+          );
+          dateField = `${parsedDate.d}/${parsedDate.m}/${parsedDate.y}`;
+
+          _object[key] = moment(dateField, "D/M/YYYY", true).format(
+            "YYYY-MM-DD"
+          );
+        } else {
+          _object[key] = moment(dateField, "DD/MM/YYYY", true).format(
+            "YYYY-MM-DD"
+          );
+        }
       } else {
         _object[key] = item[match_key_model[key]];
       }
