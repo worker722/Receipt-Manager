@@ -299,7 +299,7 @@ const processData = (data) => {
       currencySymbol: currencySymbol
         ? currencySymbol
         : currencySymbolMap.EUR.symbol_native,
-      parseData: data.lines,
+      // parseData: data.lines,
     };
 
     return result;
