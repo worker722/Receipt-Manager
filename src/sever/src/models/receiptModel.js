@@ -46,6 +46,9 @@ const receiptSchema = new Schema({
   city: {
     type: String,
   },
+  comment: {
+    type: String,
+  },
   status: {
     type: Number,
     require: true,

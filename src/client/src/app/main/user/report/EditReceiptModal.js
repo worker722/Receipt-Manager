@@ -41,6 +41,7 @@ const defaultValues = {
   vat_amount: "",
   currency: "",
   country_code: "",
+  comment: "",
 };
 
 const VisuallyHiddenInput = styled("input")({
@@ -108,6 +109,10 @@ export default function EditReceiptModal({
       shouldDirty: true,
       shouldValidate: true,
     });
+    setValue("comment", receipt?.comment ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
 
     if (receipt.image) {
       console.log(receipt.image);
@@ -121,6 +126,7 @@ export default function EditReceiptModal({
     total_amount,
     vat_amount,
     currency,
+    comment,
     country_code,
   }) => {
     setLoading(true);
@@ -132,6 +138,7 @@ export default function EditReceiptModal({
         total_amount,
         vat_amount,
         currency,
+        comment,
         country_code,
         image: receiptImage,
       })
@@ -291,7 +298,7 @@ export default function EditReceiptModal({
                     <TextField
                       {...field}
                       className="mb-24"
-                      label="Description / Vendor"
+                      label="Merchant"
                       type="name"
                       placeholder=""
                       error={!!errors.merchant_info}
@@ -299,6 +306,24 @@ export default function EditReceiptModal({
                       variant="outlined"
                       required
                       fullWidth
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="comment"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      className="mb-24"
+                      label="Comment"
+                      type="comment"
+                      helperText={errors?.comment?.message}
+                      variant="outlined"
+                      rows={5}
+                      fullWidth
+                      multiline
                     />
                   )}
                 />

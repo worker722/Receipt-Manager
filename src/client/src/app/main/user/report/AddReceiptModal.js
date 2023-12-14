@@ -41,6 +41,7 @@ const defaultValues = {
   currency: "",
   country_code: "",
   vat_amount: "",
+  comment: "",
 };
 
 const VisuallyHiddenInput = styled("input")({
@@ -87,6 +88,7 @@ export default function AddReceiptModal({
     currency,
     country_code,
     vat_amount,
+    comment,
   }) => {
     setLoading(true);
     dispatch(
@@ -97,6 +99,7 @@ export default function AddReceiptModal({
         currency,
         country_code,
         vat_amount,
+        comment,
         report_id: report._id,
         category_id: category._id,
         image: receiptImage,
@@ -256,7 +259,7 @@ export default function AddReceiptModal({
                     <TextField
                       {...field}
                       className="mb-24"
-                      label="Description / Vendor"
+                      label="Merchant"
                       type="name"
                       placeholder=""
                       error={!!errors.merchant_info}
@@ -264,6 +267,24 @@ export default function AddReceiptModal({
                       variant="outlined"
                       required
                       fullWidth
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="comment"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      className="mb-24"
+                      label="Comment"
+                      type="comment"
+                      helperText={errors?.comment?.message}
+                      variant="outlined"
+                      rows={5}
+                      fullWidth
+                      multiline
                     />
                   )}
                 />
@@ -313,7 +334,6 @@ export default function AddReceiptModal({
                       className="mb-24"
                       label="Vat"
                       type="number"
-                      error={!!errors.vat_amount}
                       helperText={errors?.vat_amount?.message}
                       variant="outlined"
                       fullWidth

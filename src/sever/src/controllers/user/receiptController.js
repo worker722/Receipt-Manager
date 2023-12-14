@@ -327,6 +327,7 @@ const createReceipt = async (req, res) => {
     currency,
     country_code,
     vat_amount,
+    comment,
     category_id,
     report_id,
     image,
@@ -339,6 +340,7 @@ const createReceipt = async (req, res) => {
     receipt.issued_at = moment(issued_at).format("YYYY-MM-DD");
     receipt.total_amount = total_amount;
     receipt.vat_amount = vat_amount;
+    receipt.comment = comment;
     receipt.currency = currency.toUpperCase();
     receipt.country_code = country_code.toUpperCase();
     if (image) receipt.image = image;
@@ -372,6 +374,7 @@ const updateReceipt = async (req, res) => {
     currency,
     country_code,
     vat_amount,
+    comment,
     image,
   } = req.body;
 
@@ -386,6 +389,7 @@ const updateReceipt = async (req, res) => {
           vat_amount,
           currency,
           country_code,
+          comment,
           image: image ?? null,
         },
       },
