@@ -121,6 +121,16 @@ const processData = (data) => {
 
     // Extract date
     const dates = extractDate(text);
+    var issuedDate;
+    if (dates && dates.length > 0) {
+      var _realDate = moment(dates[0].date);
+      var _year = _realDate.year();
+      if (_year < 1900) {
+        _year += 2000;
+        _realDate.set("year", _year);
+      }
+      issuedDate = _realDate.format("YYYY-MM-DD");
+    }
 
     var totalPrice = 0.0;
     var vatPrice = 0.0;
@@ -291,7 +301,7 @@ const processData = (data) => {
     }
 
     const result = {
-      issued_at: dates.length > 0 ? dates[0].date : "",
+      issued_at: issuedDate ?? "",
       total_amount: totalPrice,
       vat_amount: vatAmount,
       vat_price: vatPrice,
