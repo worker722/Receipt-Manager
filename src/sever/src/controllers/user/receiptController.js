@@ -122,18 +122,16 @@ const processData = (data) => {
     // Extract date
     const dates = extractDate(text);
 
-    var totalPrice;
+    var totalPrice = 0.0;
+    var vatPrice = 0.0;
+    var vatAmount = 0.0;
 
     // Extract total price
     const reversedLines = lines.reverse();
     const totolPricesLine = reversedLines.find((_line) => {
       if (
-        (_line.text.includes("Total") ||
-          _line.text.includes("TOTAL") ||
-          _line.text.includes("total")) &&
-        !_line.text.includes("sub") &&
-        !_line.text.includes("Sub") &&
-        !_line.text.includes("SUB")
+        _line.text.toLowerCase().includes("total") &&
+        !_line.text.toLowerCase().includes("sub")
       ) {
         var prices = [];
         const subjects = _line.text.split(" ");
@@ -149,11 +147,15 @@ const processData = (data) => {
           prices.sort((a, b) => b - a);
           totalPrice = prices[0];
 
+          // if total price line has vat amount also, it will be extracted;
+          if (prices.length > 2) vatPrice = prices.pop();
+
           return true;
         }
       }
     });
 
+    // Extract currency with third-party module
     var currencyCode, currencySymbol;
     if (!totalPrice && totolPricesLine && totolPricesLine?.text != "") {
       const extractPrices = extractPrice(totolPricesLine.text);
@@ -164,7 +166,7 @@ const processData = (data) => {
       }
     }
 
-    // Extract currency
+    // Extract currency manually
     var currencySymbolMapKeys = Object.keys(currencySymbolMap);
     if (currencyCode || currencySymbol) {
       currencySymbolMapKeys.map((key) => {
@@ -196,38 +198,32 @@ const processData = (data) => {
       });
     }
 
-    const vatTextArray = [
-      "vat",
-      "Vat",
-      "VAT",
-      "tva",
-      "Tva",
-      "TVA",
-      "Tax",
-      "TAX",
-      "tax",
-      "Impot",
-      "impot",
-      "IMPOT",
-      "impôt",
-      "Impôt",
-      "IMPÔT",
-      "%",
-    ];
+    // Extract vat amount
+    const vatTextArray = ["vat", "tva", "tax", "impot", "impôt", "%", "§"]; // must be lowercase letters
 
-    var vatAmount = 0.0;
     var vatLines = [];
     lines.forEach((_line) => {
       vatTextArray.forEach((_item) => {
         if (
-          _line.text.includes(_item) &&
-          !_line.text.includes("Taxi") &&
-          !_line.text.includes("taxi") &&
-          !_line.text.includes("TAXI") &&
-          !_line.text.includes("id") &&
-          !_line.text.includes("ID") &&
-          !_line.text.includes("Id")
+          _line.text.toLowerCase().includes(_item) &&
+          !_line.text.toLowerCase().includes("taxi") &&
+          !_line.text.toLowerCase().includes("id") &&
+          !_line.text.toLowerCase().includes("no")
         ) {
+          if (
+            (_line.text.toLowerCase().match(new RegExp(_item, "g")) || [])
+              .length != 1
+          )
+            return;
+          if (_item != "%" && _item != "§") {
+            const regStr = `\\b${_item}\\b`;
+            const regex = new RegExp(regStr, "g");
+            const newstr = _line.text.toLowerCase().match(regex);
+            if (!newstr || newstr.length > 1) {
+              return;
+            }
+          }
+
           var exists = false;
           vatLines.forEach((_item) => {
             if (_line.text == _item.text) {
@@ -256,21 +252,54 @@ const processData = (data) => {
             }
             return unique;
           }, []);
-          console.log(result);
           vatAmount += result.pop();
         }
       });
+    }
+
+    // Extract sub total amount
+    var subTotalPrice = 0.0;
+    lines.forEach((_line) => {
+      if (
+        _line.text.toLowerCase().includes("sub total") ||
+        _line.text.toLowerCase().includes("subtotal")
+      ) {
+        var prices = [];
+        const subjects = _line.text.split(" ");
+        subjects.forEach((_subject) => {
+          _subject = _subject.replace(",", ".");
+          let numbers = _subject.match(/[0-9.]+/g);
+          numbers &&
+            numbers.forEach((_number) => {
+              prices.push(parseFloat(_number));
+            });
+        });
+        if (prices.length > 0) {
+          prices.sort((a, b) => b - a);
+          subTotalPrice = prices[0];
+
+          return true;
+        }
+      }
+    });
+
+    if (vatAmount == 0 && vatPrice > 0) vatAmount = vatPrice;
+
+    // when total price is empty, subtotal and vat extracted, it will be sum
+    if (totalPrice == 0) {
+      totalPrice = subTotalPrice + vatAmount;
     }
 
     const result = {
       issued_at: dates.length > 0 ? dates[0].date : "",
       total_amount: totalPrice,
       vat_amount: vatAmount,
+      vat_price: vatPrice,
       currencyCode: currencyCode ? currencyCode : currencySymbolMap.EUR.code,
       currencySymbol: currencySymbol
         ? currencySymbol
         : currencySymbolMap.EUR.symbol_native,
-      parseData: data,
+      parseData: data.lines,
     };
 
     return result;
