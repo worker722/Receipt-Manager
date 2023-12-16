@@ -62,9 +62,11 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function EditReceiptModal({
   receipt = {},
+  newCategory = {},
   open = false,
   handleClose = {},
   handleAdded = {},
+  handleOpenCategoryModal = {},
 }) {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
@@ -115,7 +117,6 @@ export default function EditReceiptModal({
     });
 
     if (receipt.image) {
-      console.log(receipt.image);
       setReceiptImage(receipt.image);
     }
   }, [setValue, receipt]);
@@ -133,6 +134,7 @@ export default function EditReceiptModal({
     dispatch(
       updateReceipt({
         id: receipt._id,
+        category_id: newCategory._id ?? receipt.category._id,
         merchant_info,
         issued_at,
         total_amount,
@@ -198,7 +200,6 @@ export default function EditReceiptModal({
       currencySymbol,
     } = data?.data ?? {};
     const { pdf, image } = data.originFile;
-    console.log({ data });
 
     if (issued_at) {
       setValue("issued_at", issued_at ?? "", {
@@ -221,6 +222,10 @@ export default function EditReceiptModal({
 
     if (image[0] === ".") setReceiptImage(image.slice(2));
     else setReceiptImage(image);
+  };
+
+  const _handleChangeCategory = () => {
+    handleOpenCategoryModal(true);
   };
 
   const _onClose = (event, reason) => {
@@ -251,8 +256,20 @@ export default function EditReceiptModal({
             >
               <CloseIcon />
             </IconButton>
-            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+            <Typography sx={{ ml: 2 }} variant="h6" component="div">
               Edit Receipt
+            </Typography>
+            <Typography
+              sx={{ ml: 5, flex: 1 }}
+              component="div"
+              onClick={_handleChangeCategory}
+            >
+              <img
+                src={`${Server.SERVER_URL}/${
+                  newCategory.photo ?? receipt.category.photo
+                }`}
+                width={50}
+              ></img>
             </Typography>
           </Toolbar>
         </AppBar>

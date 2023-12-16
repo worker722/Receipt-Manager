@@ -1,3 +1,4 @@
+import { Server } from "@constants";
 import ConfirmDialog from "@fuse/core/ConfirmDialog";
 import FuseLoading from "@fuse/core/FuseLoading";
 import FusePageSimple from "@fuse/core/FusePageSimple";
@@ -190,7 +191,7 @@ const ReportPage = (props) => {
 
   const handleCategoryChoose = (category) => {
     setCurrentCategory(category);
-    setOpenAddReceiptModal(true);
+    if (!openEditReceiptModal) setOpenAddReceiptModal(true);
     setOpenCategoryModal(false);
   };
 
@@ -284,6 +285,19 @@ const ReportPage = (props) => {
           >
             heroicons-outline:check-circle
           </FuseSvgIcon>
+        );
+      },
+    },
+    {
+      field: "type",
+      headerName: "Type",
+      width: 80,
+      renderCell: (params) => {
+        return (
+          <img
+            src={`${Server.SERVER_URL}/${params.row.category.photo}`}
+            width={50}
+          ></img>
         );
       },
     },
@@ -502,9 +516,11 @@ const ReportPage = (props) => {
           {openEditReceiptModal && (
             <EditReceiptModal
               receipt={currentReceipt}
+              newCategory={currentCategory}
               open={openEditReceiptModal}
               handleClose={handleCloseEditReceiptModal}
               handleAdded={handleUpdatedReceipt}
+              handleOpenCategoryModal={setOpenCategoryModal}
             />
           )}
           {openDeleteDialog && (

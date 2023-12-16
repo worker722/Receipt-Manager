@@ -212,8 +212,16 @@ export default function AddReceiptModal({
             >
               <CloseIcon />
             </IconButton>
-            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+            <Typography sx={{ ml: 2 }} variant="h6" component="div">
               Create Receipt
+            </Typography>
+            <Typography sx={{ ml: 5, flex: 1 }} component="div">
+              {category?.photo && (
+                <img
+                  src={`${Server.SERVER_URL}/${category.photo}`}
+                  width={50}
+                ></img>
+              )}
             </Typography>
           </Toolbar>
         </AppBar>

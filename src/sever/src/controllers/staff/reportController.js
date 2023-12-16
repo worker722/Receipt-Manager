@@ -1,7 +1,4 @@
-const {
-  Receipt,
-  STATUS: RECEIPT_STATUS,
-} = require("../../models/receiptModel");
+const { REF_NAME: ReceiptRef } = require("../../models/receiptModel");
 const {
   Report,
   REF_NAME: ReportRef,
@@ -42,8 +39,22 @@ const getReport = async (req, res) => {
       .populate(ReportRef.EXPENSE_IDS)
       .populate(ReportRef.RECEIPT_IDS)
       .then((report) => {
-        return response(res, {
-          report,
+        var promisses = [];
+        var receipt_ids = [];
+        report.receipt_ids.forEach((_receipt) => {
+          const promiss = new Promise((resolve, reject) => {
+            _receipt.populate(ReceiptRef.CATEGORY).then((_newReceipt) => {
+              receipt_ids.push(_newReceipt);
+              resolve();
+            });
+          });
+          promisses.push(promiss);
+        });
+        Promise.all(promisses).then(() => {
+          report.receipt_ids = receipt_ids;
+          return response(res, {
+            report,
+          });
         });
       })
       .catch((_error) => {

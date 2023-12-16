@@ -368,6 +368,7 @@ const createReceipt = async (req, res) => {
 const updateReceipt = async (req, res) => {
   const {
     id,
+    category_id,
     merchant_info,
     issued_at,
     total_amount,
@@ -383,6 +384,7 @@ const updateReceipt = async (req, res) => {
       id,
       {
         $set: {
+          category: category_id,
           merchant_info,
           issued_at: moment(issued_at).format("YYYY-MM-DD"),
           total_amount,
@@ -397,7 +399,9 @@ const updateReceipt = async (req, res) => {
         new: true,
       }
     ).then((updatedReceipt) => {
-      return response(res, { receipt: updatedReceipt }, {}, 200);
+      updatedReceipt.populate(REF_NAME.CATEGORY).then((_result) => {
+        return response(res, { receipt: _result }, {}, 200);
+      });
     });
   } catch (error) {
     console.log(`${LOG_PATH}@updateReceipt`, error);
