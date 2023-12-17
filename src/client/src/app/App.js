@@ -67,7 +67,7 @@ function App() {
   // };
 
   useEffect(() => {
-    askNotificationPermission();
+    // askNotificationPermission();
   }, []);
 
   const askNotificationPermission = () => {
