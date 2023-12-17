@@ -152,3 +152,7 @@ input:-webkit-autofill:active
 .fc-scrollgrid-section-liquid {
     height: 1px !important;
 }
+
+.react-transform-wrapper {
+    height: 100% !important;
+}

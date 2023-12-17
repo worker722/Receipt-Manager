@@ -20,6 +20,7 @@ import * as React from "react";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
+import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import * as yup from "yup";
 import { createReceipt, uploadReceipt } from "./store/receiptSlice";
 
@@ -121,8 +122,10 @@ export default function AddReceiptModal({
   };
 
   const handleUpload = (event) => {
-    if (uploadInputRef?.current) {
-      uploadInputRef.current.click();
+    if (event.detail == 2) {
+      if (uploadInputRef?.current) {
+        uploadInputRef.current.click();
+      }
     }
   };
 
@@ -233,10 +236,20 @@ export default function AddReceiptModal({
               className="border-grey-600 border-solid rounded-6 border-2 cursor-pointer justify-center items-center w-1/2	"
             >
               {!loading && receiptImage && (
-                <img
-                  src={`${Server.SERVER_URL}/${receiptImage}`}
-                  className="w-full h-full object-contain"
-                ></img>
+                <div className="w-full h-full">
+                  <TransformWrapper initialScale={1}>
+                    {() => (
+                      <div className="h-full justify-center items-center flex">
+                        <TransformComponent>
+                          <img
+                            src={`${Server.SERVER_URL}/${receiptImage}`}
+                            className=" w-full h-full object-contain"
+                          ></img>
+                        </TransformComponent>
+                      </div>
+                    )}
+                  </TransformWrapper>
+                </div>
               )}
               {loading && (
                 <Skeleton
