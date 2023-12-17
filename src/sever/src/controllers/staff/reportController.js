@@ -1,9 +1,10 @@
-const { REF_NAME: ReceiptRef } = require("../../models/receiptModel");
+const { REF_NAME: ReceiptRef, Receipt } = require("../../models/receiptModel");
 const {
   Report,
   REF_NAME: ReportRef,
   STATUS: REPORT_STATUS,
 } = require("../../models/reportModel");
+const { Expense } = require("../../models/expenseModel");
 const { response } = require("../../utils");
 
 const LOG_PATH = "user/reportController";
@@ -95,8 +96,38 @@ const approveReport = (req, res) => {
   }
 };
 
+const closeReport = (req, res) => {
+  const { public_id } = req.body;
+
+  try {
+    Report.findOne({ public_id }).then(async (report) => {
+      await Expense.updateMany(
+        { _id: { $in: report.expense_ids } },
+        { $set: { deleted_at: new Date() } }
+      ).exec();
+
+      await Receipt.updateMany(
+        { _id: { $in: report.receipt_ids } },
+        { $set: { deleted_at: new Date() } }
+      ).exec();
+
+      await Report.findByIdAndUpdate(report._id, {
+        $set: {
+          deleted_at: new Date(),
+        },
+      }).exec();
+
+      return response(res, { report }, {});
+    });
+  } catch (error) {
+    console.log(`${LOG_PATH}@closeReport`, error);
+    response(res, {}, error, 500, "Something went wrong!");
+  }
+};
+
 module.exports = {
   getReport,
   getAllReports,
   approveReport,
+  closeReport,
 };

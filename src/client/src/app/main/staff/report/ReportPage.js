@@ -16,6 +16,8 @@ import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import { showMessage } from "app/store/fuse/messageSlice";
 import withReducer from "app/store/withReducer";
 import { motion } from "framer-motion";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -29,7 +31,12 @@ import {
   approveReceipt,
   refundReceipt,
 } from "./store/receiptSlice";
-import { REPORT_STATUS, approveReport, getReport } from "./store/reportSlice";
+import {
+  REPORT_STATUS,
+  approveReport,
+  closeReport,
+  getReport,
+} from "./store/reportSlice";
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
   "& .FusePageSimple-header": {
@@ -211,6 +218,49 @@ const ReportPage = (props) => {
       if (!FuseUtils.isEmpty(message)) {
         _showMessage(message, "error");
       } else {
+        // props.navigate("/reports");
+        setReportStatus(REPORT_STATUS.APPROVED);
+      }
+    });
+  };
+
+  const handleCloseReport = () => {
+    const doc = new jsPDF();
+    const tableHeaders = [
+      "Date",
+      "Merchant",
+      "Amount",
+      "Currency",
+      "Vat",
+      "Country",
+      "Comment",
+    ];
+    const tableData = rowReceipts.map((row) => {
+      return [
+        toLocalTime(row.issued_at),
+        row.merchant_info,
+        row.total_amount,
+        row.currency,
+        row.vat_amount,
+        row.country_code,
+        row.comment,
+      ];
+    });
+
+    autoTable(doc, {
+      head: [tableHeaders],
+      body: tableData,
+    });
+
+    doc.text(`Report_#${publicId}`, 14, 10);
+    doc.save(`Report_#${publicId}_${moment().format("YYYY_MM_DD")}.pdf`);
+
+    dispatch(closeReport(publicId)).then((data) => {
+      setLoading(false);
+      const { message = "" } = data.payload;
+      if (!FuseUtils.isEmpty(message)) {
+        _showMessage(message, "error");
+      } else {
         props.navigate("/reports");
       }
     });
@@ -377,6 +427,16 @@ const ReportPage = (props) => {
                 color="primary"
               >
                 Approve
+              </Button>
+            )}
+            {reportStatus == REPORT_STATUS.APPROVED && (
+              <Button
+                onClick={handleCloseReport}
+                component="label"
+                variant="contained"
+                color="error"
+              >
+                Close
               </Button>
             )}
           </div>

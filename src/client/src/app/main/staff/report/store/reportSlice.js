@@ -68,6 +68,38 @@ export const approveReport = createAsyncThunk(
   }
 );
 
+export const closeReport = createAsyncThunk(
+  "staff/reports/closeReport",
+  async (public_id) => {
+    const response = await axios.post("/api/staff/reports/closeReport", {
+      public_id,
+    });
+    if (response?.status == 200) {
+      const {
+        data = {},
+        error = {},
+        message = "",
+        status = -1,
+      } = response.data;
+      if (status == 200) {
+        return data ?? { reports: [] };
+      } else {
+        if (!FuseUtils.isEmpty(error))
+          console.error(`${LOG_PATH}@closeReport`, error);
+
+        return {
+          reports: [],
+          ...response.data,
+        };
+      }
+    } else {
+      return {
+        reports: [],
+      };
+    }
+  }
+);
+
 export const REPORT_STATUS = {
   IN_PROGRESS: 0,
   IN_REVIEW: 1,
