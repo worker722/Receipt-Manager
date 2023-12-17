@@ -7,9 +7,11 @@ import withRouter from "@fuse/core/withRouter";
 import FuseUtils from "@fuse/utils/FuseUtils";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/Edit";
+import MessageIcon from "@mui/icons-material/Message";
 import { Button } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { darken, lighten, styled } from "@mui/material/styles";
 import { useTheme } from "@mui/styles";
@@ -320,6 +322,18 @@ const ReportPage = (props) => {
     { field: "vat_amount", headerName: "Vat", width: 100 },
     { field: "currency", headerName: "Currency", width: 100 },
     { field: "country_code", headerName: "Country", width: 100 },
+    {
+      field: "comment",
+      headerName: "Comment",
+      width: 100,
+      renderCell: (params) => {
+        return (
+          <Tooltip title={params.row.comment} placement="bottom">
+            <MessageIcon />
+          </Tooltip>
+        );
+      },
+    },
     {
       field: "actions",
       type: "actions",

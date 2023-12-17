@@ -4,6 +4,7 @@ import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import withRouter from "@fuse/core/withRouter";
 import FuseUtils from "@fuse/utils/FuseUtils";
 import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
+import MessageIcon from "@mui/icons-material/Message";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { Box, Button } from "@mui/material";
 import Paper from "@mui/material/Paper";
@@ -302,6 +303,18 @@ const ReportPage = (props) => {
     { field: "vat_amount", headerName: "Vat", width: 100 },
     { field: "currency", headerName: "Currency", width: 100 },
     { field: "country_code", headerName: "Country", width: 100 },
+    {
+      field: "comment",
+      headerName: "Comment",
+      width: 100,
+      renderCell: (params) => {
+        return (
+          <Tooltip title={params.row.comment} placement="bottom">
+            <MessageIcon />
+          </Tooltip>
+        );
+      },
+    },
   ];
 
   const expenseColumns = [
