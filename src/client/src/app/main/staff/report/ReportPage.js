@@ -269,6 +269,7 @@ const ReportPage = (props) => {
     });
 
     tableData.push(
+      ["", "", "", "", "", "", ""],
       ["", "Total Without Receipt", totalWithoutReceipt, "EUR", "", "", ""],
       ["", "Total Personal", totalPersonal, "EUR", "", "", ""]
     );
