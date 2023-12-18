@@ -8,7 +8,7 @@ start mongodb
 From Serve folder, run `yarn dev`. http://localhost:8080 will be ready to listen
 
 ### Start client
-From client folder, run `yarn start`. If auto open not workingm Open http://localhost:3000 on your browser
+From client folder, run `yarn start`. If auto open not working, then Open http://localhost:3000 on your browser
 
 ### Compatibility
 - Node
