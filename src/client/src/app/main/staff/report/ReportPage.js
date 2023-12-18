@@ -6,7 +6,7 @@ import FuseUtils from "@fuse/utils/FuseUtils";
 import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import MessageIcon from "@mui/icons-material/Message";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import { Box, Button } from "@mui/material";
+import { Button } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
@@ -124,7 +124,8 @@ const ReportPage = (props) => {
   const [report, setReport] = useState({});
   const [reportStatus, setReportStatus] = useState(false);
   const [allResolved, setAllResolved] = useState(false);
-  const [totalPrice, setTotalPrice] = useState(0);
+  const [totalWithoutReceipt, setTotalWithoutReceipt] = useState(0);
+  const [totalPersonal, setTotalPersonal] = useState(0);
 
   const theme = useTheme();
 
@@ -163,15 +164,35 @@ const ReportPage = (props) => {
       setRowReceipts(report.receipt_ids);
 
       var _expenses = [];
+      var _amountWithoutReceipt = 0;
+      var _amountPersonal = 0;
       report.expense_ids.map((_expense) => {
         var temp_expense = _expense;
+        _amountWithoutReceipt += parseFloat(_expense.amount_charged);
         report.receipt_ids.map((_receipt) => {
           if (_receipt.expense == temp_expense._id) {
             temp_expense.matched = true;
+            _amountWithoutReceipt -= parseFloat(_expense.amount_charged);
           }
         });
         _expenses.push(temp_expense);
       });
+      report.receipt_ids.map((_receipt) => {
+        var matched = false;
+        report.expense_ids.map((_expense) => {
+          if (_receipt.expense == _expense._id) {
+            matched = true;
+            return true;
+          }
+        });
+        if (!matched && _receipt.amount_eur) {
+          _amountPersonal += parseFloat(_receipt.amount_eur);
+        }
+      });
+
+      setTotalPersonal(_amountPersonal);
+      setTotalWithoutReceipt(_amountWithoutReceipt);
+
       setRowExpenses(_expenses);
     }
   }, [report]);
@@ -228,14 +249,14 @@ const ReportPage = (props) => {
     const doc = new jsPDF();
     const tableHeaders = [
       "Date",
-      "Merchant",
+      "Raison sociale commerçant",
       "Amount",
       "Currency",
       "Vat",
       "Country",
       "Comment",
     ];
-    const tableData = rowReceipts.map((row) => {
+    var tableData = rowReceipts.map((row) => {
       return [
         toLocalTime(row.issued_at),
         row.merchant_info,
@@ -246,6 +267,11 @@ const ReportPage = (props) => {
         row.comment,
       ];
     });
+
+    tableData.push(
+      ["", "Total Without Receipt", totalWithoutReceipt, "EUR", "", "", ""],
+      ["", "Total Personal", totalPersonal, "EUR", "", "", ""]
+    );
 
     autoTable(doc, {
       head: [tableHeaders],
@@ -281,10 +307,15 @@ const ReportPage = (props) => {
 
   const CustomFooterStatusComponent = (props) => {
     return (
-      <div className="w-full">
-        <Box className=" float-right" sx={{ p: 1, display: "flex" }}>
-          {/* Total */}
-        </Box>
+      <div className="mt-10 pl-10">
+        <p>
+          Total without receipt :
+          <span className=" font-bold"> {props.totalWithoutReceipt}</span> €
+        </p>
+        <p className="mt-5">
+          Total peronal :{" "}
+          <span className="font-bold">{props.totalPersonal}</span> €
+        </p>
       </div>
     );
   };
@@ -342,13 +373,18 @@ const ReportPage = (props) => {
         ];
       },
     },
-    { field: "merchant_info", headerName: "Merchant Info", width: 150 },
+    {
+      field: "merchant_info",
+      headerName: "Raison sociale commerçant",
+      width: 150,
+    },
     {
       field: "issued_at",
       headerName: "Issued Date",
       width: 150,
       valueGetter: (params) => toLocalTime(params.row.issued_at),
     },
+    { field: "amount_eur", headerName: "Amount EUR", width: 100 },
     { field: "total_amount", headerName: "Amount", width: 100 },
     { field: "vat_amount", headerName: "Vat", width: 100 },
     { field: "currency", headerName: "Currency", width: 100 },
@@ -368,7 +404,11 @@ const ReportPage = (props) => {
   ];
 
   const expenseColumns = [
-    { field: "titular_name", headerName: "Merchant", width: 100 },
+    {
+      field: "trader_company_name",
+      headerName: "Raison sociale commerçant",
+      width: 250,
+    },
     {
       field: "treatmented_at",
       headerName: "Issued Date",
@@ -419,7 +459,7 @@ const ReportPage = (props) => {
             </div>
           </div>
           <div className=" float-right">
-            {allResolved && (
+            {reportStatus != REPORT_STATUS.APPROVED && allResolved && (
               <Button
                 onClick={handleApproveReport}
                 component="label"
@@ -468,6 +508,9 @@ const ReportPage = (props) => {
                     }}
                     slots={{
                       footer: CustomFooterStatusComponent,
+                    }}
+                    slotProps={{
+                      footer: { totalPersonal, totalWithoutReceipt },
                     }}
                   />
                 )}

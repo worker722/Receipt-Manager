@@ -28,17 +28,21 @@ import { updateReceipt, uploadReceipt } from "./store/receiptSlice";
  * Form Validation Schema
  */
 const schema = yup.object().shape({
-  merchant_info: yup.string().required("You must enter merchant information."),
+  merchant_info: yup
+    .string()
+    .required("You must enter raison sociale commerçant."),
   issued_at: yup.date().required("You must enter expense issue date."),
   total_amount: yup.string().required("You must enter total amount."),
+  amount_eur: yup.string().required("You must enter EUR amount."),
   currency: yup.string().required("You must enter transaction currency."),
-  country_code: yup.string().required("You must enter merchant country code."),
+  country_code: yup.string().required("You must enter country code."),
 });
 
 const defaultValues = {
   merchant_info: "",
   issued_at: new Date().toISOString().substring(0, 10),
   total_amount: "",
+  amount_eur: "",
   vat_amount: "",
   currency: "",
   country_code: "",
@@ -100,6 +104,10 @@ export default function EditReceiptModal({
       shouldDirty: true,
       shouldValidate: true,
     });
+    setValue("amount_eur", receipt?.amount_eur ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
     setValue("vat_amount", receipt?.vat_amount ?? "", {
       shouldDirty: true,
       shouldValidate: true,
@@ -126,6 +134,7 @@ export default function EditReceiptModal({
     merchant_info,
     issued_at,
     total_amount,
+    amount_eur,
     vat_amount,
     currency,
     comment,
@@ -139,6 +148,7 @@ export default function EditReceiptModal({
         merchant_info,
         issued_at,
         total_amount,
+        amount_eur,
         vat_amount,
         currency,
         comment,
@@ -222,6 +232,12 @@ export default function EditReceiptModal({
       shouldDirty: true,
       shouldValidate: true,
     });
+    if (currencyCode == "EUR") {
+      setValue("amount_eur", total_amount ?? "", {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
 
     if (image[0] === ".") setReceiptImage(image.slice(2));
     else setReceiptImage(image);
@@ -328,7 +344,7 @@ export default function EditReceiptModal({
                     <TextField
                       {...field}
                       className="mb-24"
-                      label="Merchant"
+                      label="Raison sociale commerçant"
                       type="name"
                       placeholder=""
                       error={!!errors.merchant_info}
@@ -376,23 +392,42 @@ export default function EditReceiptModal({
                   )}
                 />
 
-                <Controller
-                  name="total_amount"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      className="mb-24"
-                      label="Amount"
-                      type="number"
-                      error={!!errors.total_amount}
-                      helperText={errors?.total_amount?.message}
-                      variant="outlined"
-                      required
-                      fullWidth
-                    />
-                  )}
-                />
+                <div className="flex">
+                  <Controller
+                    name="total_amount"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        className="mb-24"
+                        label="Amount"
+                        type="number"
+                        error={!!errors.total_amount}
+                        helperText={errors?.total_amount?.message}
+                        variant="outlined"
+                        required
+                        fullWidth
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="amount_eur"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        className="mb-24 ml-5"
+                        label="Amount EUR"
+                        type="number"
+                        error={!!errors.amount_eur}
+                        helperText={errors?.amount_eur?.message}
+                        variant="outlined"
+                        required
+                        fullWidth
+                      />
+                    )}
+                  />
+                </div>
 
                 <Controller
                   name="vat_amount"

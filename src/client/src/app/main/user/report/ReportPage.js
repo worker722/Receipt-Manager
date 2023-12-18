@@ -94,6 +94,21 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   },
 }));
 
+export function CustomFooterStatusComponent(props) {
+  return (
+    <div className="mt-10 pl-10">
+      <p>
+        Total without receipt :
+        <span className=" font-bold"> {props.totalWithoutReceipt}</span> €
+      </p>
+      <p className="mt-5">
+        Total peronal : <span className="font-bold">{props.totalPersonal}</span>{" "}
+        €
+      </p>
+    </div>
+  );
+}
+
 const ReportPage = (props) => {
   const { t } = useTranslation("ReportsPage");
 
@@ -109,6 +124,8 @@ const ReportPage = (props) => {
   const [currentReceipt, setCurrentReceipt] = useState({});
   const [deleteReceiptId, setDeleteReceiptID] = useState();
   const [editable, setEditable] = useState(false);
+  const [totalWithoutReceipt, setTotalWithoutReceipt] = useState(0);
+  const [totalPersonal, setTotalPersonal] = useState(0);
   // Modal
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
   const [openAddReceiptModal, setOpenAddReceiptModal] = useState(false);
@@ -147,15 +164,35 @@ const ReportPage = (props) => {
     if (!FuseUtils.isEmpty(report)) {
       setRowReceipts(report.receipt_ids);
       var _expenses = [];
+      var _amountWithoutReceipt = 0;
+      var _amountPersonal = 0;
       report.expense_ids.map((_expense) => {
         var temp_expense = _expense;
+        _amountWithoutReceipt += parseFloat(_expense.amount_charged);
         report.receipt_ids.map((_receipt) => {
           if (_receipt.expense == temp_expense._id) {
             temp_expense.matched = true;
+            _amountWithoutReceipt -= parseFloat(_expense.amount_charged);
           }
         });
         _expenses.push(temp_expense);
       });
+      report.receipt_ids.map((_receipt) => {
+        var matched = false;
+        report.expense_ids.map((_expense) => {
+          if (_receipt.expense == _expense._id) {
+            matched = true;
+            return true;
+          }
+        });
+        if (!matched && _receipt.amount_eur) {
+          _amountPersonal += parseFloat(_receipt.amount_eur);
+        }
+      });
+
+      setTotalPersonal(_amountPersonal);
+      setTotalWithoutReceipt(_amountWithoutReceipt);
+
       setRowExpenses(_expenses);
 
       if (
@@ -311,13 +348,18 @@ const ReportPage = (props) => {
         return <ReceiptStatus value={params.row.status} />;
       },
     },
-    { field: "merchant_info", headerName: "Merchant Info", width: 150 },
+    {
+      field: "merchant_info",
+      headerName: "Raison sociale commerçant",
+      width: 150,
+    },
     {
       field: "issued_at",
       headerName: "Issued Date",
       width: 150,
       valueGetter: (params) => toLocalTime(params.row.issued_at),
     },
+    { field: "amount_eur", headerName: "Amount EUR", width: 100 },
     { field: "total_amount", headerName: "Amount", width: 100 },
     { field: "vat_amount", headerName: "Vat", width: 100 },
     { field: "currency", headerName: "Currency", width: 100 },
@@ -361,7 +403,11 @@ const ReportPage = (props) => {
   ];
 
   const expenseColumns = [
-    { field: "titular_name", headerName: "Merchant", width: 100 },
+    {
+      field: "trader_company_name",
+      headerName: "Raison sociale commerçant",
+      width: 220,
+    },
     {
       field: "treatmented_at",
       headerName: "Issued Date",
@@ -482,6 +528,12 @@ const ReportPage = (props) => {
                     }
                     columnVisibilityModel={{
                       actions: editable,
+                    }}
+                    slots={{
+                      footer: CustomFooterStatusComponent,
+                    }}
+                    slotProps={{
+                      footer: { totalPersonal, totalWithoutReceipt },
                     }}
                   />
                 )}

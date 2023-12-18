@@ -126,7 +126,11 @@ const ManageExpensesPage = (props) => {
   };
 
   const columns = [
-    { field: "titular_name", headerName: "Merchant", width: 100 },
+    {
+      field: "trader_company_name",
+      headerName: "Raison sociale commerçant",
+      width: 250,
+    },
     {
       field: "treatmented_at",
       headerName: "Issued Date",

@@ -28,9 +28,12 @@ import { createReceipt, uploadReceipt } from "./store/receiptSlice";
  * Form Validation Schema
  */
 const schema = yup.object().shape({
-  merchant_info: yup.string().required("You must enter merchant information."),
+  merchant_info: yup
+    .string()
+    .required("You must enter raison sociale commerçant information."),
   issued_at: yup.date().required("You must enter expense date."),
   total_amount: yup.string().required("You must enter amount."),
+  amount_eur: yup.string().required("You must enter EUR amount."),
   currency: yup.string().required("You must enter currency."),
   country_code: yup.string().required("You must enter country code."),
 });
@@ -39,6 +42,7 @@ const defaultValues = {
   merchant_info: "",
   issued_at: new Date().toISOString().substring(0, 10),
   total_amount: "",
+  amount_eur: "",
   currency: "",
   country_code: "",
   vat_amount: "",
@@ -86,6 +90,7 @@ export default function AddReceiptModal({
     merchant_info,
     issued_at,
     total_amount,
+    amount_eur,
     currency,
     country_code,
     vat_amount,
@@ -97,6 +102,7 @@ export default function AddReceiptModal({
         merchant_info,
         issued_at,
         total_amount,
+        amount_eur,
         currency,
         country_code,
         vat_amount,
@@ -182,6 +188,12 @@ export default function AddReceiptModal({
       shouldDirty: true,
       shouldValidate: true,
     });
+    if (currencyCode == "EUR") {
+      setValue("amount_eur", total_amount ?? "", {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
 
     if (image[0] === ".") setReceiptImage(image.slice(2));
     else setReceiptImage(image);
@@ -280,7 +292,7 @@ export default function AddReceiptModal({
                     <TextField
                       {...field}
                       className="mb-24"
-                      label="Merchant"
+                      label="Raison sociale commerçant"
                       type="name"
                       placeholder=""
                       error={!!errors.merchant_info}
@@ -328,23 +340,42 @@ export default function AddReceiptModal({
                   )}
                 />
 
-                <Controller
-                  name="total_amount"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      className="mb-24"
-                      label="Amount"
-                      type="number"
-                      error={!!errors.total_amount}
-                      helperText={errors?.total_amount?.message}
-                      variant="outlined"
-                      required
-                      fullWidth
-                    />
-                  )}
-                />
+                <div className="flex">
+                  <Controller
+                    name="total_amount"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        className="mb-24"
+                        label="Amount"
+                        type="number"
+                        error={!!errors.total_amount}
+                        helperText={errors?.total_amount?.message}
+                        variant="outlined"
+                        required
+                        fullWidth
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="amount_eur"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        className="mb-24 ml-5"
+                        label="Amount EUR"
+                        type="number"
+                        error={!!errors.amount_eur}
+                        helperText={errors?.amount_eur?.message}
+                        variant="outlined"
+                        required
+                        fullWidth
+                      />
+                    )}
+                  />
+                </div>
 
                 <Controller
                   name="vat_amount"
