@@ -59,11 +59,18 @@ const createExpense = async (req, res) => {
           const workbook = XLSX.readFile(req.file.path);
           const sheet_name_list = workbook.SheetNames;
           const json_data_array = XLSX.utils.sheet_to_json(
-            workbook.Sheets[sheet_name_list[0]]
+            workbook.Sheets[sheet_name_list[0]],
+            { blankrows: false }
           );
-          const parsedData = parseExpenses(json_data_array, newExpenseFile._id);
-          const expenses = await Expense.insertMany(parsedData);
-          return response(res, { expenses }, {}, 200);
+          if (json_data_array.length > 0) {
+            const parsedData = parseExpenses(
+              json_data_array,
+              newExpenseFile._id
+            );
+            const expenses = await Expense.insertMany(parsedData);
+            return response(res, { expenses }, {}, 200);
+          }
+          return response(res, { expenses: [] }, {}, 200);
         }
         response(res, {}, {}, 500, "Something went wrong!");
       }
