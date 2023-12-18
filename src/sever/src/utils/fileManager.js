@@ -206,12 +206,16 @@ const receiptUploader = multer({
 // Remove files
 const removeFile = (_file) => {
   return new Promise((resolve, reject) => {
-    if (_file.includes("public/assets")) return resolve(true);
+    try {
+      if (_file.includes("public/assets")) return resolve(true);
 
-    fs.unlink(_file, (err) => {
-      if (err) return reject(err);
-      resolve(`Deleted ${_file}`);
-    });
+      fs.unlink(_file, (err) => {
+        if (err) return reject(err);
+        resolve(`Deleted ${_file}`);
+      });
+    } catch (error) {
+      resolve("Cannot delete");
+    }
   });
 };
 
