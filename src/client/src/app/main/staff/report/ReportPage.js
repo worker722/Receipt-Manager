@@ -3,6 +3,7 @@ import FusePageSimple from "@fuse/core/FusePageSimple";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
 import withRouter from "@fuse/core/withRouter";
 import FuseUtils from "@fuse/utils/FuseUtils";
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import MessageIcon from "@mui/icons-material/Message";
 import VerifiedIcon from "@mui/icons-material/Verified";
@@ -239,13 +240,12 @@ const ReportPage = (props) => {
       if (!FuseUtils.isEmpty(message)) {
         _showMessage(message, "error");
       } else {
-        // props.navigate("/reports");
         setReportStatus(REPORT_STATUS.APPROVED);
       }
     });
   };
 
-  const handleCloseReport = () => {
+  const handleExportReport = () => {
     const doc = new jsPDF();
     const tableHeaders = [
       "Date",
@@ -277,11 +277,16 @@ const ReportPage = (props) => {
     autoTable(doc, {
       head: [tableHeaders],
       body: tableData,
+      styles: {
+        fontSize: 8,
+      },
     });
 
     doc.text(`Report_#${publicId}`, 14, 10);
     doc.save(`Report_#${publicId}_${moment().format("YYYY_MM_DD")}.pdf`);
+  };
 
+  const handleCloseReport = () => {
     dispatch(closeReport(publicId)).then((data) => {
       setLoading(false);
       const { message = "" } = data.payload;
@@ -416,7 +421,12 @@ const ReportPage = (props) => {
       width: 150,
       valueGetter: (params) => toLocalTime(params.row.treatmented_at),
     },
-    { field: "amount_charged", headerName: "Amount", width: 100 },
+    { field: "amount_charged", headerName: "Amount EUR", width: 100 },
+    {
+      field: "total_amount_original_currency",
+      headerName: "Amount Currency",
+      width: 150,
+    },
     {
       field: "origin_currency_code",
       headerName: "Currency",
@@ -471,14 +481,26 @@ const ReportPage = (props) => {
               </Button>
             )}
             {reportStatus == REPORT_STATUS.APPROVED && (
-              <Button
-                onClick={handleCloseReport}
-                component="label"
-                variant="contained"
-                color="error"
-              >
-                Close
-              </Button>
+              <div className="flex">
+                <Button
+                  onClick={handleExportReport}
+                  component="label"
+                  variant="contained"
+                  color="primary"
+                  startIcon={<CloudDownloadIcon />}
+                >
+                  Export
+                </Button>
+                <Button
+                  className=" ml-10"
+                  onClick={handleCloseReport}
+                  component="label"
+                  variant="contained"
+                  color="error"
+                >
+                  Close
+                </Button>
+              </div>
             )}
           </div>
         </div>

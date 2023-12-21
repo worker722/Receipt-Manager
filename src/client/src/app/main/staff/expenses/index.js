@@ -137,7 +137,12 @@ const ManageExpensesPage = (props) => {
       width: 150,
       valueGetter: (params) => toLocalTime(params.row.treatmented_at),
     },
-    { field: "amount_charged", headerName: "Amount", width: 100 },
+    { field: "amount_charged", headerName: "Amount EUR", width: 100 },
+    {
+      field: "total_amount_original_currency",
+      headerName: "Amount Currency",
+      width: 150,
+    },
     {
       field: "origin_currency_code",
       headerName: "Currency",
