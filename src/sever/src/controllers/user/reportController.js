@@ -239,20 +239,33 @@ const doMatch = (receipt, expense) => {
       expense.total_amount_original_currency
         ? expense.total_amount_original_currency.replace(",", ".")
         : "";
-    if (
-      receipt.total_amount == expense_amount_charged ||
-      receipt.total_amount == expense_total_amount_original_currency
-    )
-      totalAmountMatched = true;
+    try {
+      if (
+        parseFloat(receipt.total_amount) ==
+          parseFloat(expense_amount_charged) ||
+        parseFloat(receipt.total_amount) ==
+          parseFloat(expense_total_amount_original_currency)
+      )
+        totalAmountMatched = true;
+    } catch (error) {
+      console.log(error);
+    }
 
     // Check vat amount
     var vatAmountMatched = false;
-    if (
-      receipt.vat_amount == expense.commission_amount_1 ||
-      receipt.vat_amount == expense.commission_amount_2 ||
-      receipt.vat_amount == expense.commission_amount_3
-    )
-      vatAmountMatched = true;
+    try {
+      if (
+        parseFloat(receipt.vat_amount) ==
+          parseFloat(expense.commission_amount_1) ||
+        parseFloat(receipt.vat_amount) ==
+          parseFloat(expense.commission_amount_2) ||
+        parseFloat(receipt.vat_amount) ==
+          parseFloat(expense.commission_amount_3)
+      )
+        vatAmountMatched = true;
+    } catch (error) {
+      console.log(error);
+    }
 
     // Check date matched
     var processDateMatched = false;
