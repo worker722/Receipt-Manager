@@ -27,7 +27,12 @@ const getCategories = async (req, res) => {
 const getExpenses = async (req, res) => {
   try {
     const expenses = await Expense.aggregate([
-      { $match: { report: { $exists: false } } },
+      {
+        $match: {
+          report: { $exists: false },
+          $expr: { $eq: ["$assignee", { $toObjectId: req.currentUser._id }] },
+        },
+      },
       {
         $group: {
           _id: {

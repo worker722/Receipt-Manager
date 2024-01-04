@@ -214,30 +214,30 @@ export default function EditReceiptModal({
     } = data?.data ?? {};
     const { pdf, image } = data.originFile;
 
-    if (issued_at) {
-      setValue("issued_at", issued_at ?? "", {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-    }
+    // if (issued_at) {
+    //   setValue("issued_at", issued_at ?? "", {
+    //     shouldDirty: true,
+    //     shouldValidate: true,
+    //   });
+    // }
     setValue("vat_amount", vat_amount ?? "", {
       shouldDirty: true,
       shouldValidate: true,
     });
-    setValue("total_amount", total_amount ?? "", {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-    setValue("currency", currencyCode, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-    if (currencyCode == "EUR") {
-      setValue("amount_eur", total_amount ?? "", {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-    }
+    // setValue("total_amount", total_amount ?? "", {
+    //   shouldDirty: true,
+    //   shouldValidate: true,
+    // });
+    // setValue("currency", currencyCode, {
+    //   shouldDirty: true,
+    //   shouldValidate: true,
+    // });
+    // if (currencyCode == "EUR") {
+    //   setValue("amount_eur", total_amount ?? "", {
+    //     shouldDirty: true,
+    //     shouldValidate: true,
+    //   });
+    // }
 
     if (image[0] === ".") setReceiptImage(image.slice(2));
     else setReceiptImage(image);

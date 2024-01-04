@@ -122,6 +122,7 @@ const ReportPage = (props) => {
   const [categories, setCategories] = useState([]);
   const [currentCategory, setCurrentCategory] = useState({});
   const [currentReceipt, setCurrentReceipt] = useState({});
+  const [currentExpense, setCurrentExpense] = useState(false);
   const [deleteReceiptId, setDeleteReceiptID] = useState();
   const [editable, setEditable] = useState(false);
   const [totalWithoutReceipt, setTotalWithoutReceipt] = useState(0);
@@ -250,7 +251,8 @@ const ReportPage = (props) => {
     );
   };
 
-  const handelUploadReceipt = () => {
+  const handelUploadReceipt = (row = false) => {
+    setCurrentExpense(row);
     setOpenCategoryModal(true);
   };
 
@@ -404,6 +406,25 @@ const ReportPage = (props) => {
 
   const expenseColumns = [
     {
+      field: "matched",
+      headerName: "",
+      width: 30,
+      renderCell: (params) => {
+        return params.row.matched ? (
+          <></>
+        ) : (
+          <IconButton
+            variant="text"
+            color="info"
+            aria-label="Add"
+            onClick={() => handelUploadReceipt(params.row)}
+          >
+            <FuseSvgIcon size={25}>heroicons-outline:plus-circle</FuseSvgIcon>
+          </IconButton>
+        );
+      },
+    },
+    {
       field: "trader_company_name",
       headerName: "Raison sociale commerçant",
       width: 220,
@@ -506,7 +527,7 @@ const ReportPage = (props) => {
                       variant="text"
                       color="info"
                       aria-label="Add"
-                      onClick={handelUploadReceipt}
+                      onClick={() => handelUploadReceipt()}
                     >
                       <FuseSvgIcon size={30}>
                         heroicons-outline:plus-circle
@@ -578,6 +599,7 @@ const ReportPage = (props) => {
           {openAddReceiptModal && (
             <AddReceiptModal
               report={report}
+              expense={currentExpense}
               category={currentCategory}
               open={openAddReceiptModal}
               handleClose={handleCloseAddReceiptModal}
