@@ -31,8 +31,8 @@ const getExpenses = async (req, res) => {
       {
         $group: {
           _id: {
-            month: { $month: "$treatmented_at" },
-            year: { $year: "$treatmented_at" },
+            month: { $month: "$sold_at" },
+            year: { $year: "$sold_at" },
           },
           data: { $push: "$$ROOT" },
         },

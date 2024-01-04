@@ -174,10 +174,10 @@ const ManageExpensesPage = (props) => {
       width: 220,
     },
     {
-      field: "treatmented_at",
+      field: "sold_at",
       headerName: "Issued Date",
       width: 150,
-      valueGetter: (params) => toLocalTime(params.row.treatmented_at),
+      valueGetter: (params) => toLocalTime(params.row.sold_at),
     },
     { field: "amount_charged", headerName: "Amount EUR", width: 100 },
     {
