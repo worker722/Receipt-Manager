@@ -1,13 +1,48 @@
 const { ExpenseFile } = require("../../models/expenseFileModel");
 const { Expense, parseExpenses } = require("../../models/expenseModel");
+const { User, REF_NAME } = require("../../models/userModel");
+const Role = require("../../models/roleModel");
 const { response, fileManager } = require("../../utils");
 const XLSX = require("xlsx");
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 const LOG_PATH = "staff/expensesController";
 
+const getUsers = async (req, res) => {
+  try {
+    const users = await Role.aggregate([
+      {
+        $match: {
+          name: "user",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "role",
+          as: "userData",
+        },
+      },
+    ]).exec();
+
+    return response(res, { users }, {}, 200);
+  } catch (error) {
+    console.log(error);
+    response(res, {}, error, 500, "Something went wrong!");
+  }
+};
+
 const getAll = async (req, res) => {
+  const { assignee_id } = req.body;
   try {
     const expenses = await Expense.aggregate([
+      {
+        $match: {
+          $expr: { $eq: ["$assignee", { $toObjectId: assignee_id }] },
+        },
+      },
       {
         $group: {
           _id: {
@@ -51,6 +86,7 @@ const createExpense = async (req, res) => {
         );
       } else {
         if (req?.file?.path) {
+          const { assignee_id } = req.body;
           const expenseFile = new ExpenseFile();
           expenseFile.name = req.file.originalname;
           expenseFile.path = req.file.path;
@@ -65,6 +101,7 @@ const createExpense = async (req, res) => {
           if (json_data_array.length > 0) {
             const parsedData = parseExpenses(
               json_data_array,
+              assignee_id,
               newExpenseFile._id
             );
             const expenses = await Expense.insertMany(parsedData);
@@ -81,9 +118,8 @@ const createExpense = async (req, res) => {
   }
 };
 
-const generateFakeData = async () => {};
-
 module.exports = {
+  getUsers,
   getAll,
   createExpense,
 };
