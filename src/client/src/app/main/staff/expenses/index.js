@@ -152,6 +152,8 @@ const ManageExpensesPage = (props) => {
     ).then((data) => {
       reload();
     });
+
+    event.target.value = null;
   };
 
   const _showMessage = (message = "", variant = "info") => {
