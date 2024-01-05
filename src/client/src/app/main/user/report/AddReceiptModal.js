@@ -495,7 +495,9 @@ export default function AddReceiptModal({
                     className=" w-full mt-10 "
                     aria-label="Create"
                     type="submit"
-                    disabled={_.isEmpty(dirtyFields) || !isValid}
+                    disabled={
+                      !uploadedReceipt || _.isEmpty(dirtyFields) || !isValid
+                    }
                   >
                     Create
                   </LoadingButton>
