@@ -4,9 +4,11 @@ import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import { styled } from "@mui/material/styles";
@@ -16,7 +18,6 @@ import { Controller, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import * as yup from "yup";
 import { createCategory } from "./store/categorySlice";
-
 /**
  * Form Validation Schema
  */
@@ -50,6 +51,7 @@ export default function AddCategoryModal({
   const uploadInputRef = useRef(false);
   const [photoUri, setPhotoUri] = useState(false);
   const [file, setFile] = useState(false);
+  const [vatPossible, setVatPossible] = useState(false);
 
   const fileReader = new FileReader();
 
@@ -65,6 +67,7 @@ export default function AddCategoryModal({
     dispatch(
       createCategory({
         name,
+        vatPossible,
         category_photo: file,
       })
     ).then((data) => {
@@ -82,6 +85,10 @@ export default function AddCategoryModal({
           handleAdded && handleAdded(data?.payload);
       }
     });
+  };
+
+  const handleVatPossibleChanged = () => {
+    setVatPossible(!vatPossible);
   };
 
   const handleUpload = (event) => {
@@ -187,7 +194,7 @@ export default function AddCategoryModal({
               render={({ field }) => (
                 <TextField
                   {...field}
-                  className="mb-24"
+                  className="mb-12"
                   label="Name"
                   autoFocus
                   type="name"
@@ -198,6 +205,21 @@ export default function AddCategoryModal({
                   required
                   fullWidth
                 />
+              )}
+            />
+
+            <Controller
+              name="vatPossible"
+              control={control}
+              render={({ field }) => (
+                <div>
+                  <FormControlLabel
+                    {...field}
+                    className="mb-12"
+                    control={<Checkbox onChange={handleVatPossibleChanged} />}
+                    label="VAT Possible"
+                  />
+                </div>
               )}
             />
 

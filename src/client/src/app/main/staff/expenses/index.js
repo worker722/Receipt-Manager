@@ -2,8 +2,14 @@ import FuseLoading from "@fuse/core/FuseLoading";
 import FusePageSimple from "@fuse/core/FusePageSimple";
 import FuseUtils from "@fuse/utils/FuseUtils";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import { styled } from "@mui/material/styles";
@@ -18,6 +24,7 @@ import reducer from "./store";
 import {
   createExpense,
   getExpenses,
+  getUsers,
   selectExpenses,
 } from "./store/expensesSlice";
 
@@ -29,7 +36,9 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
     borderColor: theme.palette.divider,
   },
   "& .FusePageSimple-toolbar": {},
-  "& .FusePageSimple-content": {},
+  "& .FusePageSimple-content": {
+    margin: 0,
+  },
   "& .FusePageSimple-sidebarHeader": {},
   "& .FusePageSimple-sidebarContent": {},
 }));
@@ -59,6 +68,8 @@ const ManageExpensesPage = (props) => {
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
   const [tabs, setTabs] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [currentUser, setCurrentUser] = useState({});
 
   const [value, setValue] = useState(0);
 
@@ -94,21 +105,52 @@ const ManageExpensesPage = (props) => {
 
   const getAll = () => {
     setLoading(true);
-    dispatch(getExpenses()).then((data) => {
+
+    dispatch(getUsers()).then((data) => {
       const { message = "" } = data.payload;
       if (!FuseUtils.isEmpty(message)) {
         _showMessage(message, "error");
+      } else {
+        const { users } = data.payload;
+        if (users.length > 0 && users[0].userData.length > 0) {
+          setUsers(users[0].userData);
+          setCurrentUser(users[0].userData[0]);
+        }
       }
-      setLoading(false);
     });
   };
+
+  const reload = () => {
+    if (currentUser._id) {
+      setLoading(true);
+      dispatch(getExpenses(currentUser._id)).then((data) => {
+        const { message = "" } = data.payload;
+        if (!FuseUtils.isEmpty(message)) {
+          _showMessage(message, "error");
+        }
+        setLoading(false);
+      });
+    }
+  };
+
+  useEffect(() => {
+    setTabs([]);
+    setRows([]);
+
+    reload();
+  }, [currentUser._id]);
 
   const handleUploadExpenseFile = (event) => {
     if (event.target.files.length == 0) return;
 
     setLoading(true);
-    dispatch(createExpense(event.target.files[0])).then((data) => {
-      getAll();
+    dispatch(
+      createExpense({
+        expense: event.target.files[0],
+        assignee_id: currentUser._id,
+      })
+    ).then((data) => {
+      reload();
     });
   };
 
@@ -129,13 +171,13 @@ const ManageExpensesPage = (props) => {
     {
       field: "trader_company_name",
       headerName: "Raison sociale commerçant",
-      width: 250,
+      width: 220,
     },
     {
-      field: "treatmented_at",
+      field: "sold_at",
       headerName: "Issued Date",
       width: 150,
-      valueGetter: (params) => toLocalTime(params.row.treatmented_at),
+      valueGetter: (params) => toLocalTime(params.row.sold_at),
     },
     { field: "amount_charged", headerName: "Amount EUR", width: 100 },
     {
@@ -148,7 +190,7 @@ const ManageExpensesPage = (props) => {
       headerName: "Currency",
       width: 100,
     },
-    { field: "country_code", headerName: "Country", width: 100 },
+    { field: "country_code", headerName: "Country", width: 80 },
     { field: "locality", headerName: "City", width: 150 },
     { field: "commission_amount_1", headerName: "Vat 1", width: 100 },
     { field: "commission_amount_2", headerName: "Vat 2", width: 100 },
@@ -158,33 +200,35 @@ const ManageExpensesPage = (props) => {
   return (
     <Root
       header={
-        <div className="p-24 flex">
+        <div className="p-24 flex" style={{ height: "97px" }}>
           <div className=" self-center flex-none">
             <h4>{t("PAGE_TITLE")}</h4>
           </div>
-          <div className=" pl-32 pr-32 w-10/12">
-            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-              <Tabs
-                value={value}
-                onChange={handleTabChange}
-                variant="scrollable"
-                scrollButtons="auto"
-                textColor="primary"
-                indicatorColor="secondary"
-                aria-label="expense month filter tab"
-                style={{ overflow: "auto" }}
-              >
-                {tabs.map((tab, index) => (
-                  <Tab
-                    tabIndex={index}
-                    label={`${tab.title}`}
-                    key={index}
-                    {...a11yProps(index)}
-                  />
-                ))}
-              </Tabs>
-            </Box>
-          </div>
+          {tabs.length > 0 && (
+            <div className=" pl-32 pr-32 w-10/12">
+              <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                <Tabs
+                  value={value}
+                  onChange={handleTabChange}
+                  variant="scrollable"
+                  scrollButtons="auto"
+                  textColor="primary"
+                  indicatorColor="secondary"
+                  aria-label="expense month filter tab"
+                  style={{ overflow: "auto" }}
+                >
+                  {tabs.map((tab, index) => (
+                    <Tab
+                      tabIndex={index}
+                      label={`${tab.title}`}
+                      key={index}
+                      {...a11yProps(index)}
+                    />
+                  ))}
+                </Tabs>
+              </Box>
+            </div>
+          )}
           <div className=" mt-5 w-full">
             <Button
               component="label"
@@ -204,28 +248,57 @@ const ManageExpensesPage = (props) => {
         </div>
       }
       content={
-        <div style={{ width: "100%" }}>
-          {loading ? (
-            <FuseLoading />
-          ) : (
-            <>
-              {rows.length > 0 && columns.length > 0 && (
-                <DataGrid
-                  rows={rows}
-                  columns={columns}
-                  getRowId={(row) => row._id}
-                  initialState={{
-                    pagination: {
-                      paginationModel: { page: 0, pageSize: 10 },
-                    },
-                  }}
-                  pageSizeOptions={[5, 10]}
-                  checkboxSelection
-                />
-              )}
-            </>
-          )}
-        </div>
+        <>
+          <List
+            dense
+            sx={{
+              minWidth: 260,
+              maxWidth: 260,
+              bgcolor: "background.paper",
+              overflow: "auto",
+              maxHeight: "100%",
+            }}
+          >
+            {users.map((value) => {
+              const labelId = `checkbox-list-secondary-label-${value._id}`;
+              return (
+                <ListItem key={value._id} disablePadding>
+                  <ListItemButton
+                    selected={value._id == currentUser._id}
+                    onClick={() => setCurrentUser(value)}
+                  >
+                    <ListItemAvatar>
+                      <Avatar alt={value.name} />
+                    </ListItemAvatar>
+                    <ListItemText id={labelId} primary={value.name} />
+                  </ListItemButton>
+                </ListItem>
+              );
+            })}
+          </List>
+          <div style={{ width: "100%", overflowX: "auto" }}>
+            {loading ? (
+              <FuseLoading />
+            ) : (
+              <>
+                {rows.length > 0 && columns.length > 0 && (
+                  <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    getRowId={(row) => row._id}
+                    initialState={{
+                      pagination: {
+                        paginationModel: { page: 0, pageSize: 10 },
+                      },
+                    }}
+                    pageSizeOptions={[5, 10]}
+                    checkboxSelection
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </>
       }
       scroll="content"
     />

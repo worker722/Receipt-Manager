@@ -16,8 +16,9 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import { showMessage } from "app/store/fuse/messageSlice";
+import moment from "moment";
 import * as React from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
@@ -67,6 +68,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function AddReceiptModal({
   report = {},
+  expense = false,
   category = {},
   open = false,
   handleClose = {},
@@ -85,6 +87,47 @@ export default function AddReceiptModal({
     resolver: yupResolver(schema),
   });
   const { isValid, dirtyFields, errors, setError } = formState;
+
+  useEffect(() => {
+    if (expense) {
+      setValue("merchant_info", expense?.trader_company_name ?? "", {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue(
+        "issued_at",
+        moment(expense?.sold_at).format("YYYY-MM-DD") ?? "",
+        {
+          shouldDirty: true,
+          shouldValidate: true,
+        }
+      );
+      setValue(
+        "total_amount",
+        expense?.total_amount_original_currency.replace(",", ".") ?? "0.00",
+        {
+          shouldDirty: true,
+          shouldValidate: true,
+        }
+      );
+      setValue("currency", expense?.origin_currency_code ?? "", {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setValue(
+        "amount_eur",
+        expense?.amount_charged.replace(",", ".") ?? "0.00",
+        {
+          shouldDirty: true,
+          shouldValidate: true,
+        }
+      );
+      setValue("country_code", expense?.country_code ?? "", {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+  }, [setValue, expense]);
 
   const onSubmit = ({
     merchant_info,
@@ -105,7 +148,7 @@ export default function AddReceiptModal({
         amount_eur,
         currency,
         country_code,
-        vat_amount,
+        vat_amount: category.vat_possible ? vat_amount : "",
         comment,
         report_id: report._id,
         category_id: category._id,
@@ -169,31 +212,30 @@ export default function AddReceiptModal({
       vat_amount,
     } = data?.data ?? {};
     const { pdf, image } = data.originFile;
-    console.log({ data });
-    if (issued_at) {
-      setValue("issued_at", issued_at, {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-    }
-    setValue("total_amount", total_amount ?? "", {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
+    // if (issued_at) {
+    //   setValue("issued_at", issued_at, {
+    //     shouldDirty: true,
+    //     shouldValidate: true,
+    //   });
+    // }
+    // setValue("total_amount", total_amount ?? "", {
+    //   shouldDirty: true,
+    //   shouldValidate: true,
+    // });
     setValue("vat_amount", vat_amount ?? "", {
       shouldDirty: true,
       shouldValidate: true,
     });
-    setValue("currency", currencyCode, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-    if (currencyCode == "EUR") {
-      setValue("amount_eur", total_amount ?? "", {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-    }
+    // setValue("currency", currencyCode, {
+    //   shouldDirty: true,
+    //   shouldValidate: true,
+    // });
+    // if (currencyCode == "EUR") {
+    //   setValue("amount_eur", total_amount ?? "", {
+    //     shouldDirty: true,
+    //     shouldValidate: true,
+    //   });
+    // }
 
     if (image[0] === ".") setReceiptImage(image.slice(2));
     else setReceiptImage(image);
@@ -377,21 +419,23 @@ export default function AddReceiptModal({
                   />
                 </div>
 
-                <Controller
-                  name="vat_amount"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      className="mb-24"
-                      label="Vat"
-                      type="number"
-                      helperText={errors?.vat_amount?.message}
-                      variant="outlined"
-                      fullWidth
-                    />
-                  )}
-                />
+                {category.vat_possible == true && (
+                  <Controller
+                    name="vat_amount"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        className="mb-24"
+                        label="Vat"
+                        type="number"
+                        helperText={errors?.vat_amount?.message}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    )}
+                  />
+                )}
 
                 <Controller
                   name="currency"

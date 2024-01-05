@@ -5,10 +5,40 @@ import axios from "axios";
 const LOG_PATH = "staff/expenses/store/expensesSlice";
 const API = "/api/staff/expenses";
 
+export const getUsers = createAsyncThunk(
+  "staff/expenses/getUsers",
+  async () => {
+    const response = await axios.get(`${API}/getUsers`);
+    if (response?.status == 200) {
+      const {
+        data = {},
+        error = {},
+        message = "",
+        status = -1,
+      } = response.data;
+      if (status == 200) {
+        return data ?? { users: [] };
+      } else {
+        if (!FuseUtils.isEmpty(error))
+          console.error(`${LOG_PATH}@getUsers`, error);
+
+        return {
+          users: [],
+          ...response.data,
+        };
+      }
+    } else {
+      return {
+        users: [],
+      };
+    }
+  }
+);
+
 export const getExpenses = createAsyncThunk(
   "staff/expenses/getExpenses",
-  async () => {
-    const response = await axios.get(`${API}/getAll`);
+  async (assignee_id) => {
+    const response = await axios.post(`${API}/getAll`, { assignee_id });
     if (response?.status == 200) {
       const {
         data = {},
@@ -37,10 +67,10 @@ export const getExpenses = createAsyncThunk(
 
 export const createExpense = createAsyncThunk(
   "staff/expenses/createExpense",
-  async (expense) => {
+  async (data) => {
     const response = await axios.post(
       `${API}/create`,
-      { expense },
+      { ...data },
       {
         headers: {
           "Content-Type": "multipart/form-data",
