@@ -148,7 +148,7 @@ export default function AddReceiptModal({
         amount_eur,
         currency,
         country_code,
-        vat_amount,
+        vat_amount: category.vat_possible ? vat_amount : "",
         comment,
         report_id: report._id,
         category_id: category._id,
