@@ -130,6 +130,22 @@ export default function EditReceiptModal({
     }
   }, [setValue, receipt]);
 
+  useEffect(() => {
+    if (!FuseUtils.isEmpty(newCategory)) {
+      if (newCategory.vat_possible) {
+        setValue("vat_amount", receipt?.vat_amount ?? "", {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+      } else {
+        setValue("vat_amount", "", {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+      }
+    }
+  }, [newCategory]);
+
   const onSubmit = ({
     merchant_info,
     issued_at,
@@ -214,30 +230,30 @@ export default function EditReceiptModal({
     } = data?.data ?? {};
     const { pdf, image } = data.originFile;
 
-    if (issued_at) {
-      setValue("issued_at", issued_at ?? "", {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-    }
+    // if (issued_at) {
+    //   setValue("issued_at", issued_at ?? "", {
+    //     shouldDirty: true,
+    //     shouldValidate: true,
+    //   });
+    // }
     setValue("vat_amount", vat_amount ?? "", {
       shouldDirty: true,
       shouldValidate: true,
     });
-    setValue("total_amount", total_amount ?? "", {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-    setValue("currency", currencyCode, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-    if (currencyCode == "EUR") {
-      setValue("amount_eur", total_amount ?? "", {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-    }
+    // setValue("total_amount", total_amount ?? "", {
+    //   shouldDirty: true,
+    //   shouldValidate: true,
+    // });
+    // setValue("currency", currencyCode, {
+    //   shouldDirty: true,
+    //   shouldValidate: true,
+    // });
+    // if (currencyCode == "EUR") {
+    //   setValue("amount_eur", total_amount ?? "", {
+    //     shouldDirty: true,
+    //     shouldValidate: true,
+    //   });
+    // }
 
     if (image[0] === ".") setReceiptImage(image.slice(2));
     else setReceiptImage(image);
@@ -429,22 +445,26 @@ export default function EditReceiptModal({
                   />
                 </div>
 
-                <Controller
-                  name="vat_amount"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      className="mb-24"
-                      label="Vat"
-                      type="number"
-                      error={!!errors.vat_amount}
-                      helperText={errors?.vat_amount?.message}
-                      variant="outlined"
-                      fullWidth
-                    />
-                  )}
-                />
+                {(newCategory.vat_possible ||
+                  (FuseUtils.isEmpty(newCategory) &&
+                    receipt.category.vat_possible)) && (
+                  <Controller
+                    name="vat_amount"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        className="mb-24"
+                        label="Vat"
+                        type="number"
+                        error={!!errors.vat_amount}
+                        helperText={errors?.vat_amount?.message}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    )}
+                  />
+                )}
 
                 <Controller
                   name="currency"

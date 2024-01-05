@@ -127,6 +127,8 @@ const ReportPage = (props) => {
   const [allResolved, setAllResolved] = useState(false);
   const [totalWithoutReceipt, setTotalWithoutReceipt] = useState(0);
   const [totalPersonal, setTotalPersonal] = useState(0);
+  const [totalVatExpense, setTotalVatExpense] = useState(0);
+  const [totalVatPersonal, setTotalVatPersonal] = useState(0);
 
   const theme = useTheme();
 
@@ -167,7 +169,14 @@ const ReportPage = (props) => {
       var _expenses = [];
       var _amountWithoutReceipt = 0;
       var _amountPersonal = 0;
+      var _totalVatExpense = 0;
+      var _totalVatPersonal = 0;
       report.expense_ids.map((_expense) => {
+        _totalVatExpense +=
+          parseFloat(_expense.commission_amount_1.replace(",", ".")) +
+          parseFloat(_expense.commission_amount_2.replace(",", ".")) +
+          parseFloat(_expense.commission_amount_3.replace(",", "."));
+
         var temp_expense = _expense;
         _amountWithoutReceipt += parseFloat(_expense.amount_charged);
         report.receipt_ids.map((_receipt) => {
@@ -189,14 +198,23 @@ const ReportPage = (props) => {
         if (!matched && _receipt.amount_eur) {
           _amountPersonal += parseFloat(_receipt.amount_eur);
         }
+        if (!matched && _receipt.vat_amount) {
+          _totalVatPersonal += parseFloat(_receipt.vat_amount);
+        }
       });
 
-      setTotalPersonal(_amountPersonal);
-      setTotalWithoutReceipt(_amountWithoutReceipt);
+      setTotalPersonal(adjustFloatValue(_amountPersonal));
+      setTotalWithoutReceipt(adjustFloatValue(_amountWithoutReceipt));
+      setTotalVatExpense(adjustFloatValue(_totalVatExpense));
+      setTotalVatPersonal(adjustFloatValue(_totalVatPersonal));
 
       setRowExpenses(_expenses);
     }
   }, [report]);
+
+  const adjustFloatValue = (value) => {
+    return Math.round((value + Number.EPSILON) * 100) / 100;
+  };
 
   const handleApproveReceipt = (row) => {
     dispatch(approveReceipt(row._id)).then((data) => {
@@ -311,21 +329,6 @@ const ReportPage = (props) => {
     return moment.utc(time).local().format(format);
   };
 
-  const CustomFooterStatusComponent = (props) => {
-    return (
-      <div className="mt-10 pl-10">
-        <p>
-          Total without receipt :
-          <span className=" font-bold"> {props.totalWithoutReceipt}</span> €
-        </p>
-        <p className="mt-5">
-          Total peronal :{" "}
-          <span className="font-bold">{props.totalPersonal}</span> €
-        </p>
-      </div>
-    );
-  };
-
   const receiptColumns = [
     {
       field: "matched",
@@ -416,10 +419,10 @@ const ReportPage = (props) => {
       width: 250,
     },
     {
-      field: "treatmented_at",
+      field: "sold_at",
       headerName: "Issued Date",
       width: 150,
-      valueGetter: (params) => toLocalTime(params.row.treatmented_at),
+      valueGetter: (params) => toLocalTime(params.row.sold_at),
     },
     { field: "amount_charged", headerName: "Amount EUR", width: 100 },
     {
@@ -516,47 +519,77 @@ const ReportPage = (props) => {
                   <p className="w-full">Receipts</p>
                 </div>
                 {rowReceipts.length > 0 && (
-                  <StyledDataGrid
-                    rows={rowReceipts}
-                    columns={receiptColumns}
-                    getRowId={(row) => row._id}
-                    initialState={{
-                      pagination: {
-                        paginationModel: { page: 0, pageSize: 10 },
-                      },
-                    }}
-                    pageSizeOptions={[5, 10]}
-                    columnVisibilityModel={{
-                      actions: reportStatus == REPORT_STATUS.IN_REVIEW,
-                    }}
-                    slots={{
-                      footer: CustomFooterStatusComponent,
-                    }}
-                    slotProps={{
-                      footer: { totalPersonal, totalWithoutReceipt },
-                    }}
-                  />
+                  <>
+                    <StyledDataGrid
+                      rows={rowReceipts}
+                      columns={receiptColumns}
+                      getRowId={(row) => row._id}
+                      initialState={{
+                        pagination: {
+                          paginationModel: { page: 0, pageSize: 10 },
+                        },
+                      }}
+                      hideFooterSelectedRowCount
+                      pageSizeOptions={[5, 10]}
+                      columnVisibilityModel={{
+                        actions: reportStatus == REPORT_STATUS.IN_REVIEW,
+                      }}
+                    />
+                    <div className="pl-10">
+                      <div className=" flex">
+                        <p className=" mr-32">
+                          Total without receipt :
+                          <span className=" font-bold">
+                            {" "}
+                            {totalWithoutReceipt}
+                          </span>{" "}
+                          €
+                        </p>
+                        <p className="">
+                          VAT Total :
+                          <span className=" font-bold">
+                            {" "}
+                            {totalVatPersonal}
+                          </span>{" "}
+                          €
+                        </p>
+                      </div>
+                      <p className="mt-5">
+                        Total peronal :{" "}
+                        <span className="font-bold">{totalPersonal}</span> €
+                      </p>
+                    </div>
+                  </>
                 )}
               </Paper>
               <Paper className="flex flex-col w-1/2 ml-10 p-24 mt-10 shadow rounded-2xl overflow-hidden">
                 <p>Expenses</p>
                 {rowExpenses.length > 0 && (
-                  <StyledDataGrid
-                    rows={rowExpenses}
-                    columns={expenseColumns}
-                    getRowId={(row) => row._id}
-                    initialState={{
-                      pagination: {
-                        paginationModel: { page: 0, pageSize: 10 },
-                      },
-                    }}
-                    pageSizeOptions={[5, 10]}
-                    getRowClassName={(params) =>
-                      params.row.matched
-                        ? `super-app-theme--Matched`
-                        : `super-app-theme`
-                    }
-                  />
+                  <>
+                    <StyledDataGrid
+                      rows={rowExpenses}
+                      columns={expenseColumns}
+                      getRowId={(row) => row._id}
+                      initialState={{
+                        pagination: {
+                          paginationModel: { page: 0, pageSize: 10 },
+                        },
+                      }}
+                      hideFooterSelectedRowCount
+                      pageSizeOptions={[5, 10]}
+                      getRowClassName={(params) =>
+                        params.row.matched
+                          ? `super-app-theme--Matched`
+                          : `super-app-theme`
+                      }
+                    />
+                    <div className="pl-10">
+                      <p>
+                        <span>VAT Total :</span>
+                        <span className=" font-bold"> {totalVatExpense}</span> €
+                      </p>
+                    </div>
+                  </>
                 )}
               </Paper>
             </div>

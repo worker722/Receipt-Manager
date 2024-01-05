@@ -40,6 +40,10 @@ const XLSX = require("xlsx");
   }
  */
 const expenseSchema = new Schema({
+  assignee: {
+    type: Schema.Types.ObjectId,
+    ref: "users",
+  },
   report: {
     type: Schema.Types.ObjectId,
     ref: "reports",
@@ -209,11 +213,12 @@ const match_fields = {
   commission_amount_3: ["montant commission porteur3"],
 };
 
-const parseExpenses = (_data, originFileID) => {
+const parseExpenses = (_data, assignee_id, originFileID) => {
   const results = [];
   const match_key_model = getMatchModel(_data[0]);
   _data.forEach((item) => {
     var _object = {
+      assignee: assignee_id,
       originFile: originFileID,
     };
     Object.keys(match_key_model).forEach((key) => {
@@ -271,6 +276,7 @@ expenseSchema.pre("find", async function (next) {
 
 const REF_NAME = {
   ORIGIN_FILE: "originFile",
+  ASSIGNEE: "assignee",
 };
 
 const DB_COLLECTION_NAME = "expenses";

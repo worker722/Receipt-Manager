@@ -14,6 +14,10 @@ const categorySchema = new Schema({
     type: String,
     unique: true,
   },
+  vat_possible: {
+    type: Boolean,
+    default: false,
+  },
   etc: {
     type: String,
   },
