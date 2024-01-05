@@ -3,6 +3,8 @@ import ConfirmDialog from "@fuse/core/ConfirmDialog";
 import FuseLoading from "@fuse/core/FuseLoading";
 import FusePageSimple from "@fuse/core/FusePageSimple";
 import FuseUtils from "@fuse/utils/FuseUtils";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/Edit";
 import Button from "@mui/material/Button";
@@ -152,6 +154,18 @@ const ManageCategoryPage = (props) => {
       },
     },
     {
+      field: "vat_possible",
+      headerName: "VAT Possible?",
+      width: 150,
+      renderCell: (params) => {
+        return params.row.vat_possible ? (
+          <CheckIcon color="info" />
+        ) : (
+          <CloseIcon color="error" />
+        );
+      },
+    },
+    {
       field: "created_at",
       headerName: "Created at",
       width: 200,
@@ -225,7 +239,6 @@ const ManageCategoryPage = (props) => {
                   },
                 }}
                 pageSizeOptions={[5, 10]}
-                checkboxSelection
               />
               {openEditModal && (
                 <EditCategoryModal

@@ -419,21 +419,23 @@ export default function AddReceiptModal({
                   />
                 </div>
 
-                <Controller
-                  name="vat_amount"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      className="mb-24"
-                      label="Vat"
-                      type="number"
-                      helperText={errors?.vat_amount?.message}
-                      variant="outlined"
-                      fullWidth
-                    />
-                  )}
-                />
+                {category.vat_possible == true && (
+                  <Controller
+                    name="vat_amount"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        className="mb-24"
+                        label="Vat"
+                        type="number"
+                        helperText={errors?.vat_amount?.message}
+                        variant="outlined"
+                        fullWidth
+                      />
+                    )}
+                  />
+                )}
 
                 <Controller
                   name="currency"

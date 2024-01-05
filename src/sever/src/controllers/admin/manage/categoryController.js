@@ -26,7 +26,7 @@ const createCategory = async (req, res) => {
           "Photo upload failed. Please try again."
         );
       } else {
-        const { name } = req.body;
+        const { name, vatPossible } = req.body;
         if (!name) {
           if (req?.file?.path) {
             await removeFile(req.file.path);
@@ -52,6 +52,7 @@ const createCategory = async (req, res) => {
 
         const category = new Category();
         category.name = name;
+        category.vat_possible = vatPossible;
         if (req?.file?.path) category.photo = req.file.path;
         category.subname = subname;
         category
@@ -85,7 +86,7 @@ const updateCategory = async (req, res) => {
           "Photo upload failed. Please try again."
         );
       } else {
-        const { name, removePhoto, _id } = req.body;
+        const { name, removePhoto, vatPossible, _id } = req.body;
         if (!name) {
           if (req?.file?.path) {
             await removeFile(req.file.path);
@@ -116,6 +117,7 @@ const updateCategory = async (req, res) => {
 
         var fields = {};
         fields.name = name;
+        fields.vat_possible = vatPossible;
         fields.subname = subname;
         if (req?.file?.path) {
           fields.photo = req.file.path;

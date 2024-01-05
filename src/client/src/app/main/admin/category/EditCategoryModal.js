@@ -5,9 +5,11 @@ import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import { styled } from "@mui/material/styles";
@@ -27,6 +29,7 @@ const schema = yup.object().shape({
 
 const defaultValues = {
   name: "",
+  vatPossible: false,
 };
 
 const VisuallyHiddenInput = styled("input")({
@@ -52,6 +55,7 @@ export default function EditCategoryModal({
   const uploadInputRef = useRef(false);
   const [photoUri, setPhotoUri] = useState(false);
   const [file, setFile] = useState(false);
+  const [vatPossible, setVatPossible] = useState(false);
 
   const fileReader = new FileReader();
 
@@ -67,6 +71,8 @@ export default function EditCategoryModal({
       shouldDirty: true,
       shouldValidate: true,
     });
+    console.log(defaultValue);
+    setVatPossible(defaultValue?.vat_possible ?? false);
   }, [setValue, defaultValue]);
 
   useEffect(() => {
@@ -82,6 +88,7 @@ export default function EditCategoryModal({
         name,
         removePhoto: photoUri ? null : true,
         category_photo: file,
+        vatPossible,
       })
     ).then((data) => {
       fileReader.abort();
@@ -104,6 +111,10 @@ export default function EditCategoryModal({
     if (uploadInputRef?.current) {
       uploadInputRef.current.click();
     }
+  };
+
+  const handleVatPossibleChanged = () => {
+    setVatPossible(!vatPossible);
   };
 
   const handleChange = (event) => {
@@ -214,6 +225,26 @@ export default function EditCategoryModal({
                   required
                   fullWidth
                 />
+              )}
+            />
+
+            <Controller
+              name="vatPossible"
+              control={control}
+              render={({ field }) => (
+                <div>
+                  <FormControlLabel
+                    {...field}
+                    className="mb-12"
+                    control={
+                      <Checkbox
+                        checked={vatPossible}
+                        onChange={handleVatPossibleChanged}
+                      />
+                    }
+                    label="VAT Possible"
+                  />
+                </div>
               )}
             />
 
