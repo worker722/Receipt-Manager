@@ -100,6 +100,16 @@ export const closeReport = createAsyncThunk(
   }
 );
 
+export const exportReport = createAsyncThunk(
+  "staff/reports/exportReport",
+  async (data) => {
+    const response = await axios.post("/api/staff/reports/exportReport", data, {
+      responseType: "blob",
+    });
+    return response;
+  }
+);
+
 export const REPORT_STATUS = {
   IN_PROGRESS: 0,
   IN_REVIEW: 1,

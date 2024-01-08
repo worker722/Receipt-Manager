@@ -6,6 +6,12 @@ const {
 } = require("../../models/reportModel");
 const { Expense } = require("../../models/expenseModel");
 const { response } = require("../../utils");
+const moment = require("moment");
+const jsPDF = require("jspdf").default;
+const autoTable = require("jspdf-autotable").default;
+const path = require("node:path");
+const fs = require("node:fs");
+const admzip = require("adm-zip");
 
 const LOG_PATH = "user/reportController";
 
@@ -41,18 +47,18 @@ const getReport = async (req, res) => {
       .populate(ReportRef.RECEIPT_IDS)
       .then((report) => {
         var promisses = [];
-        var receipt_ids = [];
+        var receipts = [];
         report.receipt_ids.forEach((_receipt) => {
           const promiss = new Promise((resolve, reject) => {
             _receipt.populate(ReceiptRef.CATEGORY).then((_newReceipt) => {
-              receipt_ids.push(_newReceipt);
+              receipts.push(_newReceipt);
               resolve();
             });
           });
           promisses.push(promiss);
         });
         Promise.all(promisses).then(() => {
-          report.receipt_ids = receipt_ids;
+          report.receipt_ids = receipts;
           return response(res, {
             report,
           });
@@ -66,6 +72,115 @@ const getReport = async (req, res) => {
     console.log(`${LOG_PATH}@getReport`, error);
     response(res, {}, error, 500, "Something went wrong!");
   }
+};
+
+const exportReport = async (req, res) => {
+  const { publicId } = req.body;
+
+  try {
+    Report.findOne({ public_id: publicId }).then((report) => {
+      Receipt.find({ _id: { $in: report.receipt_ids } }).then((receipts) => {
+        generatePDF(req, res, receipts);
+      });
+    });
+  } catch (error) {
+    console.log(`${LOG_PATH}@exportReport`, error);
+    response(res, {}, error, 500, "Something went wrong!");
+  }
+};
+
+const generatePDF = (req, res, receipts) => {
+  const { publicId, totalWithoutReceipt, totalPersonal, totalVat } = req.body;
+  const doc = new jsPDF();
+  const tableHeaders = [
+    "Date",
+    "Raison sociale commerçant",
+    "Amount",
+    "Currency",
+    "Vat",
+    "Country",
+    "Comment",
+  ];
+
+  var receipt_images = [];
+  var tableData = receipts.map((row) => {
+    receipt_images.push(row.image);
+    return [
+      row.issued_at,
+      row.merchant_info,
+      row.total_amount,
+      row.currency,
+      row.vat_amount,
+      row.country_code,
+      row.comment,
+    ];
+  });
+
+  tableData.push(
+    ["", "", "", "", "", "", ""],
+    ["", "Total Without Receipt", totalWithoutReceipt + " €", "", "", "", ""],
+    ["", "Total Personal", totalPersonal + " €", "", "", "", ""],
+    ["", "Total VAT", totalVat + " €", "", "", "", ""]
+  );
+
+  autoTable(doc, {
+    head: [tableHeaders],
+    body: tableData,
+    styles: {
+      fontSize: 8,
+      halign: "left",
+    },
+  });
+
+  doc.text(`Report_#${publicId}`, 14, 10);
+
+  // App_path/uploads/report
+  const BASE_DIR_PATH = path.join(path.resolve("./"), "uploads/report/");
+
+  var reportPDF_path = `./uploads/report/Report_#${publicId}_${moment().format(
+    "YYYY_MM_DD"
+  )}.pdf`;
+
+  if (!fs.existsSync(BASE_DIR_PATH)) {
+    fs.mkdir(BASE_DIR_PATH, { recursive: true }, (err) => {
+      if (err) {
+        reportPDF_path = `./uploads/Report_#${publicId}_${moment().format(
+          "YYYY_MM_DD"
+        )}.pdf`;
+      } else {
+        reportPDF_path = `./uploads/reporty/Report_#${publicId}_${moment().format(
+          "YYYY_MM_DD"
+        )}.pdf`;
+      }
+      doc.save(reportPDF_path);
+    });
+  } else {
+    doc.save(reportPDF_path);
+  }
+
+  /****** Archive Zip File (Report PDF && Receipt Images) ******/
+  archiveReportZip(res, publicId, reportPDF_path, receipts);
+};
+
+const archiveReportZip = (res, publicId, pdf, receipts) => {
+  var zip = new admzip();
+  var outputFilePath =
+    "./uploads/report/Report_#" +
+    publicId +
+    "_" +
+    moment().format("YYYY_MM_DD") +
+    ".zip";
+  zip.addLocalFile(pdf);
+  receipts.forEach((_receipt) => {
+    if (_receipt.image) {
+      zip.addLocalFile(_receipt.image);
+    }
+  });
+
+  fs.writeFileSync(outputFilePath, zip.toBuffer());
+  res.download(outputFilePath, (err) => {
+    if (err) console.log(err);
+  });
 };
 
 const approveReport = (req, res) => {
@@ -130,4 +245,5 @@ module.exports = {
   getAllReports,
   approveReport,
   closeReport,
+  exportReport,
 };

@@ -17,8 +17,6 @@ import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import { showMessage } from "app/store/fuse/messageSlice";
 import withReducer from "app/store/withReducer";
 import { motion } from "framer-motion";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -36,6 +34,7 @@ import {
   REPORT_STATUS,
   approveReport,
   closeReport,
+  exportReport,
   getReport,
 } from "./store/reportSlice";
 
@@ -129,6 +128,7 @@ const ReportPage = (props) => {
   const [totalPersonal, setTotalPersonal] = useState(0);
   const [totalVatExpense, setTotalVatExpense] = useState(0);
   const [totalVatPersonal, setTotalVatPersonal] = useState(0);
+  const [totalVat, setTotalVat] = useState(0);
 
   const theme = useTheme();
 
@@ -171,6 +171,7 @@ const ReportPage = (props) => {
       var _amountPersonal = 0;
       var _totalVatExpense = 0;
       var _totalVatPersonal = 0;
+      var _totalVat = 0;
       report.expense_ids.map((_expense) => {
         _totalVatExpense +=
           parseFloat(_expense.commission_amount_1.replace(",", ".")) +
@@ -189,6 +190,11 @@ const ReportPage = (props) => {
       });
       report.receipt_ids.map((_receipt) => {
         var matched = false;
+
+        if (_receipt.vat_amount) {
+          _totalVat += parseFloat(_receipt.vat_amount);
+        }
+
         report.expense_ids.map((_expense) => {
           if (_receipt.expense == _expense._id) {
             matched = true;
@@ -207,6 +213,7 @@ const ReportPage = (props) => {
       setTotalWithoutReceipt(adjustFloatValue(_amountWithoutReceipt));
       setTotalVatExpense(adjustFloatValue(_totalVatExpense));
       setTotalVatPersonal(adjustFloatValue(_totalVatPersonal));
+      setTotalVat(adjustFloatValue(_totalVat));
 
       setRowExpenses(_expenses);
     }
@@ -264,44 +271,28 @@ const ReportPage = (props) => {
   };
 
   const handleExportReport = () => {
-    const doc = new jsPDF();
-    const tableHeaders = [
-      "Date",
-      "Raison sociale commerçant",
-      "Amount",
-      "Currency",
-      "Vat",
-      "Country",
-      "Comment",
-    ];
-    var tableData = rowReceipts.map((row) => {
-      return [
-        toLocalTime(row.issued_at),
-        row.merchant_info,
-        row.total_amount,
-        row.currency,
-        row.vat_amount,
-        row.country_code,
-        row.comment,
-      ];
+    dispatch(
+      exportReport({
+        publicId,
+        totalWithoutReceipt,
+        totalPersonal,
+        totalVat,
+      })
+    ).then((response) => {
+      if (response?.payload?.data) {
+        const url = window.URL.createObjectURL(
+          new Blob([response.payload.data])
+        );
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute(
+          "download",
+          `Report_#${publicId}_${moment().format("YYYY_MM_DD")}.zip`
+        );
+        document.body.appendChild(link);
+        link.click();
+      }
     });
-
-    tableData.push(
-      ["", "", "", "", "", "", ""],
-      ["", "Total Without Receipt", totalWithoutReceipt, "EUR", "", "", ""],
-      ["", "Total Personal", totalPersonal, "EUR", "", "", ""]
-    );
-
-    autoTable(doc, {
-      head: [tableHeaders],
-      body: tableData,
-      styles: {
-        fontSize: 8,
-      },
-    });
-
-    doc.text(`Report_#${publicId}`, 14, 10);
-    doc.save(`Report_#${publicId}_${moment().format("YYYY_MM_DD")}.pdf`);
   };
 
   const handleCloseReport = () => {

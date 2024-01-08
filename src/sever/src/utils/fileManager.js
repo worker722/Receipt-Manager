@@ -210,7 +210,7 @@ const removeFile = (_file) => {
       if (_file.includes("public/assets")) return resolve(true);
 
       fs.unlink(_file, (err) => {
-        if (err) return reject(err);
+        if (err) throw err;
         resolve(`Deleted ${_file}`);
       });
     } catch (error) {
