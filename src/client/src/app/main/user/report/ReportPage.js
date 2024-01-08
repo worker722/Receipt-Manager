@@ -92,6 +92,30 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
       },
     },
   },
+  "& .super-app-theme--UnMatched": {
+    backgroundColor: getBackgroundColor(
+      theme.palette.info.light,
+      theme.palette.mode
+    ),
+    "&:hover": {
+      backgroundColor: getHoverBackgroundColor(
+        theme.palette.info.light,
+        theme.palette.mode
+      ),
+    },
+    "&.Mui-selected": {
+      backgroundColor: getSelectedBackgroundColor(
+        theme.palette.info.light,
+        theme.palette.mode
+      ),
+      "&:hover": {
+        backgroundColor: getSelectedHoverBackgroundColor(
+          theme.palette.info.light,
+          theme.palette.mode
+        ),
+      },
+    },
+  },
 }));
 
 const ReportPage = (props) => {
@@ -114,6 +138,8 @@ const ReportPage = (props) => {
   const [totalPersonal, setTotalPersonal] = useState(0);
   const [totalVatExpense, setTotalVatExpense] = useState(0);
   const [totalVatPersonal, setTotalVatPersonal] = useState(0);
+  const [totalExpenseWithReceipt, setTotalExpenseWithReceipt] = useState(0);
+
   // Modal
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
   const [openAddReceiptModal, setOpenAddReceiptModal] = useState(false);
@@ -156,6 +182,7 @@ const ReportPage = (props) => {
       var _amountPersonal = 0;
       var _totalVatExpense = 0;
       var _totalVatPersonal = 0;
+      var _totalExpenseWithReceipt = 0;
       report.expense_ids.map((_expense) => {
         _totalVatExpense +=
           parseFloat(_expense.commission_amount_1.replace(",", ".")) +
@@ -167,6 +194,7 @@ const ReportPage = (props) => {
         report.receipt_ids.map((_receipt) => {
           if (_receipt.expense == temp_expense._id) {
             temp_expense.matched = true;
+            _totalExpenseWithReceipt++;
             _amountWithoutReceipt -= parseFloat(_expense.amount_charged);
           }
         });
@@ -188,6 +216,7 @@ const ReportPage = (props) => {
         }
       });
 
+      setTotalExpenseWithReceipt(_totalExpenseWithReceipt);
       setTotalPersonal(adjustFloatValue(_amountPersonal));
       setTotalWithoutReceipt(adjustFloatValue(_amountWithoutReceipt));
       setTotalVatExpense(adjustFloatValue(_totalVatExpense));
@@ -317,19 +346,11 @@ const ReportPage = (props) => {
 
   const receiptColumns = [
     {
-      field: "matched",
-      headerName: "",
-      width: 20,
+      field: "status",
+      headerName: "Status",
+      width: 120,
       renderCell: (params) => {
-        const validated = params.row.expense;
-        return (
-          <FuseSvgIcon
-            className={validated ? "text-green" : "text-grey"}
-            size={20}
-          >
-            heroicons-outline:check-circle
-          </FuseSvgIcon>
-        );
+        return <ReceiptStatus value={params.row.status} />;
       },
     },
     {
@@ -343,14 +364,6 @@ const ReportPage = (props) => {
             width={50}
           ></img>
         );
-      },
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      width: 120,
-      renderCell: (params) => {
-        return <ReceiptStatus value={params.row.status} />;
       },
     },
     {
@@ -561,6 +574,11 @@ const ReportPage = (props) => {
                       columnVisibilityModel={{
                         actions: editable,
                       }}
+                      getRowClassName={(params) =>
+                        params.row.expense
+                          ? `super-app-theme--Matched`
+                          : `super-app-theme--UnMatched`
+                      }
                     />
                     <div className="pl-10">
                       <div className=" flex">

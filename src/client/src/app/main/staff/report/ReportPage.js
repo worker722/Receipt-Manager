@@ -88,6 +88,30 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
       },
     },
   },
+  "& .super-app-theme--UnMatched": {
+    backgroundColor: getBackgroundColor(
+      theme.palette.info.light,
+      theme.palette.mode
+    ),
+    "&:hover": {
+      backgroundColor: getHoverBackgroundColor(
+        theme.palette.info.light,
+        theme.palette.mode
+      ),
+    },
+    "&.Mui-selected": {
+      backgroundColor: getSelectedBackgroundColor(
+        theme.palette.info.light,
+        theme.palette.mode
+      ),
+      "&:hover": {
+        backgroundColor: getSelectedHoverBackgroundColor(
+          theme.palette.info.light,
+          theme.palette.mode
+        ),
+      },
+    },
+  },
 }));
 
 const ApproveTooltip = styled(({ className, ...props }) => (
@@ -129,6 +153,7 @@ const ReportPage = (props) => {
   const [totalVatExpense, setTotalVatExpense] = useState(0);
   const [totalVatPersonal, setTotalVatPersonal] = useState(0);
   const [totalVat, setTotalVat] = useState(0);
+  const [totalExpenseWithReceipt, setTotalExpenseWithReceipt] = useState(0);
 
   const theme = useTheme();
 
@@ -172,6 +197,7 @@ const ReportPage = (props) => {
       var _totalVatExpense = 0;
       var _totalVatPersonal = 0;
       var _totalVat = 0;
+      var _totalExpenseWithReceipt = 0;
       report.expense_ids.map((_expense) => {
         _totalVatExpense +=
           parseFloat(_expense.commission_amount_1.replace(",", ".")) +
@@ -183,6 +209,7 @@ const ReportPage = (props) => {
         report.receipt_ids.map((_receipt) => {
           if (_receipt.expense == temp_expense._id) {
             temp_expense.matched = true;
+            _totalExpenseWithReceipt++;
             _amountWithoutReceipt -= parseFloat(_expense.amount_charged);
           }
         });
@@ -209,6 +236,7 @@ const ReportPage = (props) => {
         }
       });
 
+      setTotalExpenseWithReceipt(_totalExpenseWithReceipt);
       setTotalPersonal(adjustFloatValue(_amountPersonal));
       setTotalWithoutReceipt(adjustFloatValue(_amountWithoutReceipt));
       setTotalVatExpense(adjustFloatValue(_totalVatExpense));
@@ -322,22 +350,6 @@ const ReportPage = (props) => {
 
   const receiptColumns = [
     {
-      field: "matched",
-      headerName: "",
-      width: 20,
-      renderCell: (params) => {
-        const validated = params.row.expense;
-        return (
-          <FuseSvgIcon
-            className={validated ? "text-green" : "text-grey"}
-            size={20}
-          >
-            heroicons-outline:check-circle
-          </FuseSvgIcon>
-        );
-      },
-    },
-    {
       field: "status",
       headerName: "Status",
       width: 120,
@@ -352,10 +364,23 @@ const ReportPage = (props) => {
       width: 100,
       cellClassName: "actions",
       getActions: (params) => {
+        if (params.row.expense) {
+          return [
+            <ApproveTooltip title="Approve" placement="top">
+              <GridActionsCellItem
+                icon={<VerifiedIcon sx={{ fontSize: 30 }} />}
+                label="Approve"
+                className="textPrimary"
+                onClick={() => handleApproveReceipt(params.row)}
+                color="success"
+              />
+            </ApproveTooltip>,
+          ];
+        }
         return [
           <ApproveTooltip title="Approve" placement="top">
             <GridActionsCellItem
-              icon={<VerifiedIcon />}
+              icon={<VerifiedIcon sx={{ fontSize: 30 }} />}
               label="Approve"
               className="textPrimary"
               onClick={() => handleApproveReceipt(params.row)}
@@ -364,7 +389,7 @@ const ReportPage = (props) => {
           </ApproveTooltip>,
           <RefundTooltip title="Refund" placement="top">
             <GridActionsCellItem
-              icon={<CurrencyExchangeIcon />}
+              icon={<CurrencyExchangeIcon sx={{ fontSize: 29 }} />}
               label="Refund"
               onClick={() => handleRefundReceipt(params.row)}
               color="error"
@@ -525,6 +550,11 @@ const ReportPage = (props) => {
                       columnVisibilityModel={{
                         actions: reportStatus == REPORT_STATUS.IN_REVIEW,
                       }}
+                      getRowClassName={(params) =>
+                        params.row.expense
+                          ? `super-app-theme--Matched`
+                          : `super-app-theme--UnMatched`
+                      }
                     />
                     <div className="pl-10">
                       <div className=" flex">
@@ -554,7 +584,7 @@ const ReportPage = (props) => {
                 )}
               </Paper>
               <Paper className="flex flex-col w-1/2 ml-10 p-24 mt-10 shadow rounded-2xl overflow-hidden">
-                <p>Expenses</p>
+                <p>Bank Expenses</p>
                 {rowExpenses.length > 0 && (
                   <>
                     <StyledDataGrid
@@ -578,6 +608,12 @@ const ReportPage = (props) => {
                       <p>
                         <span>VAT Total :</span>
                         <span className=" font-bold"> {totalVatExpense}</span> €
+                      </p>
+                      <p className=" float-right font-bold text-18">
+                        <span>
+                          {totalExpenseWithReceipt} /{" "}
+                          {report.expense_ids.length} Bank Expenses
+                        </span>
                       </p>
                     </div>
                   </>
