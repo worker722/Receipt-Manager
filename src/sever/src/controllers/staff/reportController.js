@@ -97,9 +97,9 @@ const generatePDF = (req, res, receipts) => {
     "Raison sociale commerçant",
     "Amount",
     "Currency",
-    "Vat 1",
-    "Vat 2",
-    "Vat 3",
+    "VAT 1",
+    "VAT 2",
+    "VAT 3",
     "Country",
     "Comment",
   ];
