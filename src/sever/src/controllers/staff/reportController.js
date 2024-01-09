@@ -23,6 +23,7 @@ const getAllReports = async (req, res) => {
       .sort({ status: 1 })
       .populate(ReportRef.EXPENSE_IDS)
       .populate(ReportRef.RECEIPT_IDS)
+      .populate(ReportRef.REPORTER)
       .then((reports) => {
         return response(res, {
           reports,
@@ -45,6 +46,7 @@ const getReport = async (req, res) => {
     Report.findOne({ public_id })
       .populate(ReportRef.EXPENSE_IDS)
       .populate(ReportRef.RECEIPT_IDS)
+      .populate(ReportRef.REPORTER)
       .then((report) => {
         var promisses = [];
         var receipts = [];
