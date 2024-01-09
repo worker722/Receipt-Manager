@@ -79,9 +79,11 @@ const exportReport = async (req, res) => {
 
   try {
     Report.findOne({ public_id: publicId }).then((report) => {
-      Receipt.find({ _id: { $in: report.receipt_ids } }).then((receipts) => {
-        generatePDF(req, res, receipts);
-      });
+      Receipt.find({ _id: { $in: report.receipt_ids } })
+        .populate(ReceiptRef.CATEGORY)
+        .then((receipts) => {
+          generatePDF(req, res, receipts);
+        });
     });
   } catch (error) {
     console.log(`${LOG_PATH}@exportReport`, error);
@@ -93,6 +95,7 @@ const generatePDF = (req, res, receipts) => {
   const { publicId, totalWithoutReceipt, totalPersonal, totalVat } = req.body;
   const doc = new jsPDF();
   const tableHeaders = [
+    "Type",
     "Date",
     "Raison sociale commerçant",
     "Amount",
@@ -108,7 +111,8 @@ const generatePDF = (req, res, receipts) => {
   var tableData = receipts.map((row) => {
     receipt_images.push(row.image);
     return [
-      row.issued_at,
+      row.category.name,
+      toLocalTime(row.issued_at),
       row.merchant_info,
       row.total_amount,
       row.currency,
@@ -242,6 +246,10 @@ const closeReport = (req, res) => {
     console.log(`${LOG_PATH}@closeReport`, error);
     response(res, {}, error, 500, "Something went wrong!");
   }
+};
+
+const toLocalTime = (time, format = "YYYY-MM-DD") => {
+  return moment(time).format(format);
 };
 
 module.exports = {
