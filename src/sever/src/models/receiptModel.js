@@ -69,6 +69,10 @@ const receiptSchema = new Schema({
   image: {
     type: String,
   },
+  is_lost: {
+    type: Boolean,
+    default: false,
+  },
   created_at: {
     type: Date,
     default: Date.now,
