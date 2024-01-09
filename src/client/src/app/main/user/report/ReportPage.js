@@ -570,7 +570,7 @@ const ReportPage = (props) => {
               )}
               <Paper className="flex flex-col w-1/2 p-24 mt-10 shadow rounded-2xl overflow-hidden">
                 <div className="flex items-center">
-                  <p className="w-full">Receipts</p>
+                  <p className="w-full text-15 font-semibold">Receipts</p>
                   {editable && (
                     <IconButton
                       className=" float-right"
@@ -642,7 +642,7 @@ const ReportPage = (props) => {
                 )}
               </Paper>
               <Paper className="flex flex-col w-1/2 ml-10 p-24 mt-10 shadow rounded-2xl overflow-hidden">
-                <p>Bank Expenses</p>
+                <p className="text-15 font-semibold">Bank Expenses</p>
                 {rowExpenses.length > 0 && (
                   <>
                     <StyledDataGrid
@@ -669,6 +669,12 @@ const ReportPage = (props) => {
                       <p>
                         <span>VAT Total :</span>
                         <span className=" font-bold"> {totalVatExpense}</span> €
+                      </p>
+                      <p className=" float-right font-semibold text-15">
+                        <span>
+                          {totalExpenseWithReceipt} /{" "}
+                          {report.expense_ids.length} Bank Expenses
+                        </span>
                       </p>
                     </div>
                   </>
