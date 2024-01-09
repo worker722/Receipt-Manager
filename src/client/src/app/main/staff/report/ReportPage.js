@@ -136,6 +136,30 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
       },
     },
   },
+  "& .super-app-theme--Lost": {
+    backgroundColor: getBackgroundColor(
+      theme.palette.secondary.light,
+      theme.palette.mode
+    ),
+    "&:hover": {
+      backgroundColor: getHoverBackgroundColor(
+        theme.palette.secondary.light,
+        theme.palette.mode
+      ),
+    },
+    "&.Mui-selected": {
+      backgroundColor: getSelectedBackgroundColor(
+        theme.palette.secondary.light,
+        theme.palette.mode
+      ),
+      "&:hover": {
+        backgroundColor: getSelectedHoverBackgroundColor(
+          theme.palette.secondary.light,
+          theme.palette.mode
+        ),
+      },
+    },
+  },
 }));
 
 const ApproveTooltip = styled(({ className, ...props }) => (
@@ -530,16 +554,18 @@ const ReportPage = (props) => {
             </div>
           </div>
           <div className=" float-right">
-            {reportStatus != REPORT_STATUS.APPROVED && allResolved && (
-              <Button
-                onClick={handleApproveReport}
-                component="label"
-                variant="contained"
-                color="primary"
-              >
-                Approve
-              </Button>
-            )}
+            {reportStatus != REPORT_STATUS.APPROVED &&
+              reportStatus != REPORT_STATUS.CLOSED &&
+              allResolved && (
+                <Button
+                  onClick={handleApproveReport}
+                  component="label"
+                  variant="contained"
+                  color="primary"
+                >
+                  Approve
+                </Button>
+              )}
             {reportStatus == REPORT_STATUS.APPROVED && (
               <div className="flex">
                 <Button
@@ -591,11 +617,13 @@ const ReportPage = (props) => {
                       columnVisibilityModel={{
                         actions: reportStatus == REPORT_STATUS.IN_REVIEW,
                       }}
-                      getRowClassName={(params) =>
-                        params.row.expense
-                          ? `super-app-theme--Matched`
-                          : `super-app-theme--Personal`
-                      }
+                      getRowClassName={(params) => {
+                        if (params.row.is_lost) {
+                          return `super-app-theme--Lost`;
+                        } else if (params.row.expense)
+                          return `super-app-theme--Matched`;
+                        return `super-app-theme--Personal`;
+                      }}
                     />
                     <div className="pl-10">
                       <div className=" flex">

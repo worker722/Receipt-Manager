@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const { DB_COLLECTION_NAME: EXPENSE } = require("./expenseModel");
 const { DB_COLLECTION_NAME: RECEIPT } = require("./receiptModel");
+const { DB_COLLECTION_NAME: USER } = require("./userModel");
 
 const STATUS = {
   IN_PROGRESS: 0,
@@ -28,6 +29,10 @@ const reportSchema = new Schema({
       ref: EXPENSE,
     },
   ],
+  reporter: {
+    type: Schema.Types.ObjectId,
+    ref: USER,
+  },
   status: {
     type: Number,
     require: true,
@@ -84,6 +89,7 @@ const Report = mongoose.model(DB_COLLECTION_NAME, reportSchema);
 const REF_NAME = {
   RECEIPT_IDS: "receipt_ids",
   EXPENSE_IDS: "expense_ids",
+  REPORTER: "reporter",
 };
 
 module.exports = { Report, DB_COLLECTION_NAME, STATUS, REF_NAME };

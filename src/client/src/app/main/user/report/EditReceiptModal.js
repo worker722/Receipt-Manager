@@ -6,8 +6,10 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import { Box, Skeleton } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
 import Slide from "@mui/material/Slide";
 import TextField from "@mui/material/TextField";
@@ -81,6 +83,7 @@ export default function EditReceiptModal({
   const [file, setFile] = useState(false);
   const [uploadedReceipt, setUploadedReceipt] = useState(false);
   const [receiptImage, setReceiptImage] = useState(false);
+  const [isLost, setLost] = useState(false);
 
   const { control, formState, handleSubmit, setValue } = useForm({
     mode: "onChange",
@@ -88,6 +91,10 @@ export default function EditReceiptModal({
     resolver: yupResolver(schema),
   });
   const { isValid, dirtyFields, errors, setError } = formState;
+
+  const handleLostChanged = () => {
+    setLost(!isLost);
+  };
 
   useEffect(() => {
     setValue("merchant_info", receipt?.merchant_info ?? "", {
@@ -134,6 +141,8 @@ export default function EditReceiptModal({
       shouldDirty: true,
       shouldValidate: true,
     });
+
+    setLost(receipt.is_lost);
 
     if (receipt.image) {
       setReceiptImage(receipt.image);
@@ -200,6 +209,7 @@ export default function EditReceiptModal({
         comment,
         country_code,
         image: receiptImage,
+        is_lost: isLost,
       })
     ).then((data) => {
       setLoading(false);
@@ -563,6 +573,26 @@ export default function EditReceiptModal({
                       required
                       fullWidth
                     />
+                  )}
+                />
+
+                <Controller
+                  name="is_lost"
+                  control={control}
+                  render={({ field }) => (
+                    <div>
+                      <FormControlLabel
+                        {...field}
+                        className="mb-12"
+                        control={
+                          <Checkbox
+                            checked={isLost}
+                            onChange={handleLostChanged}
+                          />
+                        }
+                        label="Lost Receipt?"
+                      />
+                    </div>
                   )}
                 />
 

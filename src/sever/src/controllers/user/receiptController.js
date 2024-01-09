@@ -386,6 +386,7 @@ const updateReceipt = async (req, res) => {
     vat_amount_3,
     comment,
     image,
+    is_lost,
   } = req.body;
 
   try {
@@ -405,6 +406,7 @@ const updateReceipt = async (req, res) => {
           country_code,
           comment,
           image: image ?? null,
+          is_lost,
         },
       },
       {

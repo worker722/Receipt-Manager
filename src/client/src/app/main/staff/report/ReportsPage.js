@@ -67,7 +67,13 @@ const ReportsPage = (props) => {
     {
       field: "public_id",
       headerName: "ID",
+      width: 80,
+    },
+    {
+      field: "reporter",
+      headerName: "Reporter",
       width: 100,
+      valueGetter: (params) => params?.row?.reporter?.name ?? "",
     },
     {
       field: "expense_ids",
