@@ -401,7 +401,7 @@ const updateReceipt = async (req, res) => {
           vat_amount_1,
           vat_amount_2,
           vat_amount_3,
-          currency,
+          currency: currency.toUpperCase(),
           country_code,
           comment,
           image: image ?? null,
