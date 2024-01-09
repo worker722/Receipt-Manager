@@ -18,7 +18,7 @@ const LOG_PATH = "user/reportController";
 const getAllReports = async (req, res) => {
   try {
     Report.find({
-      status: { $nin: [REPORT_STATUS.IN_PROGRESS, REPORT_STATUS.CLOSED] },
+      status: { $nin: [REPORT_STATUS.IN_PROGRESS] },
     })
       .sort({ status: 1 })
       .populate(ReportRef.EXPENSE_IDS)
@@ -225,25 +225,24 @@ const closeReport = (req, res) => {
   const { public_id } = req.body;
 
   try {
-    Report.findOne({ public_id }).then(async (report) => {
-      await Expense.updateMany(
-        { _id: { $in: report.expense_ids } },
-        { $set: { deleted_at: new Date() } }
-      ).exec();
-
-      await Receipt.updateMany(
-        { _id: { $in: report.receipt_ids } },
-        { $set: { deleted_at: new Date() } }
-      ).exec();
-
-      await Report.findByIdAndUpdate(report._id, {
+    Report.findOneAndUpdate(
+      { public_id },
+      {
         $set: {
-          deleted_at: new Date(),
+          status: REPORT_STATUS.CLOSED,
         },
-      }).exec();
-
-      return response(res, { report }, {});
-    });
+      },
+      {
+        $new: true,
+      }
+    )
+      .then((closedReport) => {
+        return response(res, { report: closedReport }, {}, 200);
+      })
+      .catch((error) => {
+        console.log(`${LOG_PATH}@approveReport`, error);
+        response(res, {}, error, 500, "Something went wrong!");
+      });
   } catch (error) {
     console.log(`${LOG_PATH}@closeReport`, error);
     response(res, {}, error, 500, "Something went wrong!");

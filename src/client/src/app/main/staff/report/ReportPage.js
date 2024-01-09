@@ -554,16 +554,18 @@ const ReportPage = (props) => {
             </div>
           </div>
           <div className=" float-right">
-            {reportStatus != REPORT_STATUS.APPROVED && allResolved && (
-              <Button
-                onClick={handleApproveReport}
-                component="label"
-                variant="contained"
-                color="primary"
-              >
-                Approve
-              </Button>
-            )}
+            {reportStatus != REPORT_STATUS.APPROVED &&
+              reportStatus != REPORT_STATUS.CLOSED &&
+              allResolved && (
+                <Button
+                  onClick={handleApproveReport}
+                  component="label"
+                  variant="contained"
+                  color="primary"
+                >
+                  Approve
+                </Button>
+              )}
             {reportStatus == REPORT_STATUS.APPROVED && (
               <div className="flex">
                 <Button

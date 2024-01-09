@@ -65,9 +65,7 @@ const getExpenses = async (req, res) => {
 
 const getAllReports = async (req, res) => {
   try {
-    Report.find({
-      status: { $nin: [REPORT_STATUS.CLOSED] },
-    })
+    Report.find({})
       .sort({ status: 1 })
       .populate(ReportRef.EXPENSE_IDS)
       .populate(ReportRef.RECEIPT_IDS)
