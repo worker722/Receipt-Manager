@@ -327,7 +327,9 @@ const createReceipt = async (req, res) => {
     amount_eur,
     currency,
     country_code,
-    vat_amount,
+    vat_amount_1,
+    vat_amount_2,
+    vat_amount_3,
     comment,
     category_id,
     report_id,
@@ -341,7 +343,9 @@ const createReceipt = async (req, res) => {
     receipt.issued_at = moment(issued_at).format("YYYY-MM-DD");
     receipt.total_amount = total_amount;
     receipt.amount_eur = amount_eur;
-    receipt.vat_amount = vat_amount;
+    receipt.vat_amount_1 = vat_amount_1;
+    receipt.vat_amount_2 = vat_amount_2;
+    receipt.vat_amount_3 = vat_amount_3;
     receipt.comment = comment;
     receipt.currency = currency.toUpperCase();
     receipt.country_code = country_code.toUpperCase();
@@ -377,7 +381,9 @@ const updateReceipt = async (req, res) => {
     amount_eur,
     currency,
     country_code,
-    vat_amount,
+    vat_amount_1,
+    vat_amount_2,
+    vat_amount_3,
     comment,
     image,
   } = req.body;
@@ -392,7 +398,9 @@ const updateReceipt = async (req, res) => {
           issued_at: moment(issued_at).format("YYYY-MM-DD"),
           total_amount,
           amount_eur,
-          vat_amount,
+          vat_amount_1,
+          vat_amount_2,
+          vat_amount_3,
           currency,
           country_code,
           comment,

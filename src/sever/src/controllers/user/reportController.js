@@ -253,9 +253,9 @@ const doMatch = (receipt, expense) => {
     // Check vat amount
     var vatAmountMatched = false;
     if (
-      receipt.vat_amount == expense.commission_amount_1 ||
-      receipt.vat_amount == expense.commission_amount_2 ||
-      receipt.vat_amount == expense.commission_amount_3
+      receipt.vat_amount_1 == expense.commission_amount_1 ||
+      receipt.vat_amount_2 == expense.commission_amount_2 ||
+      receipt.vat_amount_3 == expense.commission_amount_3
     )
       vatAmountMatched = true;
 
