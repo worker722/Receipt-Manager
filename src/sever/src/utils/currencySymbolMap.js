@@ -80,4 +80,13 @@ module.exports = currencySymbolMap = {
     code: "PLN",
     name_plural: "Polish zlotys",
   },
+  VND: {
+    symbol: "₫",
+    name: "Vietnamese Dong",
+    symbol_native: "₫",
+    decimal_digits: 0,
+    rounding: 0,
+    code: "VND",
+    name_plural: "Vietnamese dong",
+  },
 };

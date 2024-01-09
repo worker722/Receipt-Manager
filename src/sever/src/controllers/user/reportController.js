@@ -297,23 +297,27 @@ const doMatch = (receipt, expense) => {
       processDateMatched = true;
 
     // Check currency
-    var currencyMatched = false;
-    var receiptCurrency = currencySymbolMap._NONE;
-    var currencySymbolMapKeys = Object.keys(currencySymbolMap);
-    currencySymbolMapKeys.map((key) => {
+    var currencyMatched =
+      receipt.currency.toUpperCase() ==
+      expense.origin_currency_code.toUpperCase();
+    if (!currencyMatched) {
+      var receiptCurrency = currencySymbolMap._NONE;
+      var currencySymbolMapKeys = Object.keys(currencySymbolMap);
+      currencySymbolMapKeys.map((key) => {
+        if (
+          currencySymbolMap[key].code == receipt.currency ||
+          currencySymbolMap[key].symbol_native == receipt.currency
+        ) {
+          receiptCurrency = currencySymbolMap[key];
+          return;
+        }
+      });
       if (
-        currencySymbolMap[key].code == receipt.currency ||
-        currencySymbolMap[key].symbol_native == receipt.currency
-      ) {
-        receiptCurrency = currencySymbolMap[key];
-        return;
-      }
-    });
-    if (
-      receiptCurrency.code == expense.origin_currency_code ||
-      receiptCurrency.symbol_native == expense.origin_currency_code
-    )
-      currencyMatched = true;
+        receiptCurrency.code == expense.origin_currency_code ||
+        receiptCurrency.symbol_native == expense.origin_currency_code
+      )
+        currencyMatched = true;
+    }
 
     // Check country
     var countryMatched = false;
