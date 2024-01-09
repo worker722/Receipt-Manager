@@ -46,7 +46,9 @@ const defaultValues = {
   amount_eur: "",
   currency: "",
   country_code: "",
-  vat_amount: "",
+  vat_amount_1: "0",
+  vat_amount_2: "0",
+  vat_amount_3: "0",
   comment: "",
 };
 
@@ -136,7 +138,9 @@ export default function AddReceiptModal({
     amount_eur,
     currency,
     country_code,
-    vat_amount,
+    vat_amount_1,
+    vat_amount_2,
+    vat_amount_3,
     comment,
   }) => {
     setLoading(true);
@@ -148,7 +152,9 @@ export default function AddReceiptModal({
         amount_eur,
         currency,
         country_code,
-        vat_amount: category.vat_possible ? vat_amount : "",
+        vat_amount_1: category.vat_possible ? vat_amount_1 : "0",
+        vat_amount_2: category.vat_possible ? vat_amount_2 : "0",
+        vat_amount_3: category.vat_possible ? vat_amount_3 : "0",
         comment,
         report_id: report._id,
         category_id: category._id,
@@ -236,7 +242,7 @@ export default function AddReceiptModal({
       }
     }
 
-    setValue("vat_amount", vat_amount ?? "", {
+    setValue("vat_amount_1", vat_amount ?? "0", {
       shouldDirty: true,
       shouldValidate: true,
     });
@@ -424,21 +430,50 @@ export default function AddReceiptModal({
                 </div>
 
                 {category.vat_possible == true && (
-                  <Controller
-                    name="vat_amount"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        className="mb-24"
-                        label="Vat"
-                        type="number"
-                        helperText={errors?.vat_amount?.message}
-                        variant="outlined"
-                        fullWidth
-                      />
-                    )}
-                  />
+                  <div className="flex">
+                    <Controller
+                      name="vat_amount_1"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          className="mb-24 w-full"
+                          label="VAT 1"
+                          type="number"
+                          helperText={errors?.vat_amount_1?.message}
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="vat_amount_2"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          className="mb-24 w-full ml-5"
+                          label="VAT 2"
+                          type="number"
+                          helperText={errors?.vat_amount_2?.message}
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="vat_amount_3"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          className="mb-24 w-full ml-5"
+                          label="VAT 3"
+                          type="number"
+                          helperText={errors?.vat_amount_3?.message}
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </div>
                 )}
 
                 <Controller

@@ -34,8 +34,17 @@ const receiptSchema = new Schema({
   total_amount: {
     type: String,
   },
-  vat_amount: {
+  vat_amount_1: {
     type: String,
+    default: "0",
+  },
+  vat_amount_2: {
+    type: String,
+    default: "0",
+  },
+  vat_amount_3: {
+    type: String,
+    default: "0",
   },
   amount_eur: {
     type: String,

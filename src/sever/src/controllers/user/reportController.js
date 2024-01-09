@@ -260,11 +260,11 @@ const doMatch = (receipt, expense) => {
     var vatAmountMatched = false;
     try {
       if (
-        parseFloat(receipt.vat_amount) ==
+        parseFloat(receipt.vat_amount_1) ==
           parseFloat(expense.commission_amount_1) ||
-        parseFloat(receipt.vat_amount) ==
+        parseFloat(receipt.vat_amount_2) ==
           parseFloat(expense.commission_amount_2) ||
-        parseFloat(receipt.vat_amount) ==
+        parseFloat(receipt.vat_amount_3) ==
           parseFloat(expense.commission_amount_3)
       )
         vatAmountMatched = true;

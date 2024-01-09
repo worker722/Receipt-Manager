@@ -43,7 +43,9 @@ const defaultValues = {
   issued_at: new Date().toISOString().substring(0, 10),
   total_amount: "",
   amount_eur: "",
-  vat_amount: "",
+  vat_amount_1: "0",
+  vat_amount_2: "0",
+  vat_amount_3: "0",
   currency: "",
   country_code: "",
   comment: "",
@@ -108,7 +110,15 @@ export default function EditReceiptModal({
       shouldDirty: true,
       shouldValidate: true,
     });
-    setValue("vat_amount", receipt?.vat_amount ?? "", {
+    setValue("vat_amount_1", receipt?.vat_amount_1 ?? "0", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue("vat_amount_2", receipt?.vat_amount_2 ?? "0", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue("vat_amount_3", receipt?.vat_amount_3 ?? "0", {
       shouldDirty: true,
       shouldValidate: true,
     });
@@ -133,12 +143,28 @@ export default function EditReceiptModal({
   useEffect(() => {
     if (!FuseUtils.isEmpty(newCategory)) {
       if (newCategory.vat_possible) {
-        setValue("vat_amount", receipt?.vat_amount ?? "", {
+        setValue("vat_amount_1", receipt?.vat_amount_1 ?? "0", {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+        setValue("vat_amount_2", receipt?.vat_amount_2 ?? "0", {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+        setValue("vat_amount_3", receipt?.vat_amount_3 ?? "0", {
           shouldDirty: true,
           shouldValidate: true,
         });
       } else {
-        setValue("vat_amount", "", {
+        setValue("vat_amount_1", "0", {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+        setValue("vat_amount_2", "0", {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+        setValue("vat_amount_3", "0", {
           shouldDirty: true,
           shouldValidate: true,
         });
@@ -151,7 +177,9 @@ export default function EditReceiptModal({
     issued_at,
     total_amount,
     amount_eur,
-    vat_amount,
+    vat_amount_1,
+    vat_amount_2,
+    vat_amount_3,
     currency,
     comment,
     country_code,
@@ -165,7 +193,9 @@ export default function EditReceiptModal({
         issued_at,
         total_amount,
         amount_eur,
-        vat_amount,
+        vat_amount_1,
+        vat_amount_2,
+        vat_amount_3,
         currency,
         comment,
         country_code,
@@ -236,7 +266,7 @@ export default function EditReceiptModal({
     //     shouldValidate: true,
     //   });
     // }
-    setValue("vat_amount", vat_amount ?? "", {
+    setValue("vat_amount_1", vat_amount ?? "0", {
       shouldDirty: true,
       shouldValidate: true,
     });
@@ -448,22 +478,56 @@ export default function EditReceiptModal({
                 {(newCategory.vat_possible ||
                   (FuseUtils.isEmpty(newCategory) &&
                     receipt.category.vat_possible)) && (
-                  <Controller
-                    name="vat_amount"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        className="mb-24"
-                        label="Vat"
-                        type="number"
-                        error={!!errors.vat_amount}
-                        helperText={errors?.vat_amount?.message}
-                        variant="outlined"
-                        fullWidth
-                      />
-                    )}
-                  />
+                  <div className="flex">
+                    <Controller
+                      name="vat_amount_1"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          className="mb-24 w-full"
+                          label="VAT 1"
+                          type="number"
+                          error={!!errors.vat_amount_1}
+                          helperText={errors?.vat_amount_1?.message}
+                          variant="outlined"
+                          fullWidth
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="vat_amount_2"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          className="mb-24 w-full ml-5"
+                          label="VAT 2"
+                          type="number"
+                          error={!!errors.vat_amount_2}
+                          helperText={errors?.vat_amount_2?.message}
+                          variant="outlined"
+                          fullWidth
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="vat_amount_3"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          className="mb-24 w-full ml-5"
+                          label="VAT 3"
+                          type="number"
+                          error={!!errors.vat_amount_3}
+                          helperText={errors?.vat_amount_3?.message}
+                          variant="outlined"
+                          fullWidth
+                        />
+                      )}
+                    />
+                  </div>
                 )}
 
                 <Controller

@@ -194,9 +194,9 @@ const ManageExpensesPage = (props) => {
     },
     { field: "country_code", headerName: "Country", width: 80 },
     { field: "locality", headerName: "City", width: 150 },
-    { field: "commission_amount_1", headerName: "Vat 1", width: 100 },
-    { field: "commission_amount_2", headerName: "Vat 2", width: 100 },
-    { field: "commission_amount_3", headerName: "Vat 3", width: 100 },
+    { field: "commission_amount_1", headerName: "VAT 1", width: 100 },
+    { field: "commission_amount_2", headerName: "VAT 2", width: 100 },
+    { field: "commission_amount_3", headerName: "VAT 3", width: 100 },
   ];
 
   return (

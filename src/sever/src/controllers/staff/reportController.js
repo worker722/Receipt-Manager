@@ -97,7 +97,9 @@ const generatePDF = (req, res, receipts) => {
     "Raison sociale commerçant",
     "Amount",
     "Currency",
-    "Vat",
+    "VAT 1",
+    "VAT 2",
+    "VAT 3",
     "Country",
     "Comment",
   ];
@@ -110,7 +112,9 @@ const generatePDF = (req, res, receipts) => {
       row.merchant_info,
       row.total_amount,
       row.currency,
-      row.vat_amount,
+      row.vat_amount_1,
+      row.vat_amount_2,
+      row.vat_amount_3,
       row.country_code,
       row.comment,
     ];

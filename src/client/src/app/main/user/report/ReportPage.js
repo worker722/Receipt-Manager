@@ -94,6 +94,30 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   },
   "& .super-app-theme--UnMatched": {
     backgroundColor: getBackgroundColor(
+      theme.palette.warning.light,
+      theme.palette.mode
+    ),
+    "&:hover": {
+      backgroundColor: getHoverBackgroundColor(
+        theme.palette.warning.light,
+        theme.palette.mode
+      ),
+    },
+    "&.Mui-selected": {
+      backgroundColor: getSelectedBackgroundColor(
+        theme.palette.warning.light,
+        theme.palette.mode
+      ),
+      "&:hover": {
+        backgroundColor: getSelectedHoverBackgroundColor(
+          theme.palette.warning.light,
+          theme.palette.mode
+        ),
+      },
+    },
+  },
+  "& .super-app-theme--Personal": {
+    backgroundColor: getBackgroundColor(
       theme.palette.info.light,
       theme.palette.mode
     ),
@@ -211,8 +235,16 @@ const ReportPage = (props) => {
         if (!matched && _receipt.amount_eur) {
           _amountPersonal += parseFloat(_receipt.amount_eur);
         }
-        if (!matched && _receipt.vat_amount) {
-          _totalVatPersonal += parseFloat(_receipt.vat_amount);
+        if (
+          !matched &&
+          (_receipt.vat_amount_1 ||
+            _receipt.vat_amount_2 ||
+            _receipt.vat_amount_3)
+        ) {
+          _totalVatPersonal +=
+            parseFloat(_receipt.vat_amount_1) +
+            parseFloat(_receipt.vat_amount_2) +
+            parseFloat(_receipt.vat_amount_3);
         }
       });
 
@@ -379,7 +411,9 @@ const ReportPage = (props) => {
     },
     { field: "amount_eur", headerName: "Amount EUR", width: 100 },
     { field: "total_amount", headerName: "Amount", width: 100 },
-    { field: "vat_amount", headerName: "Vat", width: 100 },
+    { field: "vat_amount_1", headerName: "VAT 1", width: 100 },
+    { field: "vat_amount_2", headerName: "VAT 2", width: 100 },
+    { field: "vat_amount_3", headerName: "VAT 3", width: 100 },
     { field: "currency", headerName: "Currency", width: 100 },
     { field: "country_code", headerName: "Country", width: 100 },
     {
@@ -464,9 +498,9 @@ const ReportPage = (props) => {
     },
     { field: "country_code", headerName: "Country", width: 100 },
     { field: "locality", headerName: "City", width: 150 },
-    { field: "commission_amount_1", headerName: "Vat 1", width: 100 },
-    { field: "commission_amount_2", headerName: "Vat 2", width: 100 },
-    { field: "commission_amount_3", headerName: "Vat 3", width: 100 },
+    { field: "commission_amount_1", headerName: "VAT 1", width: 100 },
+    { field: "commission_amount_2", headerName: "VAT 2", width: 100 },
+    { field: "commission_amount_3", headerName: "VAT 3", width: 100 },
   ];
 
   return (
@@ -559,7 +593,7 @@ const ReportPage = (props) => {
                       getRowId={(row) => row._id}
                       initialState={{
                         pagination: {
-                          paginationModel: { page: 0, pageSize: 10 },
+                          paginationModel: { page: 0, pageSize: 5 },
                         },
                       }}
                       pagination
@@ -577,7 +611,7 @@ const ReportPage = (props) => {
                       getRowClassName={(params) =>
                         params.row.expense
                           ? `super-app-theme--Matched`
-                          : `super-app-theme--UnMatched`
+                          : `super-app-theme--Personal`
                       }
                     />
                     <div className="pl-10">
@@ -608,7 +642,7 @@ const ReportPage = (props) => {
                 )}
               </Paper>
               <Paper className="flex flex-col w-1/2 ml-10 p-24 mt-10 shadow rounded-2xl overflow-hidden">
-                <p>Expenses</p>
+                <p>Bank Expenses</p>
                 {rowExpenses.length > 0 && (
                   <>
                     <StyledDataGrid
@@ -617,7 +651,7 @@ const ReportPage = (props) => {
                       getRowId={(row) => row._id}
                       initialState={{
                         pagination: {
-                          paginationModel: { page: 0, pageSize: 10 },
+                          paginationModel: { page: 0, pageSize: 5 },
                         },
                       }}
                       hideFooterSelectedRowCount
@@ -625,8 +659,11 @@ const ReportPage = (props) => {
                       getRowClassName={(params) =>
                         params.row.matched
                           ? `super-app-theme--Matched`
-                          : `super-app-theme`
+                          : `super-app-theme--UnMatched`
                       }
+                      columnVisibilityModel={{
+                        matched: editable,
+                      }}
                     />
                     <div className="pl-10">
                       <p>
