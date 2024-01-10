@@ -12,6 +12,7 @@ const autoTable = require("jspdf-autotable").default;
 const path = require("node:path");
 const fs = require("node:fs");
 const admzip = require("adm-zip");
+const _ = require("lodash");
 
 const LOG_PATH = "user/reportController";
 
@@ -95,13 +96,14 @@ const exportReport = async (req, res) => {
 
 const generatePDF = (req, res, receipts) => {
   const { publicId, totalWithoutReceipt, totalPersonal, totalVat } = req.body;
+
   const doc = new jsPDF();
-  const tableHeaders = [
+  const receiptTableHeaders = [
     "Type",
     "Date",
     "Raison sociale commerçant",
-    "Amount",
-    "Currency",
+    "Amount EUR",
+    "Amount Currency",
     "VAT 1",
     "VAT 2",
     "VAT 3",
@@ -109,15 +111,17 @@ const generatePDF = (req, res, receipts) => {
     "Comment",
   ];
 
+  const categoryTableHeaders = ["Name", "NB", "HT", "VAT"];
+
   var receipt_images = [];
-  var tableData = receipts.map((row) => {
+  var receiptTableData = receipts.map((row) => {
     receipt_images.push(row.image);
     return [
       row.category.name,
       toLocalTime(row.issued_at),
       row.merchant_info,
-      row.total_amount,
-      row.currency,
+      row.amount_eur + " €",
+      row.total_amount + " " + row.currency,
       row.vat_amount_1,
       row.vat_amount_2,
       row.vat_amount_3,
@@ -126,23 +130,57 @@ const generatePDF = (req, res, receipts) => {
     ];
   });
 
-  tableData.push(
+  receiptTableData.push(
     ["", "", "", "", "", "", ""],
     ["", "Total Without Receipt", totalWithoutReceipt + " €", "", "", "", ""],
     ["", "Total Personal", totalPersonal + " €", "", "", "", ""],
     ["", "Total VAT", totalVat + " €", "", "", "", ""]
   );
 
+  doc.text(`Report_#${publicId}`, 14, 10);
+
   autoTable(doc, {
-    head: [tableHeaders],
-    body: tableData,
+    head: [receiptTableHeaders],
+    body: receiptTableData,
     styles: {
       fontSize: 8,
       halign: "left",
     },
   });
 
-  doc.text(`Report_#${publicId}`, 14, 10);
+  const groupReceiptByCategory = _.groupBy(receipts, "category._id");
+
+  var categoryTableData = Object.keys(groupReceiptByCategory).map((key) => {
+    const _receipt = groupReceiptByCategory[key];
+    const _totalAmount = _.sumBy(_receipt, function (o) {
+      return parseFloat(o.total_amount);
+    });
+    const _totalVAT = _.sumBy(_receipt, function (o) {
+      return (
+        parseFloat(o.vat_amount_1) +
+        parseFloat(o.vat_amount_2) +
+        parseFloat(o.vat_amount_3)
+      );
+    });
+    return [
+      _receipt[0].category.name,
+      _receipt.length,
+      adjustFloatValue(_totalAmount) + " €",
+      adjustFloatValue(_totalVAT) + " €",
+    ];
+  });
+
+  doc.text("Summary by Category", 15, doc.autoTable.previous.finalY + 15);
+
+  autoTable(doc, {
+    head: [categoryTableHeaders],
+    body: categoryTableData,
+    styles: {
+      fontSize: 8,
+      halign: "left",
+    },
+    startY: doc.autoTable.previous.finalY + 20,
+  });
 
   // App_path/uploads/report
   const BASE_DIR_PATH = path.join(path.resolve("./"), "uploads/report/");
@@ -251,6 +289,10 @@ const closeReport = (req, res) => {
 
 const toLocalTime = (time, format = "YYYY-MM-DD") => {
   return moment(time).format(format);
+};
+
+const adjustFloatValue = (value) => {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
 };
 
 module.exports = {
