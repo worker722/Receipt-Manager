@@ -1,3 +1,4 @@
+import { Server } from "@constants";
 import FuseLoading from "@fuse/core/FuseLoading";
 import FusePageSimple from "@fuse/core/FusePageSimple";
 import FuseSvgIcon from "@fuse/core/FuseSvgIcon";
@@ -421,6 +422,19 @@ const ReportPage = (props) => {
       },
     },
     {
+      field: "type",
+      headerName: "Type",
+      width: 80,
+      renderCell: (params) => {
+        return (
+          <img
+            src={`${Server.SERVER_URL}/${params.row.category.photo}`}
+            width={50}
+          ></img>
+        );
+      },
+    },
+    {
       field: "actions",
       type: "actions",
       headerName: "Actions",
@@ -566,8 +580,9 @@ const ReportPage = (props) => {
                   Approve
                 </Button>
               )}
-            {reportStatus == REPORT_STATUS.APPROVED && (
-              <div className="flex">
+            <div className="flex">
+              {(reportStatus == REPORT_STATUS.APPROVED ||
+                reportStatus == REPORT_STATUS.CLOSED) && (
                 <Button
                   onClick={handleExportReport}
                   component="label"
@@ -577,6 +592,8 @@ const ReportPage = (props) => {
                 >
                   Export
                 </Button>
+              )}
+              {reportStatus == REPORT_STATUS.APPROVED && (
                 <Button
                   className=" ml-10"
                   onClick={handleCloseReport}
@@ -586,8 +603,8 @@ const ReportPage = (props) => {
                 >
                   Close
                 </Button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       }
