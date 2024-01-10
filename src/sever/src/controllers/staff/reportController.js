@@ -153,7 +153,7 @@ const generatePDF = (req, res, receipts) => {
   var categoryTableData = Object.keys(groupReceiptByCategory).map((key) => {
     const _receipt = groupReceiptByCategory[key];
     const _totalAmount = _.sumBy(_receipt, function (o) {
-      return parseFloat(o.total_amount);
+      return parseFloat(o.amount_eur);
     });
     const _totalVAT = _.sumBy(_receipt, function (o) {
       return (
