@@ -353,7 +353,6 @@ const submitReport = (req, res) => {
       {
         $set: {
           status: REPORT_STATUS.IN_REVIEW,
-          reporter: req.currentUser._id,
         },
       },
       {
