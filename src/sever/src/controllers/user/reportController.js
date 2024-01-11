@@ -65,7 +65,7 @@ const getExpenses = async (req, res) => {
 
 const getAllReports = async (req, res) => {
   try {
-    Report.find({})
+    Report.find({ reporter: req.currentUser._id })
       .sort({ status: 1 })
       .populate(ReportRef.EXPENSE_IDS)
       .populate(ReportRef.RECEIPT_IDS)
@@ -127,6 +127,7 @@ const createReport = async (req, res) => {
     const newReport = new Report();
     newReport.expense_ids = expense_ids;
     newReport.public_id = 0;
+    newReport.reporter = req.currentUser._id;
 
     newReport
       .save()
