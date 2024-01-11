@@ -104,7 +104,14 @@ const createExpense = async (req, res) => {
               assignee_id,
               newExpenseFile._id
             );
-            const expenses = await Expense.insertMany(parsedData);
+            var correctData = [];
+            parsedData.forEach((_item) => {
+              if (!_item.sold_at) {
+                _item.sold_at = _item.treatmented_at;
+              }
+              correctData.push(_item);
+            });
+            const expenses = await Expense.insertMany(correctData);
             return response(res, { expenses }, {}, 200);
           }
           return response(res, { expenses: [] }, {}, 200);
