@@ -24,7 +24,11 @@ import { Controller, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import * as yup from "yup";
-import { updateReceipt, uploadReceipt } from "./store/receiptSlice";
+import {
+  RECEIPT_STATUS,
+  updateReceipt,
+  uploadReceipt,
+} from "./store/receiptSlice";
 
 /**
  * Form Validation Schema
@@ -76,6 +80,7 @@ export default function EditReceiptModal({
   handleClose = {},
   handleAdded = {},
   handleOpenCategoryModal = {},
+  fromStaff = false,
 }) {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
@@ -84,6 +89,7 @@ export default function EditReceiptModal({
   const [uploadedReceipt, setUploadedReceipt] = useState(false);
   const [receiptImage, setReceiptImage] = useState(false);
   const [isLost, setLost] = useState(false);
+  const [disabled, setDisabled] = useState(false);
 
   const { control, formState, handleSubmit, setValue } = useForm({
     mode: "onChange",
@@ -143,6 +149,15 @@ export default function EditReceiptModal({
     });
 
     setLost(receipt.is_lost);
+
+    if (fromStaff) {
+      setDisabled(true);
+    } else {
+      setDisabled(
+        receipt.status != RECEIPT_STATUS.IN_PROGRESS &&
+          receipt.status != RECEIPT_STATUS.REFUNDED
+      );
+    }
 
     if (receipt.image) {
       setReceiptImage(receipt.image);
@@ -332,12 +347,12 @@ export default function EditReceiptModal({
               <CloseIcon />
             </IconButton>
             <Typography sx={{ ml: 2 }} variant="h6" component="div">
-              Edit Receipt
+              {disabled ? "Show Receipt" : "Edit Receipt"}
             </Typography>
             <Typography
               sx={{ ml: 5, flex: 1 }}
               component="div"
-              onClick={_handleChangeCategory}
+              onClick={() => !disabled && _handleChangeCategory()}
             >
               <img
                 src={`${Server.SERVER_URL}/${
@@ -352,7 +367,7 @@ export default function EditReceiptModal({
           <div className=" flex pl-112 pr-112 h-full ">
             <div
               name={"fileUploadForm"}
-              onClick={handleUpload}
+              onClick={() => !disabled && handleUpload()}
               className="border-grey-600 border-solid rounded-6 border-2 cursor-pointer	justify-center items-center w-1/2	"
             >
               {!loading && receiptImage && (
@@ -408,6 +423,7 @@ export default function EditReceiptModal({
                       variant="outlined"
                       required
                       fullWidth
+                      disabled={disabled}
                     />
                   )}
                 />
@@ -425,6 +441,7 @@ export default function EditReceiptModal({
                       variant="outlined"
                       rows={5}
                       fullWidth
+                      disabled={disabled}
                       multiline
                     />
                   )}
@@ -444,6 +461,7 @@ export default function EditReceiptModal({
                       variant="outlined"
                       required
                       fullWidth
+                      disabled={disabled}
                     />
                   )}
                 />
@@ -463,6 +481,7 @@ export default function EditReceiptModal({
                         variant="outlined"
                         required
                         fullWidth
+                        disabled={disabled}
                       />
                     )}
                   />
@@ -480,6 +499,7 @@ export default function EditReceiptModal({
                         variant="outlined"
                         required
                         fullWidth
+                        disabled={disabled}
                       />
                     )}
                   />
@@ -502,6 +522,7 @@ export default function EditReceiptModal({
                           helperText={errors?.vat_amount_1?.message}
                           variant="outlined"
                           fullWidth
+                          disabled={disabled}
                         />
                       )}
                     />
@@ -518,6 +539,7 @@ export default function EditReceiptModal({
                           helperText={errors?.vat_amount_2?.message}
                           variant="outlined"
                           fullWidth
+                          disabled={disabled}
                         />
                       )}
                     />
@@ -534,6 +556,7 @@ export default function EditReceiptModal({
                           helperText={errors?.vat_amount_3?.message}
                           variant="outlined"
                           fullWidth
+                          disabled={disabled}
                         />
                       )}
                     />
@@ -554,6 +577,7 @@ export default function EditReceiptModal({
                       variant="outlined"
                       required
                       fullWidth
+                      disabled={disabled}
                     />
                   )}
                 />
@@ -572,6 +596,7 @@ export default function EditReceiptModal({
                       variant="outlined"
                       required
                       fullWidth
+                      disabled={disabled}
                     />
                   )}
                 />
@@ -588,6 +613,7 @@ export default function EditReceiptModal({
                           <Checkbox
                             checked={isLost}
                             onChange={handleLostChanged}
+                            disabled={disabled}
                           />
                         }
                         label="Lost Receipt?"
@@ -596,29 +622,31 @@ export default function EditReceiptModal({
                   )}
                 />
 
-                <Box>
-                  <Button
-                    variant="outlined"
-                    color={"error"}
-                    className="w-full mt-20"
-                    disabled={loading}
-                    aria-label="Cancel"
-                    onClick={_onClose}
-                  >
-                    Cancel
-                  </Button>
-                  <LoadingButton
-                    loading={loading}
-                    variant="contained"
-                    color="success"
-                    className=" w-full mt-10 "
-                    aria-label="Create"
-                    type="submit"
-                    disabled={_.isEmpty(dirtyFields) || !isValid}
-                  >
-                    Update
-                  </LoadingButton>
-                </Box>
+                {!disabled && (
+                  <Box>
+                    <Button
+                      variant="outlined"
+                      color={"error"}
+                      className="w-full mt-20"
+                      disabled={loading}
+                      aria-label="Cancel"
+                      onClick={_onClose}
+                    >
+                      Cancel
+                    </Button>
+                    <LoadingButton
+                      loading={loading}
+                      variant="contained"
+                      color="success"
+                      className=" w-full mt-10 "
+                      aria-label="Create"
+                      type="submit"
+                      disabled={_.isEmpty(dirtyFields) || !isValid}
+                    >
+                      Update
+                    </LoadingButton>
+                  </Box>
+                )}
               </form>
             </div>
           </div>

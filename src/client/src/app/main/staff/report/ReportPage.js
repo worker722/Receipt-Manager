@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { Link, useParams } from "react-router-dom";
+import EditReceiptModal from "../../user/report/EditReceiptModal";
 import ReceiptStatus from "./ReceiptStatus";
 import ReportStatus from "./ReportStatus";
 import reducer from "./store";
@@ -204,6 +205,9 @@ const ReportPage = (props) => {
   const [totalVat, setTotalVat] = useState(0);
   const [totalExpenseWithReceipt, setTotalExpenseWithReceipt] = useState(0);
 
+  const [currentReceipt, setCurrentReceipt] = useState({});
+  const [openEditReceiptModal, setOpenEditReceiptModal] = useState(false);
+
   const theme = useTheme();
 
   const dispatch = useDispatch();
@@ -313,6 +317,19 @@ const ReportPage = (props) => {
 
   const adjustFloatValue = (value) => {
     return Math.round((value + Number.EPSILON) * 100) / 100;
+  };
+
+  const handleDoubleClick = (params) => {
+    handleEditReceipt(params.row);
+  };
+
+  const handleEditReceipt = (_receipt) => {
+    setCurrentReceipt(_receipt);
+    setOpenEditReceiptModal(true);
+  };
+
+  const handleCloseEditReceiptModal = () => {
+    setOpenEditReceiptModal(false);
   };
 
   const handleApproveReceipt = (row) => {
@@ -634,6 +651,7 @@ const ReportPage = (props) => {
                       columnVisibilityModel={{
                         actions: reportStatus == REPORT_STATUS.IN_REVIEW,
                       }}
+                      onRowDoubleClick={handleDoubleClick}
                       getRowClassName={(params) => {
                         if (params.row.is_lost) {
                           return `super-app-theme--Lost`;
@@ -705,6 +723,15 @@ const ReportPage = (props) => {
                   </>
                 )}
               </Paper>
+
+              {openEditReceiptModal && (
+                <EditReceiptModal
+                  receipt={currentReceipt}
+                  open={openEditReceiptModal}
+                  handleClose={handleCloseEditReceiptModal}
+                  fromStaff
+                />
+              )}
             </div>
           )}
         </div>

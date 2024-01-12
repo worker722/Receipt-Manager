@@ -30,11 +30,7 @@ import ExpenseCategoryModal from "./ExpenseCategoryModal";
 import ReceiptStatus from "./ReceiptStatus";
 import ReportStatus from "./ReportStatus";
 import reducer from "./store";
-import {
-  RECEIPT_STATUS,
-  deleteReceipt,
-  getCategories,
-} from "./store/receiptSlice";
+import { deleteReceipt, getCategories } from "./store/receiptSlice";
 import {
   REPORT_STATUS,
   getReport,
@@ -623,12 +619,7 @@ const ReportPage = (props) => {
                       pagination
                       hideFooterSelectedRowCount
                       pageSizeOptions={[5, 10]}
-                      onRowDoubleClick={(rowParams) =>
-                        editable &&
-                        (rowParams.row.status == RECEIPT_STATUS.IN_PROGRESS ||
-                          rowParams.row.status == RECEIPT_STATUS.REFUNDED) &&
-                        handleDoubleClick(rowParams)
-                      }
+                      onRowDoubleClick={handleDoubleClick}
                       columnVisibilityModel={{
                         actions: editable,
                       }}
