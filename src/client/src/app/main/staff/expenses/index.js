@@ -241,6 +241,7 @@ const ManageExpensesPage = (props) => {
               color="primary"
               className=" float-right"
               startIcon={<CloudUploadIcon />}
+              disabled={!currentUser._id}
             >
               Upload
               <VisuallyHiddenInput
