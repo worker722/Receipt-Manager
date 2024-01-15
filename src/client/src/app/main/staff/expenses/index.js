@@ -110,11 +110,14 @@ const ManageExpensesPage = (props) => {
       const { message = "" } = data.payload;
       if (!FuseUtils.isEmpty(message)) {
         _showMessage(message, "error");
+        setLoading(false);
       } else {
         const { users } = data.payload;
         if (users.length > 0 && users[0].userData.length > 0) {
           setUsers(users[0].userData);
           setCurrentUser(users[0].userData[0]);
+        } else {
+          setLoading(false);
         }
       }
     });
@@ -251,33 +254,35 @@ const ManageExpensesPage = (props) => {
       }
       content={
         <>
-          <List
-            dense
-            sx={{
-              minWidth: 260,
-              maxWidth: 260,
-              bgcolor: "background.paper",
-              overflow: "auto",
-              maxHeight: "100%",
-            }}
-          >
-            {users.map((value) => {
-              const labelId = `checkbox-list-secondary-label-${value._id}`;
-              return (
-                <ListItem key={value._id} disablePadding>
-                  <ListItemButton
-                    selected={value._id == currentUser._id}
-                    onClick={() => setCurrentUser(value)}
-                  >
-                    <ListItemAvatar>
-                      <Avatar alt={value.name} />
-                    </ListItemAvatar>
-                    <ListItemText id={labelId} primary={value.name} />
-                  </ListItemButton>
-                </ListItem>
-              );
-            })}
-          </List>
+          {users.length > 0 && (
+            <List
+              dense
+              sx={{
+                minWidth: 260,
+                maxWidth: 260,
+                bgcolor: "background.paper",
+                overflow: "auto",
+                maxHeight: "100%",
+              }}
+            >
+              {users.map((value) => {
+                const labelId = `checkbox-list-secondary-label-${value._id}`;
+                return (
+                  <ListItem key={value._id} disablePadding>
+                    <ListItemButton
+                      selected={value._id == currentUser._id}
+                      onClick={() => setCurrentUser(value)}
+                    >
+                      <ListItemAvatar>
+                        <Avatar alt={value.name} />
+                      </ListItemAvatar>
+                      <ListItemText id={labelId} primary={value.name} />
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })}
+            </List>
+          )}
           <div style={{ width: "100%", overflowX: "auto" }}>
             {loading ? (
               <FuseLoading />
