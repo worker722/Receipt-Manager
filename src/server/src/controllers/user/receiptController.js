@@ -341,11 +341,11 @@ const createReceipt = async (req, res) => {
     receipt.category = category_id;
     receipt.merchant_info = merchant_info;
     receipt.issued_at = moment(issued_at).format("YYYY-MM-DD");
-    receipt.total_amount = total_amount;
-    receipt.amount_eur = amount_eur;
-    receipt.vat_amount_1 = vat_amount_1;
-    receipt.vat_amount_2 = vat_amount_2;
-    receipt.vat_amount_3 = vat_amount_3;
+    receipt.total_amount = validateNumber(total_amount);
+    receipt.amount_eur = validateNumber(amount_eur);
+    receipt.vat_amount_1 = validateNumber(vat_amount_1);
+    receipt.vat_amount_2 = validateNumber(vat_amount_2);
+    receipt.vat_amount_3 = validateNumber(vat_amount_3);
     receipt.comment = comment;
     receipt.currency = currency.toUpperCase();
     receipt.country_code = country_code.toUpperCase();
@@ -397,11 +397,11 @@ const updateReceipt = async (req, res) => {
           category: category_id,
           merchant_info,
           issued_at: moment(issued_at).format("YYYY-MM-DD"),
-          total_amount,
-          amount_eur,
-          vat_amount_1,
-          vat_amount_2,
-          vat_amount_3,
+          total_amount: validateNumber(total_amount),
+          amount_eur: validateNumber(amount_eur),
+          vat_amount_1: validateNumber(vat_amount_1),
+          vat_amount_2: validateNumber(vat_amount_2),
+          vat_amount_3: validateNumber(vat_amount_3),
           currency: currency.toUpperCase(),
           country_code,
           comment,
@@ -443,6 +443,10 @@ const deleteReceipt = async (req, res) => {
     console.log(`${LOG_PATH}@deleteReceipt`, error);
     response(res, {}, error, 500, "Something went wrong!");
   }
+};
+
+const validateNumber = (value) => {
+  return !value || value == "" || value == null ? "0" : value;
 };
 
 module.exports = {

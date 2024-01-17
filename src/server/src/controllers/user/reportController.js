@@ -333,8 +333,13 @@ const doMatch = (receipt, expense) => {
     /**************Check whole matching**************/
     /***********************************************/
 
-    // If total amount and currency, date are correct, passed now;
-    if (totalAmountMatched && currencyMatched && processDateMatched) {
+    // If merchant, total amount, currency, date are correct, passed now;
+    if (
+      merchantMatched &&
+      totalAmountMatched &&
+      currencyMatched &&
+      processDateMatched
+    ) {
       return true;
     }
     return false;
