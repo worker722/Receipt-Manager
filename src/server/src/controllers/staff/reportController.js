@@ -82,6 +82,14 @@ const exportReport = async (req, res) => {
 
   try {
     Report.findOne({ public_id: publicId }).then((report) => {
+      if (report.zip_file) {
+        if (fs.existsSync(report.zip_file)) {
+          res.download(report.zip_file, (err) => {
+            if (err) console.log(err);
+          });
+          return;
+        }
+      }
       Receipt.find({ _id: { $in: report.receipt_ids } })
         .populate(ReceiptRef.CATEGORY)
         .then((receipts) => {
@@ -99,6 +107,7 @@ const generatePDF = (req, res, receipts) => {
 
   const doc = new jsPDF();
   const receiptTableHeaders = [
+    "ID",
     "Type",
     "Date",
     "Raison sociale commerçant",
@@ -114,9 +123,10 @@ const generatePDF = (req, res, receipts) => {
   const categoryTableHeaders = ["Name", "NB", "HT", "VAT"];
 
   var receipt_images = [];
-  var receiptTableData = receipts.map((row) => {
+  var receiptTableData = receipts.map((row, index) => {
     receipt_images.push(row.image);
     return [
+      `#${index + 1}`,
       row.category.name,
       toLocalTime(row.issued_at),
       row.merchant_info,
@@ -182,29 +192,8 @@ const generatePDF = (req, res, receipts) => {
     startY: doc.autoTable.previous.finalY + 20,
   });
 
-  // App_path/uploads/report
-  const BASE_DIR_PATH = path.join(path.resolve("./"), "uploads/report/");
-
-  var reportPDF_path = `./uploads/report/Report_#${publicId}_${moment().format(
-    "YYYY_MM_DD"
-  )}.pdf`;
-
-  if (!fs.existsSync(BASE_DIR_PATH)) {
-    fs.mkdir(BASE_DIR_PATH, { recursive: true }, (err) => {
-      if (err) {
-        reportPDF_path = `./uploads/Report_#${publicId}_${moment().format(
-          "YYYY_MM_DD"
-        )}.pdf`;
-      } else {
-        reportPDF_path = `./uploads/reporty/Report_#${publicId}_${moment().format(
-          "YYYY_MM_DD"
-        )}.pdf`;
-      }
-      doc.save(reportPDF_path);
-    });
-  } else {
-    doc.save(reportPDF_path);
-  }
+  var reportPDF_path = `./uploads/report/${publicId}/Report_#${publicId}.pdf`;
+  doc.save(reportPDF_path);
 
   /****** Archive Zip File (Report PDF && Receipt Images) ******/
   archiveReportZip(res, publicId, reportPDF_path, receipts);
@@ -212,12 +201,7 @@ const generatePDF = (req, res, receipts) => {
 
 const archiveReportZip = (res, publicId, pdf, receipts) => {
   var zip = new admzip();
-  var outputFilePath =
-    "./uploads/report/Report_#" +
-    publicId +
-    "_" +
-    moment().format("YYYY_MM_DD") +
-    ".zip";
+  var outputFilePath = `./uploads/report/${publicId}/Report_#${publicId}.zip`;
   zip.addLocalFile(pdf);
   receipts.forEach((_receipt) => {
     if (_receipt.image) {
@@ -226,8 +210,21 @@ const archiveReportZip = (res, publicId, pdf, receipts) => {
   });
 
   fs.writeFileSync(outputFilePath, zip.toBuffer());
-  res.download(outputFilePath, (err) => {
-    if (err) console.log(err);
+
+  Report.findOneAndUpdate(
+    { public_id: publicId },
+    {
+      $set: {
+        zip_file: outputFilePath,
+      },
+    },
+    {
+      $new: true,
+    }
+  ).then((updateReport) => {
+    res.download(outputFilePath, (err) => {
+      if (err) console.log(err);
+    });
   });
 };
 
@@ -246,8 +243,24 @@ const approveReport = (req, res) => {
         $new: true,
       }
     )
+      .populate(ReportRef.RECEIPT_IDS)
       .then((updatedReport) => {
-        return response(res, { report: updatedReport }, {}, 200);
+        const BASE_DIR_PATH = path.join(
+          path.resolve("./"),
+          `uploads/report/${public_id}`
+        );
+
+        if (!fs.existsSync(BASE_DIR_PATH)) {
+          fs.mkdir(BASE_DIR_PATH, { recursive: true }, (error) => {
+            if (error) {
+              console.log(`${LOG_PATH}@approveReport`, error);
+              return response(res, {}, error, 500, "Something went wrong!");
+            }
+            processReceiptFiles(res, updatedReport);
+          });
+        } else {
+          processReceiptFiles(res, updatedReport);
+        }
       })
       .catch((error) => {
         console.log(`${LOG_PATH}@approveReport`, error);
@@ -257,6 +270,39 @@ const approveReport = (req, res) => {
     console.log(`${LOG_PATH}@approveReport`, error);
     response(res, {}, error, 500, "Something went wrong!");
   }
+};
+
+const processReceiptFiles = (res, updatedReport) => {
+  const promises = [];
+  updatedReport.receipt_ids.forEach((_receipt, index) => {
+    promises.push(
+      renameFile(
+        _receipt,
+        `uploads/report/${updatedReport.public_id}/Receipt_${index + 1}.png`
+      )
+    );
+  });
+  Promise.all(promises).then(() => {
+    return response(res, { report: updatedReport }, {}, 200);
+  });
+};
+
+const renameFile = (receipt, dst) => {
+  return new Promise((resolve, reject) => {
+    fs.rename(receipt.image, dst, (err) => {
+      if (!err) {
+        Receipt.findByIdAndUpdate(receipt._id, {
+          $set: {
+            image: dst,
+          },
+        }).then(() => {
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
+  });
 };
 
 const closeReport = (req, res) => {

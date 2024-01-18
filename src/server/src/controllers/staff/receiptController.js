@@ -23,9 +23,11 @@ const approveReceipt = async (req, res) => {
       {
         new: true,
       }
-    ).then((updatedReceipt) => {
-      return response(res, { receipt: updatedReceipt }, {}, 200);
-    });
+    )
+      .populate(REF_NAME.CATEGORY)
+      .then((updatedReceipt) => {
+        return response(res, { receipt: updatedReceipt }, {}, 200);
+      });
   } catch (error) {
     console.log(`${LOG_PATH}@approveReceipt`, error);
     response(res, {}, error, 500, "Something went wrong!");
@@ -52,9 +54,11 @@ const refundReceipt = async (req, res) => {
       {
         new: true,
       }
-    ).then((updatedReceipt) => {
-      return response(res, { receipt: updatedReceipt }, {}, 200);
-    });
+    )
+      .populate(REF_NAME.CATEGORY)
+      .then((updatedReceipt) => {
+        return response(res, { receipt: updatedReceipt }, {}, 200);
+      });
   } catch (error) {
     console.log(`${LOG_PATH}@refundReceipt`, error);
     response(res, {}, error, 500, "Something went wrong!");

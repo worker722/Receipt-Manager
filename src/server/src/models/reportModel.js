@@ -33,6 +33,9 @@ const reportSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: USER,
   },
+  zip_file: {
+    type: String,
+  },
   status: {
     type: Number,
     require: true,

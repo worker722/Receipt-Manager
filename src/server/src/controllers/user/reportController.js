@@ -12,6 +12,8 @@ const {
 } = require("../../models/reportModel");
 const { response, fileManager, currencySymbolMap } = require("../../utils");
 const moment = require("moment");
+const path = require("node:path");
+const fs = require("node:fs");
 
 const LOG_PATH = "user/reportController";
 
@@ -137,6 +139,12 @@ const createReport = async (req, res) => {
           { $set: { report: savedReport._id } },
           { upsert: true }
         ).exec();
+
+        const BASE_DIR_PATH = path.join(path.resolve("./"), `uploads/report`);
+
+        if (!fs.existsSync(BASE_DIR_PATH)) {
+          fs.mkdir(BASE_DIR_PATH, { recursive: true }, (error) => {});
+        }
 
         return response(res, {
           report: savedReport,
