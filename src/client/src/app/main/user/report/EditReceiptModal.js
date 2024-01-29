@@ -245,7 +245,7 @@ export default function EditReceiptModal({
   const handleUpload = (event) => {
     if (event.detail == 2) {
       if (uploadInputRef?.current) {
-        uploadInputRef.current.click();
+        if (!disabled) uploadInputRef.current.click();
       }
     }
   };
@@ -367,7 +367,7 @@ export default function EditReceiptModal({
           <div className=" flex pl-112 pr-112 h-full ">
             <div
               name={"fileUploadForm"}
-              onClick={() => !disabled && handleUpload()}
+              onClick={handleUpload}
               className="border-grey-600 border-solid rounded-6 border-2 cursor-pointer	justify-center items-center w-1/2	"
             >
               {!loading && receiptImage && (
