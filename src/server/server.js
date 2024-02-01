@@ -7,6 +7,9 @@ const dotenv = require("dotenv");
 const path = require("path");
 
 const routes = require("./src/routes");
+const {
+  clearNullDateExpenses,
+} = require("./src/controllers/staff/expensesController");
 
 const app = express();
 
@@ -56,3 +59,5 @@ connectDB()
 async function connectDB() {
   await mongoose.connect(DB_CONNECTION_URL);
 }
+
+clearNullDateExpenses();

@@ -183,7 +183,7 @@ const expenseSchema = new Schema({
 
 // For new column, you need to add that new correct value array
 const match_fields = {
-  treatmented_at: ["date traitement"],
+  treatmented_at: ["date traitement", "date d'achat"],
   contracting_by_number: ["numero contractant"],
   contract_number: ["numero contrat"],
   operation_location_code: ["code lieu opération"],
@@ -200,7 +200,10 @@ const match_fields = {
   amount_charged: ["montant imputé"],
   origin_currency_code: ["code devise origine"],
   total_amount_original_currency: ["montant brut devise origine"],
-  trader_company_name: ["raison sociale commerçant"],
+  trader_company_name: [
+    "raison sociale commerçant",
+    "raison sociale commercant",
+  ],
   code_department: ["code département"],
   country_code: ["code pays"],
   locality: ["localite"],

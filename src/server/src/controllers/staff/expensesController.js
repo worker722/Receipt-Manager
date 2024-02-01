@@ -106,10 +106,10 @@ const createExpense = async (req, res) => {
             );
             var correctData = [];
             parsedData.forEach((_item) => {
-              if (!_item.sold_at) {
+              if (!_item.sold_at && _item.treatmented_at) {
                 _item.sold_at = _item.treatmented_at;
               }
-              correctData.push(_item);
+              if (_item.sold_at) correctData.push(_item);
             });
             const expenses = await Expense.insertMany(correctData);
             return response(res, { expenses }, {}, 200);
@@ -125,8 +125,14 @@ const createExpense = async (req, res) => {
   }
 };
 
+const clearNullDateExpenses = async () => {
+  await Expense.deleteMany({ sold_at: null });
+  return true;
+};
+
 module.exports = {
   getUsers,
   getAll,
   createExpense,
+  clearNullDateExpenses,
 };
