@@ -15,6 +15,7 @@ module.exports = currencySymbolMap = {
     decimal_digits: 2,
     rounding: 0,
     code: "USD",
+    numeric: 840,
     name_plural: "US dollars",
   },
   EUR: {
@@ -24,6 +25,7 @@ module.exports = currencySymbolMap = {
     decimal_digits: 2,
     rounding: 0,
     code: "EUR",
+    numeric: 978,
     name_plural: "euros",
   },
   GBP: {
@@ -33,6 +35,7 @@ module.exports = currencySymbolMap = {
     decimal_digits: 2,
     rounding: 0,
     code: "GBP",
+    numeric: 826,
     name_plural: "British pounds sterling",
   },
   CHF: {
@@ -42,6 +45,7 @@ module.exports = currencySymbolMap = {
     decimal_digits: 2,
     rounding: 0.05,
     code: "CHF",
+    numeric: 756,
     name_plural: "Swiss francs",
   },
   CNY: {
@@ -51,6 +55,7 @@ module.exports = currencySymbolMap = {
     decimal_digits: 2,
     rounding: 0,
     code: "CNY",
+    numeric: 156,
     name_plural: "Chinese yuan",
   },
   JPY: {
@@ -60,6 +65,7 @@ module.exports = currencySymbolMap = {
     decimal_digits: 0,
     rounding: 0,
     code: "JPY",
+    numeric: 392,
     name_plural: "Japanese yen",
   },
   KRW: {
@@ -69,6 +75,7 @@ module.exports = currencySymbolMap = {
     decimal_digits: 0,
     rounding: 0,
     code: "KRW",
+    numeric: 410,
     name_plural: "South Korean won",
   },
   PLN: {
@@ -78,6 +85,7 @@ module.exports = currencySymbolMap = {
     decimal_digits: 2,
     rounding: 0,
     code: "PLN",
+    numeric: 985,
     name_plural: "Polish zlotys",
   },
   VND: {
@@ -87,6 +95,7 @@ module.exports = currencySymbolMap = {
     decimal_digits: 0,
     rounding: 0,
     code: "VND",
+    numeric: 704,
     name_plural: "Vietnamese dong",
   },
 };

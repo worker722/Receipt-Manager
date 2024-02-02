@@ -4,8 +4,7 @@ const { User, REF_NAME } = require("../../models/userModel");
 const Role = require("../../models/roleModel");
 const { response, fileManager } = require("../../utils");
 const XLSX = require("xlsx");
-const mongoose = require("mongoose");
-const ObjectId = mongoose.Types.ObjectId;
+const { response, fileManager, currencySymbolMap } = require("../../utils");
 
 const LOG_PATH = "staff/expensesController";
 
@@ -105,7 +104,23 @@ const createExpense = async (req, res) => {
               newExpenseFile._id
             );
             var correctData = [];
+
+            const currencySymbolMapKeys = Object.keys(currencySymbolMap);
             parsedData.forEach((_item) => {
+              // If currency code is ISO 4217 format numberic, convert to String Symbol
+              if (
+                !isNaN(_item.origin_currency_code) &&
+                !isNaN(parseFloat(_item.origin_currency_code))
+              ) {
+                currencySymbolMapKeys.map((key) => {
+                  if (
+                    parseInt(currencySymbolMap[key].numeric) ==
+                    parseInt(_item.origin_currency_code)
+                  ) {
+                    _item.origin_currency_code = currencySymbolMap[key].code;
+                  }
+                });
+              }
               if (!_item.sold_at && _item.treatmented_at) {
                 _item.sold_at = _item.treatmented_at;
               }
